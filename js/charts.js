@@ -85,28 +85,54 @@ export function renderPortfolioDayChart() {
   const canvas = document.getElementById('portfolioDayChart');
   if (!wrap || !canvas) return;
 
-  // Aggregate 5-min intraday ticks across all holdings
-  // dayHistories[ticker] = [{ time: "09:15", ts, price }, ...]
+  // Aggregate 5-min intraday ticks across all holdings.
+  // KEY FIX: stocks don't tick at the same timestamps. Naively summing only
+  // stocks present at each slot causes wild swings as stocks drop in/out.
+  // Solution: collect the union of all time slots, then for each stock
+  // carry its last known price forward into any gap (forward-fill per stock).
   const holdings = Object.values(state.holdings);
-  const timeMap  = {}; // "HH:MM" → total portfolio value
 
+  // Step 1 — collect union of all time slots
+  const allTimesSet = new Set();
   holdings.forEach((h) => {
     const ticks = state.dayHistories[h.ticker];
-    if (!ticks || !ticks.length) return;
-    ticks.forEach(({ time, price }) => {
-      if (!timeMap[time]) timeMap[time] = 0;
-      timeMap[time] += price * h.totalQty;
-    });
+    if (ticks && ticks.length) ticks.forEach(({ time }) => allTimesSet.add(time));
   });
 
-  const sortedTimes = Object.keys(timeMap).sort();
+  const sortedTimes = [...allTimesSet].sort();
   if (!sortedTimes.length) {
     noDataMsg(wrap, 'Intraday data unavailable for today');
     return;
   }
 
-  const values = sortedTimes.map((t) => Math.round(timeMap[t]));
-  const isUp   = values.length > 1 && values[values.length - 1] >= values[0];
+  // Step 2 — accumulate portfolio value per time slot with forward-fill per stock
+  const values = new Array(sortedTimes.length).fill(0);
+
+  holdings.forEach((h) => {
+    const ticks = state.dayHistories[h.ticker];
+    const fallbackPrice = state.livePrices[h.ticker] || h.avgBuy;
+
+    if (!ticks || !ticks.length) {
+      // No intraday data — use live/avgBuy as flat contribution
+      sortedTimes.forEach((_, i) => { values[i] += fallbackPrice * h.totalQty; });
+      return;
+    }
+
+    // Build tick lookup for this stock
+    const tickMap = {};
+    ticks.forEach(({ time, price }) => { tickMap[time] = price; });
+
+    // Walk all slots, carrying last price forward so no slot is ever missing this stock
+    let lastPrice = null;
+    sortedTimes.forEach((t, i) => {
+      if (tickMap[t] != null) lastPrice = tickMap[t];
+      // Only start counting once we have a first tick for this stock
+      if (lastPrice != null) values[i] += lastPrice * h.totalQty;
+    });
+  });
+
+  const roundedValues = values.map(Math.round);
+  const isUp   = roundedValues.length > 1 && roundedValues[roundedValues.length - 1] >= roundedValues[0];
   const color  = isUp ? '#22c55e' : '#ef4444';
 
   if (state.portfolioDayChartInstance) state.portfolioDayChartInstance.destroy();
@@ -118,7 +144,7 @@ export function renderPortfolioDayChart() {
 
   state.portfolioDayChartInstance = new Chart(ctx, {
     type: 'line',
-    data: { labels: sortedTimes, datasets: [{ data: values, borderColor: color,
+    data: { labels: sortedTimes, datasets: [{ data: roundedValues, borderColor: color,
       borderWidth: 2, backgroundColor: grad, fill: true,
       pointRadius: 0, pointHoverRadius: 4, tension: 0.2 }] },
     options: {
