@@ -122,15 +122,15 @@ export async function fetchDayHistory(ticker) {
     const meta = result?.meta || {};
 
     const series = timestamps
-      .map((ts, i) => ({
-        time: new Date(ts * 1000).toLocaleTimeString('en-IN', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        }),
-        ts,
-        price: closes[i],
-      }))
+      .map((ts, i) => {
+        const d = new Date(ts * 1000);
+        // Use zero-padded HH:MM built from Date methods — toLocaleTimeString
+        // is locale-dependent and can produce '9:15' vs '09:15' inconsistently
+        // across browsers, causing slots to mismatch when aggregating.
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return { time: `${hh}:${mm}`, ts, price: closes[i] };
+      })
       .filter((x) => x.price != null);
 
     const previousClose = meta?.chartPreviousClose ?? meta?.previousClose ?? null;
