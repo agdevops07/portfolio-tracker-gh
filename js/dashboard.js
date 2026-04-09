@@ -276,18 +276,8 @@ function renderHoldingCards(holdings, totalCurrent) {
     const currentVal  = lp ? lp * h.totalQty : null;
     const pnlVal      = currentVal != null ? currentVal - h.invested : null;
     const pnlPct      = pnlVal != null ? (pnlVal / h.invested) * 100 : null;
-
-    // ✅ FIX: keep raw allocation separate
-    const allocPct = totalCurrent && currentVal 
-      ? (currentVal / totalCurrent) * 100 
-      : null;
-
-    // ✅ FIX: separate UI scaling (for bar only)
-    const allocBarWidth = allocPct != null 
-      ? Math.min(100, allocPct * 2) 
-      : 10;
-
-    const color = COLORS[i % COLORS.length];
+    const allocPct    = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
+    const color       = COLORS[i % COLORS.length];
 
     // Today's change
     const todayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
@@ -296,7 +286,6 @@ function renderHoldingCards(holdings, totalCurrent) {
     const card = document.createElement('div');
     card.className = 'holding-card';
     card.onclick = () => import('./drilldown.js').then((m) => m.openDrilldown(h.ticker));
-
     card.innerHTML = `
       <div class="hc-top">
         <div>
@@ -312,40 +301,26 @@ function renderHoldingCards(holdings, totalCurrent) {
           </div>
         </div>
       </div>
-
       <div class="hc-bar-bg">
-        <div class="hc-bar" style="width:${allocBarWidth}%;background:${color}"></div>
+        <div class="hc-bar" style="width:${allocPct ? Math.min(100, allocPct * 2) : 10}%;background:${color}"></div>
       </div>
-
       <div class="hc-bottom">
         <div><div class="hc-meta-label">Invested</div><div class="hc-meta-val">${fmt(h.invested)}</div></div>
         <div><div class="hc-meta-label">Current</div><div class="hc-meta-val">${currentVal ? fmt(currentVal) : '—'}</div></div>
         <div><div class="hc-meta-label">Live Price</div><div class="hc-meta-val">${lp ? lp.toFixed(2) : '—'}</div></div>
-
         <div>
           <div class="hc-meta-label">Today</div>
           <div class="hc-meta-val" style="color:${todayChgPct != null ? colorPnl(todayChgPct) : 'var(--text2)'}">
             ${todayChgPct != null ? pct(todayChgPct) : '—'}
           </div>
         </div>
-
         <div>
           <div class="hc-meta-label">Day P&amp;L</div>
           <div class="hc-meta-val" style="color:${todayChgAbs != null ? colorPnl(todayChgAbs) : 'var(--text2)'}">
             ${todayChgAbs != null ? (todayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(todayChgAbs)) : '—'}
           </div>
         </div>
-
-        <!-- ✅ FIX: rounded allocation display -->
-        <div>
-          <div class="hc-meta-label">Allocation</div>
-          <div class="hc-meta-val">
-            ${allocPct != null ? allocPct.toFixed(1) + '%' : '—'}
-          </div>
-        </div>
-      </div>
-    `;
-
+      </div>`;
     grid.appendChild(card);
   });
 }
