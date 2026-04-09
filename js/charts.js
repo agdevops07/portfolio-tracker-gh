@@ -110,11 +110,13 @@ export function renderPortfolioDayChart() {
 
   holdings.forEach((h) => {
     const ticks = state.dayHistories[h.ticker];
-    const fallbackPrice = state.livePrices[h.ticker] || h.avgBuy;
+    // Seed with live price (or avgBuy) so slots BEFORE the first tick still
+    // include this stock's full value — prevents the "stock joins late" swing.
+    const seedPrice = state.livePrices[h.ticker] || h.avgBuy;
 
     if (!ticks || !ticks.length) {
-      // No intraday data — use live/avgBuy as flat contribution
-      sortedTimes.forEach((_, i) => { values[i] += fallbackPrice * h.totalQty; });
+      // No intraday data — flat line at seed price all day
+      sortedTimes.forEach((_, i) => { values[i] += seedPrice * h.totalQty; });
       return;
     }
 
@@ -122,12 +124,13 @@ export function renderPortfolioDayChart() {
     const tickMap = {};
     ticks.forEach(({ time, price }) => { tickMap[time] = price; });
 
-    // Walk all slots, carrying last price forward so no slot is ever missing this stock
-    let lastPrice = null;
+    // Seed lastPrice BEFORE the loop — this is the key fix.
+    // Without seeding, stocks that start ticking late cause the total to
+    // jump up suddenly (not a price move, just the stock "joining" the sum).
+    let lastPrice = seedPrice;
     sortedTimes.forEach((t, i) => {
       if (tickMap[t] != null) lastPrice = tickMap[t];
-      // Only start counting once we have a first tick for this stock
-      if (lastPrice != null) values[i] += lastPrice * h.totalQty;
+      values[i] += lastPrice * h.totalQty;
     });
   });
 
