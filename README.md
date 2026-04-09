@@ -50,7 +50,7 @@ AAPL,15,175.00,2023-03-01,
 | `quantity` | ✅ | Number of shares |
 | `average_buy_price` | ✅ | Your average purchase price |
 | `buy_date` | Optional | Format: `YYYY-MM-DD` |
-| `upstoxTicker` | Optional | ISIN for Upstox data (ignored in this version) |
+| `upstoxTicker` | Optional | ISIN for Upstox data (Required for SME stocks to fetch Historical Data) |
 
 After editing the CSV, commit and push — the site updates within a minute.
 
