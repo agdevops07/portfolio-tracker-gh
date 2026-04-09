@@ -20,12 +20,9 @@
     <div class="drop-title">Drop your CSV here</div>
     <div class="drop-sub">Supports ticker, quantity, average_buy_price,<br>buy_date columns</div>
     <input type="file" id="file-input" accept=".csv">
-    <div style="display:flex;gap:12px;">
-      <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
-      <button class="btn btn-primary" onclick="loadMyPortfolio()">Load Portfolio</button>
-    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
     <div class="or-divider">or</div>
-    <button class="sample-btn" onclick="loadSampleData()">Load sample portfolio</button>
+    <button class="sample-btn" onclick="loadMyPortfolio()">Load sample portfolio</button>
   </div>
   <div class="format-hint">
     <details>
