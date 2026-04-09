@@ -70,6 +70,21 @@ export async function loadMyPortfolio() {
   }
 }
 
+// ── Date normalizer — converts any common format to YYYY-MM-DD ──────────────
+function normalizeDate(raw) {
+  if (!raw) return '';
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  // DD-MM-YYYY or DD/MM/YYYY
+  const dmY = raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if (dmY) return `${dmY[3]}-${dmY[2].padStart(2,'0')}-${dmY[1].padStart(2,'0')}`;
+  // MM-DD-YYYY or MM/DD/YYYY (US format — less likely but handle it)
+  // Fallback: try native Date parse
+  const d = new Date(raw);
+  if (!isNaN(d)) return d.toISOString().split('T')[0];
+  return raw;
+}
+
 // ── CSV processing ───────────────────────────────
 export function processCSV(rows) {
   const errDiv = document.getElementById('preview-error');
@@ -89,7 +104,7 @@ export function processCSV(rows) {
     if (!ticker) { errors.push(`Row ${i + 1}: missing ticker`); return; }
     if (!qty || qty <= 0) { errors.push(`Row ${i + 1}: invalid quantity`); return; }
 
-    clean.push({ ticker, qty, avg, date: date.trim(), upstoxTicker: upstoxTicker || null });
+    clean.push({ ticker, qty, avg, date: normalizeDate(date.trim()), upstoxTicker: upstoxTicker || null });
   });
 
   if (errors.length) {

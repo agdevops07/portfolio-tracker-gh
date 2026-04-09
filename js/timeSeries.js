@@ -29,29 +29,52 @@ export function forwardFill(series) {
 
 /**
  * Build a daily portfolio value time series from individual stock histories.
+ * For stocks with no history (e.g. SME), uses avgBuy as a constant price
+ * so they are never silently dropped from the portfolio value.
  * @param {{ [ticker: string]: { [date: string]: number } }} histories
  * @returns {Promise<Array<{ date: string, value: number }>>}
  */
 export async function buildTimeSeries(histories) {
   const holdings = Object.values(state.holdings);
 
-  // Collect all dates across all stocks
+  // Collect all dates from stocks that HAVE history
   const allDates = new Set();
   holdings.forEach((h) => {
     const hist = histories[h.ticker];
-    if (hist) Object.keys(hist).forEach((d) => allDates.add(d));
+    if (hist && Object.keys(hist).length > 0) {
+      Object.keys(hist).forEach((d) => allDates.add(d));
+    }
   });
 
+  if (!allDates.size) return [];
+
   const sortedDates = [...allDates].sort();
-  if (!sortedDates.length) return [];
+
+  // For each stock with no history, generate a flat series from its earliestDate
+  // using avgBuy, covering the same date range as the portfolio
+  const augmented = { ...histories };
+  holdings.forEach((h) => {
+    const hist = histories[h.ticker];
+    if (!hist || Object.keys(hist).length === 0) {
+      // Build flat series at avgBuy from earliestDate onwards
+      const flatSeries = {};
+      sortedDates.forEach((d) => {
+        if (!h.earliestDate || d >= h.earliestDate) {
+          flatSeries[d] = h.avgBuy;
+        }
+      });
+      augmented[h.ticker] = flatSeries;
+    }
+  });
 
   const result = sortedDates
     .map((date) => {
       let value = 0;
       holdings.forEach((h) => {
-        const hist = histories[h.ticker];
+        // Skip dates before this stock was purchased
+        if (h.earliestDate && date < h.earliestDate) return;
+        const hist = augmented[h.ticker];
         if (!hist) return;
-        if (h.earliestDate && date < h.earliestDate) return; // only count after purchase
         const price = hist[date];
         if (price != null) value += price * h.totalQty;
       });

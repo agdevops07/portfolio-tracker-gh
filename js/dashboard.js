@@ -38,20 +38,28 @@ export async function loadDashboard() {
       tickers.map(async (ticker) => {
         const h = state.holdings[ticker];
         const hist = await fetchHistory(h.ticker, h.upstoxTicker, '2y');
-        return { ticker, data: hist ? forwardFill(hist) : null };
+        // hist may be empty {} for SME stocks — forwardFill handles that gracefully
+        const filled = (hist && Object.keys(hist).length > 0) ? forwardFill(hist) : {};
+        return { ticker, data: filled };
       })
     );
     const histories = {};
-    historyResults.forEach(({ ticker, data }) => { if (data) histories[ticker] = data; });
+    // Always store, even if empty — buildTimeSeries uses avgBuy fallback for empty ones
+    historyResults.forEach(({ ticker, data }) => { histories[ticker] = data; });
 
     // 2. Live prices + prevClose (parallel) — must run BEFORE intraday so prevClose is set
     loadMsg.textContent = 'Fetching live prices…';
     const priceResults = await Promise.all(
       tickers.map(async (ticker) => {
         let price = await fetchPrice(ticker);
-        if (!price && histories[ticker]) {
+        if (!price && histories[ticker] && Object.keys(histories[ticker]).length > 0) {
+          // Use last known close from history
           const dates = Object.keys(histories[ticker]).sort();
           price = histories[ticker][dates[dates.length - 1]];
+        }
+        if (!price) {
+          // Final fallback for SME stocks with no data at all: use avgBuy
+          price = state.holdings[ticker]?.avgBuy ?? null;
         }
         return { ticker, price };
       })
@@ -96,9 +104,12 @@ export async function refreshPricesOnly() {
   await Promise.all(
     tickers.map(async (ticker) => {
       let price = await fetchPrice(ticker);
-      if (!price && state.histories[ticker]) {
+      if (!price && state.histories[ticker] && Object.keys(state.histories[ticker]).length > 0) {
         const dates = Object.keys(state.histories[ticker]).sort();
         price = state.histories[ticker][dates[dates.length - 1]];
+      }
+      if (!price) {
+        price = state.holdings[ticker]?.avgBuy ?? null;
       }
       state.livePrices[ticker] = price;
     })

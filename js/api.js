@@ -43,6 +43,38 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
   const key = `${ticker}_${upstoxTicker || ''}_${range}`;
   if (state.historyCache[key]) return state.historyCache[key];
 
+  // 1. Try Upstox public historical API for stocks that have an ISIN (SME stocks)
+  if (upstoxTicker) {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const fromDate = new Date();
+      fromDate.setFullYear(fromDate.getFullYear() - 2);
+      const from = fromDate.toISOString().split('T')[0];
+      const upstoxUrl = `https://api.upstox.com/v2/historical-candle/NSE_EQ|${upstoxTicker}/day/${today}/${from}`;
+      const res = await fetch(proxyUrl(upstoxUrl));
+      if (res.ok) {
+        const data = await res.json();
+        const candles = data?.data?.candles || [];
+        if (candles.length > 0) {
+          const today = new Date().toISOString().split('T')[0];
+          const series = {};
+          // Upstox format: [datetime, open, high, low, close, volume, oi]
+          candles.forEach(c => {
+            const date = c[0].split('T')[0];
+            if (date !== today && c[4] != null) series[date] = c[4];
+          });
+          if (Object.keys(series).length > 0) {
+            state.historyCache[key] = series;
+            return series;
+          }
+        }
+      }
+    } catch (e) {
+      // Upstox failed (likely needs auth), fall through to Yahoo
+    }
+  }
+
+  // 2. Try Yahoo Finance
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=${range}`;
     const res = await fetch(proxyUrl(url));
@@ -61,12 +93,17 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
       }
     });
 
-    state.historyCache[key] = series;
-    return series;
+    if (Object.keys(series).length > 0) {
+      state.historyCache[key] = series;
+      return series;
+    }
   } catch (e) {
-    console.error('fetchHistory failed:', ticker, e);
-    return null;
+    console.warn('fetchHistory Yahoo failed:', ticker, e);
   }
+
+  // 3. No data from any source — return empty, dashboard will use avgBuy fallback
+  state.historyCache[key] = {};
+  return {};
 }
 
 // ── Intraday (5-min) data for day charts ─────────
