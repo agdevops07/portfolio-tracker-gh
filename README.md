@@ -10,7 +10,7 @@ A fully client-side portfolio tracker. No server, no backend. Works from any sta
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/portfolio-tracker.git
+git remote add origin https://github.com/YOUR_USERNAME/portfolio-tracker-gh.git
 git push -u origin main
 ```
 
