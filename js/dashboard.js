@@ -320,6 +320,8 @@ function renderHoldingCards(holdings, totalCurrent) {
             ${todayChgAbs != null ? (todayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(todayChgAbs)) : '—'}
           </div>
         </div>
+        <div><div class="hc-meta-label">Allocation</div><div class="hc-meta-val">${allocPct ? Math.min(100, allocPct * 2) : 10}%</div></div>
+
       </div>`;
     grid.appendChild(card);
   });
