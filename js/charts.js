@@ -42,7 +42,9 @@ function formatDateLabel(dateStr) {
 }
 
 // ── Portfolio custom date state ──────────────────
-const portCustom = { active: false, from: null, to: null };
+// Default: 31 March 2026 → today
+const _today = new Date().toISOString().split('T')[0];
+const portCustom = { active: true, from: '2026-03-31', to: _today };
 
 function filterPortfolioCustom(from, to) {
   const all = state.fullTimeSeries;
@@ -65,11 +67,31 @@ function updatePortPeriodChg(series) {
 
 // ── Portfolio history chart ───────────────────────
 export function renderPortfolioChart(filter) {
+  // Pre-populate date inputs with defaults if empty
+  const portFromEl = document.getElementById('port-from');
+  const portToEl   = document.getElementById('port-to');
+  if (portFromEl && !portFromEl.value) portFromEl.value = portCustom.from;
+  if (portToEl   && !portToEl.value)   portToEl.value   = portCustom.to;
+
   let series;
-  if (filter === 'CUSTOM' && portCustom.from && portCustom.to) {
+  // Treat first render (filter='1Y' from state default) as CUSTOM too
+  if (portCustom.active && portCustom.from && portCustom.to) {
     series = filterPortfolioCustom(portCustom.from, portCustom.to);
+    // Activate the CUSTOM button visually on first render
+    if (filter !== 'CUSTOM') {
+      const customBtn = document.querySelector('.tf-btn[onclick*="CUSTOM"]');
+      if (customBtn) {
+        customBtn.closest('.time-filters')?.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+        customBtn.classList.add('active');
+      }
+      // Show the custom date picker
+      const customWrap = document.getElementById('port-custom-wrap');
+      if (customWrap) customWrap.style.display = 'flex';
+    }
+  } else if (filter === 'CUSTOM') {
+    series = state.fullTimeSeries; // fallback if no dates set
   } else {
-    series = filterTimeSeries(filter === 'CUSTOM' ? '1Y' : filter);
+    series = filterTimeSeries(filter);
   }
 
   const rawDates = series.map(p => p.date);
@@ -116,17 +138,20 @@ export function renderPortfolioChart(filter) {
 
 export function setTimeFilter(filter, btn) {
   state.currentFilter = filter;
-  // Only clear portfolio chart filter buttons
+  // Only clear portfolio chart filter buttons (within same .time-filters parent)
   const portFilters = btn.closest('.time-filters');
   if (portFilters) portFilters.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
   const customWrap = document.getElementById('port-custom-wrap');
   if (filter === 'CUSTOM') {
+    portCustom.active = true;
     if (customWrap) customWrap.style.display = 'flex';
+    // If dates already set, render immediately
+    if (portCustom.from && portCustom.to) renderPortfolioChart('CUSTOM');
   } else {
-    if (customWrap) customWrap.style.display = 'none';
     portCustom.active = false;
+    if (customWrap) customWrap.style.display = 'none';
     renderPortfolioChart(filter);
   }
 }

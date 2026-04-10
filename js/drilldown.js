@@ -14,42 +14,66 @@ const DEFAULT_FROM = '2026-03-31';
 const ddFilter = { value: 'CUSTOM', customFrom: DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
 
 // ── Fetch stock fundamentals from Yahoo Finance ──
+// NOTE FOR NEXT SESSION:
+// Yahoo Finance quoteSummary is blocked via corsproxy for Indian stocks (.NS).
+// Better alternative: scrape Screener.in which has full fundamentals for NSE stocks.
+// URL pattern: https://www.screener.in/company/{SYMBOL}/  (strip .NS from ticker)
+// Key fields available: P/E, Market Cap, 52W High/Low, Book Value, Dividend Yield,
+// ROCE, ROE, Debt/Equity, Sales/Profit growth, Promoter holding, etc.
+// The page is public (no auth needed) and scrapable via corsproxy + DOMParser.
+// Example: ticker "RELIANCE.NS" → fetch "https://www.screener.in/company/RELIANCE/"
+//
+// Yahoo Finance alternative endpoint (sometimes works):
+// https://query1.finance.yahoo.com/v7/finance/quote?symbols=TICKER
+// (returns marketCap, trailingPE, fiftyTwoWeekHigh/Low in a single call)
 async function fetchFundamentals(ticker) {
   const PROXY = 'https://corsproxy.io/?url=';
-  const urls = [
-    `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=summaryDetail,defaultKeyStatistics,assetProfile,price`,
-    `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=summaryDetail,defaultKeyStatistics,assetProfile,price`,
+
+  // Try Yahoo v7/finance/quote first (lighter, more reliable than quoteSummary)
+  const v7urls = [
+    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=marketCap,trailingPE,fiftyTwoWeekHigh,fiftyTwoWeekLow,trailingEps,priceToBook,beta,averageVolume,dividendYield`,
+    `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=marketCap,trailingPE,fiftyTwoWeekHigh,fiftyTwoWeekLow,trailingEps,priceToBook,beta,averageVolume,dividendYield`,
   ];
 
-  for (const url of urls) {
+  for (const url of v7urls) {
     try {
       const res = await fetch(PROXY + encodeURIComponent(url));
       if (!res.ok) continue;
       const data = await res.json();
-      const result = data?.quoteSummary?.result?.[0];
-      if (!result) continue;
+      const q = data?.quoteResponse?.result?.[0];
+      if (!q) continue;
 
-      const sd  = result.summaryDetail || {};
-      const ks  = result.defaultKeyStatistics || {};
-      const ap  = result.assetProfile || {};
-      const pr  = result.price || {};
+      const fmt = (v, decimals = 2) => v != null ? Number(v).toFixed(decimals) : null;
+      const fmtLarge = (v) => {
+        if (v == null) return null;
+        if (v >= 1e12) return (v / 1e12).toFixed(2) + 'T';
+        if (v >= 1e9)  return (v / 1e9).toFixed(2) + 'B';
+        if (v >= 1e7)  return '₹' + (v / 1e7).toFixed(1) + 'Cr';
+        return v.toLocaleString('en-IN');
+      };
 
       return {
-        marketCap:       pr.marketCap?.fmt || sd.marketCap?.fmt || null,
-        peRatio:         sd.trailingPE?.fmt || pr.trailingPE?.fmt || null,
-        week52High:      sd.fiftyTwoWeekHigh?.fmt || null,
-        week52Low:       sd.fiftyTwoWeekLow?.fmt || null,
-        sector:          ap.sector || null,
-        industry:        ap.industry || null,
-        dividendYield:   sd.dividendYield?.fmt || null,
-        beta:            sd.beta?.fmt || null,
-        eps:             ks.trailingEps?.fmt || null,
-        bookValue:       ks.bookValue?.fmt || null,
-        priceToBook:     ks.priceToBook?.fmt || null,
-        avgVolume:       sd.averageVolume?.fmt || null,
+        marketCap:     fmtLarge(q.marketCap),
+        peRatio:       fmt(q.trailingPE),
+        week52High:    fmt(q.fiftyTwoWeekHigh),
+        week52Low:     fmt(q.fiftyTwoWeekLow),
+        eps:           fmt(q.trailingEps),
+        priceToBook:   fmt(q.priceToBook),
+        beta:          fmt(q.beta),
+        avgVolume:     q.averageVolume ? Number(q.averageVolume).toLocaleString('en-IN') : null,
+        dividendYield: q.dividendYield != null ? (q.dividendYield * 100).toFixed(2) + '%' : null,
+        sector:        q.sector || null,
+        industry:      q.industry || null,
       };
     } catch (e) { /* try next */ }
   }
+
+  // TODO (next session): scrape Screener.in as fallback
+  // const sym = ticker.replace('.NS','').replace('.BO','');
+  // const screenerUrl = `https://www.screener.in/company/${sym}/`;
+  // const html = await fetch(PROXY + encodeURIComponent(screenerUrl)).then(r => r.text());
+  // parse with DOMParser — li[data-source] items contain all ratios
+
   return null;
 }
 
@@ -58,7 +82,14 @@ function renderFundamentals(ticker, fund) {
   if (!el) return;
 
   if (!fund) {
-    el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Fundamentals unavailable</div>';
+    const sym = ticker.replace('.NS','').replace('.BO','');
+    el.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">
+      Fundamentals unavailable via API for this stock.
+      <a href="https://www.screener.in/company/${sym}/" target="_blank"
+         style="color:var(--accent2);text-decoration:none;margin-left:6px;">
+        View on Screener.in ↗
+      </a>
+    </div>`;
     return;
   }
 

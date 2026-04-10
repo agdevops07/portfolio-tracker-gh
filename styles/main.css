@@ -215,10 +215,10 @@ tr:hover td { background: var(--bg3); }
 .modal-box {
   background: var(--bg2);
   border: 1px solid var(--border2);
-  border-radius: 18px;
-  width: 100%;
-  max-width: 98vw;
-  max-height: 95vh;
+  border-radius: 14px;
+  width: 90vw;
+  max-width: 1000px;
+  max-height: 75vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -233,12 +233,12 @@ tr:hover td { background: var(--bg3); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  padding: 0.9rem 1.25rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .modal-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 .modal-close {
@@ -270,24 +270,25 @@ tr:hover td { background: var(--bg3); }
 .modal-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
 }
 .modal-table th {
   background: var(--bg3);
   color: var(--text3);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 10px 16px;
+  padding: 8px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 2;
+  cursor: pointer;
 }
 .modal-table td {
-  padding: 10px 16px;
+  padding: 7px 12px;
   border-bottom: 1px solid var(--border);
   color: var(--text);
   white-space: nowrap;
