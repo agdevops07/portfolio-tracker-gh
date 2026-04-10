@@ -19,7 +19,7 @@
 body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
 
 /* ── UPLOAD SCREEN ── */
-#upload-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+/* #upload-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
 .logo { font-size: 13px; font-weight: 600; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 3rem; }
 .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; text-align: center; line-height: 1.1; margin-bottom: 1rem; }
 .hero-sub { color: var(--text2); font-size: 1rem; text-align: center; margin-bottom: 3rem; max-width: 400px; line-height: 1.6; }
@@ -35,8 +35,106 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .format-hint { margin-top: 2rem; max-width: 520px; }
 .format-hint details summary { font-size: 13px; color: var(--text3); cursor: pointer; list-style: none; }
 .format-hint details summary::-webkit-details-marker { display: none; }
-.format-hint pre { margin-top: 0.75rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-size: 12px; color: var(--text2); font-family: 'SF Mono', monospace; overflow-x: auto; }
+.format-hint pre { margin-top: 0.75rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-size: 12px; color: var(--text2); font-family: 'SF Mono', monospace; overflow-x: auto; } */
 
+/* ── UPLOAD SCREEN ── */
+#upload-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 2rem 3rem;
+}
+
+/* TOP LOGO */
+.upload-top {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+/* MAIN LAYOUT */
+.upload-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5rem;
+}
+
+/* LEFT */
+.upload-left {
+  flex: 1;
+  max-width: 520px;
+}
+
+.hero-title {
+  text-align: left;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.hero-sub {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+/* RIGHT */
+.upload-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* DROP ZONE UPGRADE */
+.drop-zone {
+  width: 100%;
+  max-width: 520px;
+  padding: 3rem 2rem;
+  border-radius: 18px;
+
+  background: linear-gradient(145deg, var(--bg2), var(--bg3));
+  border: 1px solid var(--border2);
+
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* FORMAT HINT INSIDE CARD */
+.format-hint {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.format-hint summary {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  #upload-screen {
+    height: auto;
+  }
+
+  .upload-main {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .upload-left {
+    text-align: center;
+  }
+
+  .hero-title,
+  .hero-sub {
+    text-align: center;
+  }
+}
 
 /* ── PREVIEW SCREEN ── */
 #preview-screen { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; }
