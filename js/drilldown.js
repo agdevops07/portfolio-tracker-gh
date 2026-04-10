@@ -7,27 +7,30 @@ import { fmt, pct, colorPnl, showScreen } from './utils.js';
 import { renderDrilldownChart, renderDrilldownDayChart } from './charts.js';
 import { fetchDayHistory } from './api.js';
 
+// Track current filter per ticker
+const ddFilter = { value: '1Y', customFrom: null, customTo: null };
+
 export async function openDrilldown(ticker) {
   showScreen('drilldown-screen');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  ddFilter.value = '1Y'; ddFilter.customFrom = null; ddFilter.customTo = null;
 
   const h = state.holdings[ticker];
-  document.getElementById('dd-ticker').textContent   = ticker;
+  document.getElementById('dd-ticker').textContent = ticker;
   document.getElementById('dd-subtitle').textContent =
     `${h.totalQty} shares · Avg buy: ${h.avgBuy.toFixed(2)} · Invested: ₹${h.invested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   const lp  = state.livePrices[ticker];
   const pc  = state.prevClosePrices[ticker];
-  const currentVal    = lp ? lp * h.totalQty : null;
-  const pnlVal        = currentVal != null ? currentVal - h.invested : null;
-  const pnlPct        = pnlVal != null ? (pnlVal / h.invested) * 100 : null;
-  const todayChgPct   = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
-  const todayChgAbs   = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+  const currentVal  = lp ? lp * h.totalQty : null;
+  const pnlVal      = currentVal != null ? currentVal - h.invested : null;
+  const pnlPct      = pnlVal != null ? (pnlVal / h.invested) * 100 : null;
+  const todayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+  const todayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
 
-  // CAGR
   let cagr = null;
   if (h.earliestDate && lp) {
-    const days  = (Date.now() - new Date(h.earliestDate)) / (1000 * 60 * 60 * 24);
+    const days = (Date.now() - new Date(h.earliestDate)) / (1000 * 60 * 60 * 24);
     const years = days / 365;
     if (years > 0.1) cagr = (Math.pow(lp / h.avgBuy, 1 / years) - 1) * 100;
   }
@@ -60,19 +63,89 @@ export async function openDrilldown(ticker) {
       <div class="stat-label">Current Value</div>
       <div class="stat-value">${currentVal ? fmt(currentVal) : '—'}</div>
     </div>
-    ${cagr != null ? `
-    <div class="stat-card">
+    ${cagr != null ? `<div class="stat-card">
       <div class="stat-label">CAGR</div>
       <div class="stat-value" style="color:${colorPnl(cagr)}">${pct(cagr)}</div>
     </div>` : ''}`;
 
-  // History chart
-  const hist = state.histories?.[ticker];
-  if (hist) renderDrilldownChart(ticker, hist, h.earliestDate);
+  // Render history chart with filters
+  renderDDHistorySection(ticker);
 
-  // Intraday day chart — fetch if not cached
+  // Intraday
   if (!state.dayHistories[ticker]?.length) {
     state.dayHistories[ticker] = await fetchDayHistory(h.ticker);
   }
   renderDrilldownDayChart(ticker);
 }
+
+function renderDDHistorySection(ticker) {
+  const hist = state.histories?.[ticker];
+  if (!hist || !Object.keys(hist).length) return;
+
+  const allDates = Object.keys(hist).sort();
+  const today = new Date().toISOString().split('T')[0];
+
+  // Compute cutoff
+  let from = allDates[0];
+  if (ddFilter.value === 'CUSTOM' && ddFilter.customFrom) {
+    from = ddFilter.customFrom;
+    const to = ddFilter.customTo || today;
+    renderDrilldownChart(ticker, filterHist(hist, from, to));
+    updateDDFilterUI(ticker, hist, from, to);
+    return;
+  }
+  const last = new Date(allDates[allDates.length - 1]);
+  if (ddFilter.value === '1M') { const d = new Date(last); d.setMonth(d.getMonth()-1); from = d.toISOString().split('T')[0]; }
+  else if (ddFilter.value === '3M') { const d = new Date(last); d.setMonth(d.getMonth()-3); from = d.toISOString().split('T')[0]; }
+  else if (ddFilter.value === '1Y') { const d = new Date(last); d.setFullYear(d.getFullYear()-1); from = d.toISOString().split('T')[0]; }
+  else from = allDates[0]; // ALL
+
+  const filtered = filterHist(hist, from, today);
+  renderDrilldownChart(ticker, filtered);
+  updateDDFilterUI(ticker, hist, from, today);
+}
+
+function filterHist(hist, from, to) {
+  const out = {};
+  Object.keys(hist).forEach(d => { if (d >= from && d <= to) out[d] = hist[d]; });
+  return out;
+}
+
+function updateDDFilterUI(ticker, hist, from, to) {
+  // Update active button
+  document.querySelectorAll('.dd-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === ddFilter.value));
+
+  // Compute % change for the selected period
+  const dates = Object.keys(filterHist(hist, from, to)).sort();
+  if (dates.length >= 2) {
+    const startPrice = hist[dates[0]];
+    const endPrice   = hist[dates[dates.length - 1]];
+    const chg = ((endPrice - startPrice) / startPrice) * 100;
+    const el = document.getElementById('dd-period-chg');
+    if (el) {
+      el.textContent = `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}% in period`;
+      el.style.color = chg >= 0 ? 'var(--green)' : 'var(--red)';
+    }
+  }
+}
+
+// Exposed to window for inline onclick
+window.setDDFilter = function(f, btn) {
+  ddFilter.value = f;
+  const ticker = document.getElementById('dd-ticker').textContent;
+  if (f !== 'CUSTOM') {
+    document.getElementById('dd-custom-wrap').style.display = 'none';
+    renderDDHistorySection(ticker);
+  } else {
+    document.getElementById('dd-custom-wrap').style.display = 'flex';
+  }
+};
+
+window.applyDDCustom = function() {
+  const from = document.getElementById('dd-from').value;
+  const to   = document.getElementById('dd-to').value;
+  if (!from || !to) return;
+  ddFilter.customFrom = from; ddFilter.customTo = to;
+  const ticker = document.getElementById('dd-ticker').textContent;
+  renderDDHistorySection(ticker);
+};

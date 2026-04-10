@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio Tracker</title>
+<title>📈 Portfolio Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="styles/main.css">
@@ -114,17 +115,22 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     <div class="cards-grid" id="stat-cards"></div>
 
     <!-- Portfolio History Chart -->
-    <div class="chart-card">
-      <div class="chart-header">
+    <div class="chart-card collapsible-card">
+      <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
         <div class="chart-title">Portfolio Value Over Time</div>
-        <div class="time-filters">
-          <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
-          <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
-          <button class="tf-btn active" onclick="setTimeFilter('1Y',this)">1Y</button>
-          <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="time-filters" onclick="event.stopPropagation()">
+            <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
+            <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
+            <button class="tf-btn active" onclick="setTimeFilter('1Y',this)">1Y</button>
+            <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
+          </div>
+          <button class="collapse-btn" id="portfolio-chart-toggle">▲ Collapse</button>
         </div>
       </div>
-      <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+      <div id="portfolio-chart-body" class="collapsible-body">
+        <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+      </div>
     </div>
 
     <!-- Portfolio Day Chart (collapsible) -->
@@ -141,21 +147,36 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     </div>
 
     <!-- Allocation -->
-    <div class="chart-card" style="margin-bottom:1.5rem">
-      <div class="chart-title" style="margin-bottom:1rem">Allocation</div>
-      <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
+    <div class="chart-card collapsible-card" style="margin-bottom:1rem">
+      <div class="chart-header collapsible-header" onclick="toggleSection('alloc-body','alloc-toggle')">
+        <div class="chart-title">Allocation</div>
+        <button class="collapse-btn" id="alloc-toggle">▲ Collapse</button>
+      </div>
+      <div id="alloc-body" class="collapsible-body">
+        <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
+      </div>
     </div>
 
     <!-- Overall P&L + Today P&L side by side -->
     <div class="two-col">
-      <div class="chart-card">
-        <div class="chart-title" style="margin-bottom:1rem">P&amp;L by Stock (Overall)</div>
-        <div style="position:relative;width:100%;height:280px;"><canvas id="pnlChart"></canvas></div>
+      <div class="chart-card collapsible-card">
+        <div class="chart-header collapsible-header" onclick="toggleSection('pnl-body','pnl-toggle')">
+          <div class="chart-title">P&amp;L by Stock (Overall)</div>
+          <button class="collapse-btn" id="pnl-toggle">▲ Collapse</button>
+        </div>
+        <div id="pnl-body" class="collapsible-body">
+          <div style="position:relative;width:100%;height:280px;"><canvas id="pnlChart"></canvas></div>
+        </div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title" style="margin-bottom:1rem">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
-        <div id="today-pnl-wrap" style="position:relative;width:100%;height:280px;">
-          <canvas id="todayPnlChart"></canvas>
+      <div class="chart-card collapsible-card">
+        <div class="chart-header collapsible-header" onclick="toggleSection('today-pnl-body','today-pnl-toggle')">
+          <div class="chart-title">Today's P&amp;L <span class="chart-subtitle">(vs Prev Close)</span></div>
+          <button class="collapse-btn" id="today-pnl-toggle">▲ Collapse</button>
+        </div>
+        <div id="today-pnl-body" class="collapsible-body">
+          <div id="today-pnl-wrap" style="position:relative;width:100%;height:280px;">
+            <canvas id="todayPnlChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -177,16 +198,44 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
 
   <!-- Stock History Chart -->
-  <div class="chart-card" style="margin-bottom:1rem">
-    <div class="chart-title" style="margin-bottom:1rem">Price History</div>
-    <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
+  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
+    <div class="chart-header collapsible-header" onclick="toggleSection('dd-history-body','dd-history-toggle')">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="chart-title">Price History</div>
+        <span id="dd-period-chg" style="font-size:13px;font-weight:600;"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+        <div class="time-filters">
+          <button class="tf-btn dd-tf-btn" data-f="1M" onclick="setDDFilter('1M',this)">1M</button>
+          <button class="tf-btn dd-tf-btn" data-f="3M" onclick="setDDFilter('3M',this)">3M</button>
+          <button class="tf-btn dd-tf-btn active" data-f="1Y" onclick="setDDFilter('1Y',this)">1Y</button>
+          <button class="tf-btn dd-tf-btn" data-f="ALL" onclick="setDDFilter('ALL',this)">ALL</button>
+          <button class="tf-btn dd-tf-btn" data-f="CUSTOM" onclick="setDDFilter('CUSTOM',this)">Custom</button>
+        </div>
+        <button class="collapse-btn" id="dd-history-toggle">▲ Collapse</button>
+      </div>
+    </div>
+    <div id="dd-history-body" class="collapsible-body">
+      <div id="dd-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
+        <input type="date" id="dd-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+        <span style="color:var(--text3)">to</span>
+        <input type="date" id="dd-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+        <button class="tf-btn active" onclick="applyDDCustom()">Apply</button>
+      </div>
+      <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
+    </div>
   </div>
 
   <!-- Stock Day Chart -->
-  <div class="chart-card">
-    <div class="chart-title" style="margin-bottom:1rem">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
-    <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
-      <canvas id="ddDayChart"></canvas>
+  <div class="chart-card collapsible-card">
+    <div class="chart-header collapsible-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
+      <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
+      <button class="collapse-btn" id="dd-day-toggle">▲ Collapse</button>
+    </div>
+    <div id="dd-day-body" class="collapsible-body">
+      <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
+        <canvas id="ddDayChart"></canvas>
+      </div>
     </div>
   </div>
 </div>
