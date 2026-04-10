@@ -2,7 +2,7 @@
 // MAIN — Bootstrap + holdings modal logic
 // ═══════════════════════════════════════════════
 
-import { initFileHandlers, loadSampleData, loadMyPortfolio } from './fileHandler.js';
+import { initFileHandlers, loadSampleData, loadMyPortfolio, processCSV } from './fileHandler.js';
 import { sortPreview } from './preview.js';
 import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval } from './dashboard.js';
 import { setTimeFilter } from './charts.js';
@@ -13,7 +13,7 @@ import { state } from './state.js';
 import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS } from './charts.js';
 
-// Expose globals immediately (before DOMContentLoaded) so inline onclick attrs work
+// Expose globals immediately so inline onclick attrs work
 window.loadSampleData      = loadSampleData;
 window.loadMyPortfolio     = loadMyPortfolio;
 window.loadDashboard       = loadDashboard;
@@ -29,10 +29,44 @@ window.exportChart         = exportChart;
 window.openDrilldown       = openDrilldown;
 window.openHoldingsModal   = openHoldingsModal;
 window.closeHoldingsModal  = closeHoldingsModal;
+window.sortHoldingsModal   = sortHoldingsModal;
+window.toggleCsvTextInput  = toggleCsvTextInput;
+window.loadFromTextInput   = loadFromTextInput;
 
 document.addEventListener('DOMContentLoaded', () => {
   initFileHandlers();
 });
+
+// ── Feature 3: Paste CSV text input ─────────────
+export function toggleCsvTextInput() {
+  const wrap = document.getElementById('csv-text-wrap');
+  wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+}
+
+export function loadFromTextInput() {
+  const text = document.getElementById('csv-text-input').value.trim();
+  if (!text) { alert('Please paste some CSV data first.'); return; }
+  Papa.parse(text, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (r) => processCSV(r.data),
+    error: (err) => alert('CSV parse error: ' + err.message),
+  });
+}
+
+// ── Holdings Modal sort state ────────────────────
+const modalSort = { key: 'currentVal', asc: false };
+
+// ── Feature 1: Sort holdings modal by column ─────
+export function sortHoldingsModal(key) {
+  if (modalSort.key === key) {
+    modalSort.asc = !modalSort.asc;
+  } else {
+    modalSort.key = key;
+    modalSort.asc = false;
+  }
+  renderHoldingsTable();
+}
 
 // ── Holdings Full-Screen Modal ───────────────────
 export function openHoldingsModal() {
@@ -44,36 +78,63 @@ export function closeHoldingsModal() {
   document.getElementById('holdings-modal').style.display = 'none';
 }
 
+function computeRow(h, totalCurrent, i) {
+  const lp        = state.livePrices[h.ticker];
+  const pc        = state.prevClosePrices[h.ticker];
+  const currentVal = lp ? lp * h.totalQty : null;
+  const pnlAbs    = currentVal != null ? currentVal - h.invested : null;
+  const pnlPct    = pnlAbs != null ? (pnlAbs / h.invested) * 100 : null;
+  const allocPct  = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
+  const dayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+  const dayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
+  return { h, lp, pc, currentVal, pnlAbs, pnlPct, allocPct, dayChgAbs, dayChgPct,
+           color: COLORS[i % COLORS.length] };
+}
+
 function renderHoldingsTable() {
   const holdings = Object.values(state.holdings);
-
   let totalCurrent = 0;
   holdings.forEach((h) => {
     const lp = state.livePrices[h.ticker];
     if (lp) totalCurrent += lp * h.totalQty;
   });
 
-  const sorted = [...holdings].sort((a, b) => {
-    const va = (state.livePrices[a.ticker] || 0) * a.totalQty;
-    const vb = (state.livePrices[b.ticker] || 0) * b.totalQty;
-    return vb - va;
+  // Compute all derived values first so we can sort on them
+  const rows = holdings.map((h, i) => computeRow(h, totalCurrent, i));
+
+  // Sort
+  rows.sort((a, b) => {
+    let va, vb;
+    switch (modalSort.key) {
+      case 'ticker':     va = a.h.ticker;    vb = b.h.ticker;    break;
+      case 'totalQty':   va = a.h.totalQty;  vb = b.h.totalQty;  break;
+      case 'avgBuy':     va = a.h.avgBuy;    vb = b.h.avgBuy;    break;
+      case 'livePrice':  va = a.lp ?? -Infinity;  vb = b.lp ?? -Infinity; break;
+      case 'prevClose':  va = a.pc ?? -Infinity;  vb = b.pc ?? -Infinity; break;
+      case 'invested':   va = a.h.invested;  vb = b.h.invested;  break;
+      case 'currentVal': va = a.currentVal ?? -Infinity; vb = b.currentVal ?? -Infinity; break;
+      case 'pnlAbs':     va = a.pnlAbs ?? -Infinity;    vb = b.pnlAbs ?? -Infinity;    break;
+      case 'pnlPct':     va = a.pnlPct ?? -Infinity;    vb = b.pnlPct ?? -Infinity;    break;
+      case 'dayChgAbs':  va = a.dayChgAbs ?? -Infinity; vb = b.dayChgAbs ?? -Infinity; break;
+      case 'dayChgPct':  va = a.dayChgPct ?? -Infinity; vb = b.dayChgPct ?? -Infinity; break;
+      case 'allocPct':   va = a.allocPct ?? -Infinity;  vb = b.allocPct ?? -Infinity;  break;
+      default:            va = a.currentVal ?? -Infinity; vb = b.currentVal ?? -Infinity;
+    }
+    if (typeof va === 'string') return modalSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return modalSort.asc ? va - vb : vb - va;
+  });
+
+  // Update sort indicators on headers
+  document.querySelectorAll('.sortable-th').forEach(th => {
+    const key = th.id.replace('mth-', '');
+    const base = th.textContent.replace(/ [↑↓]$/, '');
+    th.textContent = key === modalSort.key ? base + (modalSort.asc ? ' ↑' : ' ↓') : base;
   });
 
   const tbody = document.getElementById('holdings-modal-tbody');
   tbody.innerHTML = '';
 
-  sorted.forEach((h, i) => {
-    const lp  = state.livePrices[h.ticker];
-    const pc  = state.prevClosePrices[h.ticker];
-    const currentVal  = lp ? lp * h.totalQty : null;
-    const pnlVal      = currentVal != null ? currentVal - h.invested : null;
-    const pnlPct      = pnlVal != null ? (pnlVal / h.invested) * 100 : null;
-    const allocPct    = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
-    const color       = COLORS[i % COLORS.length];
-
-    const dayChgAbs   = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
-    const dayChgPct   = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
-
+  rows.forEach(({ h, lp, pc, currentVal, pnlAbs, pnlPct, allocPct, dayChgAbs, dayChgPct, color }) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
@@ -88,8 +149,8 @@ function renderHoldingsTable() {
       <td style="color:var(--text2)">${pc ? pc.toFixed(2) : '—'}</td>
       <td>${fmt(h.invested)}</td>
       <td>${currentVal ? fmt(currentVal) : '—'}</td>
-      <td style="color:${pnlVal != null ? colorPnl(pnlVal) : 'var(--text2)'}">
-        ${pnlVal != null ? (pnlVal >= 0 ? '+' : '') + fmt(Math.abs(pnlVal)) : '—'}
+      <td style="color:${pnlAbs != null ? colorPnl(pnlAbs) : 'var(--text2)'}">
+        ${pnlAbs != null ? (pnlAbs >= 0 ? '+' : '') + fmt(Math.abs(pnlAbs)) : '—'}
       </td>
       <td style="color:${pnlPct != null ? colorPnl(pnlPct) : 'var(--text2)'}">
         ${pnlPct != null ? pct(pnlPct) : '—'}

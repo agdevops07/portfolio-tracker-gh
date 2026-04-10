@@ -9,6 +9,7 @@ import { fetchDayHistory } from './api.js';
 
 export async function openDrilldown(ticker) {
   showScreen('drilldown-screen');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   const h = state.holdings[ticker];
   document.getElementById('dd-ticker').textContent   = ticker;

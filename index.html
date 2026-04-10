@@ -20,15 +20,25 @@
     <div class="drop-title">Drop your CSV here</div>
     <div class="drop-sub">Supports ticker, quantity, average_buy_price,<br>buy_date columns</div>
     <input type="file" id="file-input" accept=".csv">
-    <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
+      <button class="btn btn-secondary" onclick="toggleCsvTextInput()">✏️ Paste CSV</button>
+      <button class="btn btn-primary" onclick="loadMyPortfolio()">Load Portfolio</button>
+    </div>
+    <div id="csv-text-wrap" style="display:none;width:100%;margin-top:0.75rem;">
+      <textarea id="csv-text-input" placeholder="Paste CSV here…
+ticker,quantity,average_buy_price,buy_date
+RELIANCE.NS,10,2400.50,2023-06-01" style="width:100%;height:140px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'SF Mono',monospace;font-size:12px;padding:0.75rem;resize:vertical;outline:none;"></textarea>
+      <button class="btn btn-primary" style="margin-top:0.5rem;width:100%" onclick="loadFromTextInput()">Load from Text →</button>
+    </div>
     <div class="or-divider">or</div>
-    <button class="sample-btn" onclick="loadMyPortfolio()">Load sample portfolio</button>
+    <button class="sample-btn" onclick="loadSampleData()">Load sample portfolio</button>
   </div>
   <div class="format-hint">
     <details>
       <summary>📋 CSV format reference</summary>
       <pre>ticker,quantity,average_buy_price,buy_date,upstox_ticker
-RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
+RELIANCE.NS,10,2400.50,2023-06-01,ABC
 TCS.NS,5,3800.00,2023-04-15,
 INFY.NS,20,1500.00,2023-01-10,</pre>
     </details>
@@ -114,7 +124,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     <!-- Portfolio Day Chart (collapsible) -->
     <div class="chart-card collapsible-card">
       <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
-        <div class="chart-title">Portfolio Today<span class="chart-subtitle">(Intraday 5-min)</span></div>
+        <div class="chart-title">Portfolio Today [Under Developement..] <span class="chart-subtitle">(Intraday 5-min)</span></div>
         <button class="collapse-btn" id="day-chart-toggle">▲ Collapse</button>
       </div>
       <div id="day-chart-body" class="collapsible-body">
@@ -124,23 +134,23 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       </div>
     </div>
 
-    <!-- Allocation + Overall P&L -->
+    <!-- Allocation -->
+    <div class="chart-card" style="margin-bottom:1.5rem">
+      <div class="chart-title" style="margin-bottom:1rem">Allocation</div>
+      <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
+    </div>
+
+    <!-- Overall P&L + Today P&L side by side -->
     <div class="two-col">
-      <div class="chart-card">
-        <div class="chart-title" style="margin-bottom:1rem">Allocation</div>
-        <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
-      </div>
       <div class="chart-card">
         <div class="chart-title" style="margin-bottom:1rem">P&amp;L by Stock (Overall)</div>
         <div style="position:relative;width:100%;height:280px;"><canvas id="pnlChart"></canvas></div>
       </div>
-    </div>
-
-    <!-- Today's P&L bar chart -->
-    <div class="chart-card">
-      <div class="chart-title" style="margin-bottom:1rem">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
-      <div id="today-pnl-wrap" style="position:relative;width:100%;height:280px;">
-        <canvas id="todayPnlChart"></canvas>
+      <div class="chart-card">
+        <div class="chart-title" style="margin-bottom:1rem">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
+        <div id="today-pnl-wrap" style="position:relative;width:100%;height:280px;">
+          <canvas id="todayPnlChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -160,6 +170,12 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <div class="dd-subtitle" id="dd-subtitle"></div>
   <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
 
+  <!-- Stock History Chart -->
+  <div class="chart-card" style="margin-bottom:1rem">
+    <div class="chart-title" style="margin-bottom:1rem">Price History</div>
+    <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
+  </div>
+
   <!-- Stock Day Chart -->
   <div class="chart-card">
     <div class="chart-title" style="margin-bottom:1rem">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
@@ -167,14 +183,6 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       <canvas id="ddDayChart"></canvas>
     </div>
   </div>
-
-  <!-- Stock History Chart -->
-  <div class="chart-card" style="margin-bottom:1rem">
-    <div class="chart-title" style="margin-bottom:1rem">Price History</div>
-    <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
-  </div>
-
-
 </div>
 
 <!-- HOLDINGS MODAL -->
@@ -189,18 +197,18 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
         <table class="modal-table">
           <thead>
             <tr>
-              <th>Ticker</th>
-              <th>Qty</th>
-              <th>Avg Buy</th>
-              <th>Live Price</th>
-              <th>Prev Close</th>
-              <th>Invested</th>
-              <th>Current Value</th>
-              <th>P&amp;L (₹)</th>
-              <th>P&amp;L (%)</th>
-              <th>Day Change</th>
-              <th>Day Change %</th>
-              <th>Allocation</th>
+              <th onclick="sortHoldingsModal('ticker')" class="sortable-th" id="mth-ticker">Ticker</th>
+              <th onclick="sortHoldingsModal('totalQty')" class="sortable-th" id="mth-totalQty">Qty</th>
+              <th onclick="sortHoldingsModal('avgBuy')" class="sortable-th" id="mth-avgBuy">Avg Buy</th>
+              <th onclick="sortHoldingsModal('livePrice')" class="sortable-th" id="mth-livePrice">Live Price</th>
+              <th onclick="sortHoldingsModal('prevClose')" class="sortable-th" id="mth-prevClose">Prev Close</th>
+              <th onclick="sortHoldingsModal('invested')" class="sortable-th" id="mth-invested">Invested</th>
+              <th onclick="sortHoldingsModal('currentVal')" class="sortable-th" id="mth-currentVal">Current Value</th>
+              <th onclick="sortHoldingsModal('pnlAbs')" class="sortable-th" id="mth-pnlAbs">P&amp;L (₹)</th>
+              <th onclick="sortHoldingsModal('pnlPct')" class="sortable-th" id="mth-pnlPct">P&amp;L (%)</th>
+              <th onclick="sortHoldingsModal('dayChgAbs')" class="sortable-th" id="mth-dayChgAbs">Day Change</th>
+              <th onclick="sortHoldingsModal('dayChgPct')" class="sortable-th" id="mth-dayChgPct">Day Change %</th>
+              <th onclick="sortHoldingsModal('allocPct')" class="sortable-th" id="mth-allocPct">Allocation</th>
             </tr>
           </thead>
           <tbody id="holdings-modal-tbody"></tbody>

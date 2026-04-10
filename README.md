@@ -10,7 +10,7 @@ A fully client-side portfolio tracker. No server, no backend. Works from any sta
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/portfolio-tracker-gh.git
+git remote add origin https://github.com/YOUR_USERNAME/portfolio-tracker.git
 git push -u origin main
 ```
 
@@ -50,7 +50,7 @@ AAPL,15,175.00,2023-03-01,
 | `quantity` | ✅ | Number of shares |
 | `average_buy_price` | ✅ | Your average purchase price |
 | `buy_date` | Optional | Format: `YYYY-MM-DD` |
-| `upstoxTicker` | Optional | ISIN for Upstox data (Required for SME stocks to fetch Historical Data) |
+| `upstoxTicker` | Optional | ISIN for Upstox data (ignored in this version) |
 
 After editing the CSV, commit and push — the site updates within a minute.
 
