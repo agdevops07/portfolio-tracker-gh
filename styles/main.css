@@ -77,21 +77,21 @@ tr:hover td { background: var(--bg3); }
 .tf-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
 .tf-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); }
 .chart-wrap { position: relative; width: 100%; height: 320px; }
-.holdings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-.holding-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; cursor: pointer; transition: all 0.15s; }
+.holdings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+.holding-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.15s; }
 .holding-card:hover { border-color: var(--border2); transform: translateY(-1px); }
-.hc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; }
-.hc-ticker { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
-.hc-name { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.hc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.6rem; }
+.hc-ticker { font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
+.hc-name { font-size: 10px; color: var(--text2); margin-top: 2px; }
 .hc-pnl { text-align: right; }
-.hc-pnl-val { font-size: 14px; font-weight: 700; }
-.hc-pnl-pct { font-size: 11px; }
-.hc-bar-bg { background: var(--bg4); border-radius: 4px; height: 4px; margin-bottom: 0.75rem; }
-.hc-bar { height: 4px; border-radius: 4px; }
-.hc-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 11px; }
-.hc-meta-label { color: var(--text3); margin-bottom: 1px; }
-.hc-meta-val { font-weight: 600; font-size: 13px; }
-.pie-wrap { position: relative; width: 100%; height: 280px; }
+.hc-pnl-val { font-size: 13px; font-weight: 700; }
+.hc-pnl-pct { font-size: 10px; }
+.hc-bar-bg { background: var(--bg4); border-radius: 4px; height: 3px; margin-bottom: 0.6rem; }
+.hc-bar { height: 3px; border-radius: 4px; }
+.hc-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; font-size: 10px; }
+.hc-meta-label { color: var(--text3); margin-bottom: 1px; font-size: 10px; }
+.hc-meta-val { font-weight: 600; font-size: 12px; }
+.pie-wrap { position: relative; width: 100%; height: 380px; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } .dash-header { flex-direction: column; align-items: flex-start; } }
 
@@ -163,13 +163,13 @@ tr:hover td { background: var(--bg3); }
 }
 .collapse-btn:hover { border-color: var(--border2); color: var(--text); }
 .collapsible-body {
-  max-height: 300px;
+  max-height: 800px;
   overflow: hidden;
-  transition: max-height 0.35s ease, opacity 0.25s ease;
+  transition: max-height 0.45s ease, opacity 0.3s ease;
   opacity: 1;
 }
 .collapsible-body.collapsed {
-  max-height: 0;
+  max-height: 0 !important;
   opacity: 0;
 }
 
@@ -348,7 +348,50 @@ tr:hover td { background: var(--bg3); }
 }
 .export-menu-item:hover { background: var(--bg4); color: var(--text); }
 
-/* ── PRINT / PDF ── */
+/* ── FUNDAMENTALS ── */
+.fund-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+.fund-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fund-item.fund-wide {
+  grid-column: span 2;
+}
+.fund-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.fund-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.fund-industry {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+}
+
+/* ── CHART SUBTITLE ── */
+.chart-subtitle {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text3);
+  margin-left: 6px;
+} */
 @media print {
   #upload-screen, #preview-screen, #drilldown-screen,
   .dash-header, .holdings-grid, #holdings-modal,

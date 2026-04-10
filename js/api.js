@@ -96,7 +96,8 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
     const series = {};
     timestamps.forEach((ts, i) => {
       const date = new Date(ts * 1000).toISOString().split('T')[0];
-      if (date !== today && closes[i] != null) {
+      // Include today's data if it's the latest available point (intraday close)
+      if (closes[i] != null) {
         series[date] = closes[i];
       }
     });

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📈 Portfolio Tracker</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<title>Portfolio Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>" type="image/svg+xml">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="styles/main.css">
@@ -123,11 +123,21 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
             <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
             <button class="tf-btn active" onclick="setTimeFilter('1Y',this)">1Y</button>
             <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
+            <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)">Custom</button>
           </div>
-          <button class="collapse-btn" id="portfolio-chart-toggle">▲ Collapse</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="port-period-chg" style="font-size:13px;font-weight:600;"></span>
+            <button class="collapse-btn" id="portfolio-chart-toggle">▲ Collapse</button>
+          </div>
         </div>
       </div>
       <div id="portfolio-chart-body" class="collapsible-body">
+        <div id="port-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
+          <input type="date" id="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <span style="color:var(--text3)">to</span>
+          <input type="date" id="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <button class="tf-btn active" onclick="applyPortCustom()">Apply</button>
+        </div>
         <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
       </div>
     </div>
@@ -195,6 +205,17 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <div class="dd-title" id="dd-ticker"></div>
   <div class="dd-subtitle" id="dd-subtitle"></div>
   <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
+
+  <!-- Fundamentals Panel -->
+  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
+    <div class="chart-header collapsible-header" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">
+      <div class="chart-title">Fundamentals <span class="chart-subtitle">(Yahoo Finance)</span></div>
+      <button class="collapse-btn" id="dd-fund-toggle">▲ Collapse</button>
+    </div>
+    <div id="dd-fund-body" class="collapsible-body">
+      <div id="dd-fundamentals" style="padding:0.25rem 0 0.5rem;"></div>
+    </div>
+  </div>
 
   <!-- Stock History Chart -->
   <div class="chart-card collapsible-card" style="margin-bottom:1rem">

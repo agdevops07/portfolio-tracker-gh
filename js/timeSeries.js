@@ -16,7 +16,11 @@ export function forwardFill(series) {
 
   const filled = {};
   const start = new Date(dates[0]);
-  const end = new Date(dates[dates.length - 1]);
+  // Extend end to today so the latest data point is always included
+  const seriesEnd = new Date(dates[dates.length - 1]);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = seriesEnd > today ? seriesEnd : today;
   let last = null;
 
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
