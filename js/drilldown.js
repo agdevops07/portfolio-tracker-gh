@@ -82,7 +82,7 @@ function renderFundamentals(ticker, fund) {
   if (!el) return;
 
   if (!fund) {
-    const sym = ticker.replace('.NS','').replace('.BO','');
+    const sym = ticker.replace('.NS','').replace('.BO','').replace('-SM', '');
     el.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">
       Fundamentals unavailable via API for this stock.
       <a href="https://www.screener.in/company/${sym}/" target="_blank"
