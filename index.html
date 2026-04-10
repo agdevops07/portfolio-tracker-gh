@@ -117,7 +117,9 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     <!-- Portfolio History Chart -->
     <div class="chart-card collapsible-card">
       <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
-        <div class="chart-title">Portfolio Value Over Time</div>
+        <div class="chart-title">Portfolio Value Over Time
+          <span id="port-period-chg" style="font-size:13px;font-weight:600;"></span>
+        </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="time-filters" onclick="event.stopPropagation()">
             <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
@@ -127,7 +129,6 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
             <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)">Custom</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span id="port-period-chg" style="font-size:13px;font-weight:600;"></span>
             <button class="collapse-btn" id="portfolio-chart-toggle">▲ Collapse</button>
           </div>
         </div>
