@@ -23,57 +23,59 @@ export function exportPDF() {
   closeExportMenu();
 
   const element = document.getElementById("dashboard-screen");
+  if (!element) return;
 
-  if (!element) {
-    console.error("Dashboard element not found");
-    return;
-  }
+  // Store original styles so we can restore later
+  const originalStyles = new Map();
 
-  // Dynamically load html2pdf if not already loaded
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const existing = document.querySelector(`script[src="${src}"]`);
-      if (existing) return resolve();
-
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.body.appendChild(script);
+  // Fix canvas (Chart.js) stretching
+  const canvases = element.querySelectorAll("canvas");
+  canvases.forEach((canvas) => {
+    originalStyles.set(canvas, {
+      width: canvas.style.width,
+      height: canvas.style.height
     });
-  }
 
-  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-
-  loadScript(CDN).then(() => {
-    const filename = `portfolio-${new Date().toISOString().slice(0, 10)}.pdf`;
-
-    const opt = {
-      margin: 10,
-      filename,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,              // improves resolution
-        useCORS: true,
-        scrollY: 0
-      },
-      jsPDF: {
-        unit: "mm",
-        format: "a4",
-        orientation: "portrait"
-      }
-    };
-
-    // Small delay ensures charts/layout fully rendered
-    setTimeout(() => {
-      window.html2pdf()
-        .set(opt)
-        .from(element)
-        .save();
-    }, 300);
-  }).catch(err => {
-    console.error("Failed to load PDF library", err);
+    // Lock actual rendered size
+    canvas.style.width = canvas.offsetWidth + "px";
+    canvas.style.height = canvas.offsetHeight + "px";
   });
+
+  // Fix images stretching
+  const images = element.querySelectorAll("img");
+  images.forEach((img) => {
+    originalStyles.set(img, {
+      maxWidth: img.style.maxWidth,
+      height: img.style.height
+    });
+
+    img.style.maxWidth = "100%";
+    img.style.height = "auto";
+    img.style.objectFit = "contain";
+  });
+
+  // Prevent page-break chaos inside cards/sections
+  const blocks = element.querySelectorAll("div, section");
+  blocks.forEach((el) => {
+    originalStyles.set(el, {
+      breakInside: el.style.breakInside
+    });
+    el.style.breakInside = "avoid";
+  });
+
+  // Small delay to let layout settle
+  setTimeout(() => {
+    window.print();
+
+    // Restore everything after print dialog opens
+    setTimeout(() => {
+      originalStyles.forEach((styles, el) => {
+        Object.keys(styles).forEach((key) => {
+          el.style[key] = styles[key] || "";
+        });
+      });
+    }, 500);
+  }, 300);
 }
 
 // ── Export dropdown toggle ───────────────────────
