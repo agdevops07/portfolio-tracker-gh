@@ -84,16 +84,22 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
         <span id="last-refresh-time" class="refresh-timestamp"></span>
         <select id="refresh-interval-sel" class="interval-sel" onchange="setRefreshInterval(+this.value)">
           <option value="30000">30s</option>
-          <option value="60000" selected>1m</option>
+          <option value="60000">1m</option>
           <option value="120000">2m</option>
-          <option value="300000">5m</option>
+          <option value="300000" selected>5m</option>
           <option value="600000">10m</option>
         </select>
         <button id="refresh-pause-btn" class="export-btn" onclick="toggleRefreshPause()">⏸ Pause</button>
         <button class="export-btn" onclick="refreshPricesOnly()">🔄 Refresh Prices</button>
         <button class="export-btn" onclick="refreshDashboard()">⟳ Full Refresh</button>
       </div>
-      <button class="export-btn" onclick="exportChart()">⬇ Export Chart</button>
+      <div class="export-dropdown" id="export-dropdown">
+        <button class="export-btn" onclick="toggleExportMenu()">⬇ Export ▾</button>
+        <div class="export-menu" id="export-menu">
+          <div class="export-menu-item" onclick="exportPDF()">📄 Download as PDF</div>
+          <div class="export-menu-item" onclick="exportChart()">🖼 Export Chart PNG</div>
+        </div>
+      </div>
       <button class="btn btn-secondary" onclick="goBack()">← Upload New</button>
     </div>
   </div>

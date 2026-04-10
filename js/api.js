@@ -14,39 +14,20 @@ function proxyUrl(url) {
 }
 
 // ── Live price + previous close ──────────────────
-// Primary: Upstox quote API (for stocks with an ISIN / upstoxTicker)
-// Fallback 1: Yahoo Finance v8
-// Fallback 2: NSE India unofficial API (for .NS stocks)
+// Source 1: Yahoo Finance query1 (primary)
+// Source 2: Yahoo Finance query2 (fallback mirror)
 export async function fetchPrice(ticker) {
   if (state.priceCache[ticker]) return state.priceCache[ticker];
 
-  // Find the holding to get upstoxTicker / ISIN
-  const holding = Object.values(state.holdings).find(h => h.ticker === ticker);
-  const isin = holding?.upstoxTicker || null;
+  const mirrors = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`,
+  ];
 
-  // ── Source 1: Upstox Market Quote (public, no auth needed for LTP) ──
-  if (isin) {
+  for (const url of mirrors) {
     try {
-      const upstoxUrl = `https://api.upstox.com/v2/market-quote/ltp?instrument_key=NSE_EQ|${isin}`;
-      const res = await fetch(proxyUrl(upstoxUrl));
-      if (res.ok) {
-        const data = await res.json();
-        // Response: { data: { "NSE_EQ|ISIN": { last_price: 123.45 } } }
-        const key = `NSE_EQ|${isin}`;
-        const price = data?.data?.[key]?.last_price;
-        if (price && price > 0) {
-          state.priceCache[ticker] = price;
-          return price;
-        }
-      }
-    } catch (e) { /* fall through */ }
-  }
-
-  // ── Source 2: Yahoo Finance ──
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-    const res = await fetch(proxyUrl(url));
-    if (res.ok) {
+      const res = await fetch(proxyUrl(url));
+      if (!res.ok) continue;
       const data = await res.json();
       const meta = data?.chart?.result?.[0]?.meta;
       const price = meta?.regularMarketPrice;
@@ -58,24 +39,7 @@ export async function fetchPrice(ticker) {
         }
         return price;
       }
-    }
-  } catch (e) { /* fall through */ }
-
-  // ── Source 3: NSE India unofficial API (only for .NS stocks) ──
-  if (ticker.endsWith('.NS')) {
-    try {
-      const sym = ticker.replace('.NS', '');
-      const nseUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-      const res = await fetch(proxyUrl(nseUrl));
-      if (res.ok) {
-        const data = await res.json();
-        const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-        if (price && price > 0) {
-          state.priceCache[ticker] = price;
-          return price;
-        }
-      }
-    } catch (e) { /* fall through */ }
+    } catch (e) { /* try next mirror */ }
   }
 
   console.warn('fetchPrice: all sources failed for', ticker);

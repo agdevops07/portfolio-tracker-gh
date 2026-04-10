@@ -40,17 +40,17 @@ export async function openDrilldown(ticker) {
     </div>
     <div class="stat-card">
       <div class="stat-label">Today's Change</div>
-      <div class="stat-value" style="color:${todayChgPct != null ? colorPnl(todayChgPct) : 'var(--text2)'}">
-        ${todayChgPct != null ? pct(todayChgPct) : '—'}
+      <div class="stat-value" style="color:${todayChgAbs != null ? colorPnl(todayChgAbs) : 'var(--text2)'}">
+        ${todayChgAbs != null ? (todayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(todayChgAbs)) : '—'}
       </div>
-      <div class="stat-sub" style="color:${todayChgAbs != null ? colorPnl(todayChgAbs) : 'var(--text2)'}">
-        ${todayChgAbs != null ? (todayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(todayChgAbs)) : 'Prev close unavailable'}
+      <div class="stat-sub" style="color:${todayChgPct != null ? colorPnl(todayChgPct) : 'var(--text2)'}">
+        ${todayChgPct != null ? pct(todayChgPct) + ' today' : 'Prev close unavailable'}
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-label">P&amp;L (Overall)</div>
       <div class="stat-value" style="color:${pnlVal != null ? colorPnl(pnlVal) : 'inherit'}">
-        ${pnlVal != null ? fmt(Math.abs(pnlVal)) : '—'}
+        ${pnlVal != null ? (pnlVal >= 0 ? '+' : '') + fmt(Math.abs(pnlVal)) : '—'}
       </div>
       <div class="stat-sub" style="color:${pnlPct != null ? colorPnl(pnlPct) : 'inherit'}">
         ${pnlPct != null ? pct(pnlPct) : ''}
