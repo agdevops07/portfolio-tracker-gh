@@ -27,8 +27,10 @@
     </div>
     <div id="csv-text-wrap" style="display:none;width:100%;margin-top:0.75rem;">
       <textarea id="csv-text-input" placeholder="Paste CSV here…
-ticker,quantity,average_buy_price,buy_date
-RELIANCE.NS,10,2400.50,2023-06-01" style="width:100%;height:140px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'SF Mono',monospace;font-size:12px;padding:0.75rem;resize:vertical;outline:none;"></textarea>
+ticker,quantity,average_buy_price,buy_date,upstox_ticker
+RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
+TCS.NS,5,3800.00,2023-04-15,
+INFY.NS,20,1500.00,2023-01-10, style="width:100%;height:140px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'SF Mono',monospace;font-size:12px;padding:0.75rem;resize:vertical;outline:none;"></textarea>
       <button class="btn btn-primary" style="margin-top:0.5rem;width:100%" onclick="loadFromTextInput()">Load from Text →</button>
     </div>
     <div class="or-divider">or</div>
@@ -38,7 +40,7 @@ RELIANCE.NS,10,2400.50,2023-06-01" style="width:100%;height:140px;background:var
     <details>
       <summary>📋 CSV format reference</summary>
       <pre>ticker,quantity,average_buy_price,buy_date,upstox_ticker
-RELIANCE.NS,10,2400.50,2023-06-01,ABC
+RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
 TCS.NS,5,3800.00,2023-04-15,
 INFY.NS,20,1500.00,2023-01-10,</pre>
     </details>
