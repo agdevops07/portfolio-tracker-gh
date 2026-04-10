@@ -218,7 +218,7 @@ tr:hover td { background: var(--bg3); }
   border-radius: 16px;
   width: 98vw;          /* was 95vw */
   max-width: 1400px;   /* was 1000px */
-  max-height: 80vh;
+  max-height: 92vh;   /* or even 95vh */  
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -258,7 +258,7 @@ tr:hover td { background: var(--bg3); }
 .modal-close:hover { color: var(--text); border-color: var(--border2); }
 .modal-body {
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
   display: flex;
   flex-direction: column;
