@@ -77,9 +77,17 @@
           📥 Download Sample CSV
         </button>
       </div>
-      <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in · Not financial advice</p>
     </div>
   </div>
+
+  <!-- Footer pinned inside upload screen -->
+  <footer class="app-footer" style="position:absolute;bottom:0;left:0;right:0;margin-top:0;z-index:2;">
+    <span>📈 Portfolio Tracker</span>
+    <span class="footer-sep">·</span>
+    <span>Data via <a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> &amp; <a href="https://www.screener.in" target="_blank">Screener.in</a></span>
+    <span class="footer-sep">·</span>
+    <span>Prices delayed · Not financial advice</span>
+  </footer>
 </div>
 
 
@@ -372,15 +380,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
-<!-- FOOTER -->
-<footer class="app-footer">
-  <span>📈 Portfolio Tracker</span>
-  <span class="footer-sep">·</span>
-  <span>Data via <a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> &amp; <a href="https://www.screener.in" target="_blank">Screener.in</a></span>
-  <span class="footer-sep">·</span>
-  <span>Prices delayed · Not financial advice</span>
-</footer>
 
 <script>
 function toggleSection(bodyId, btnId) {
