@@ -73,13 +73,9 @@
         <p class="drop-trust">🔒 Your data stays in memory — never uploaded to any server</p>
       </div>
       <div class="format-hint">
-        <details>
-          <summary>📋 CSV format reference</summary>
-          <pre>ticker,quantity,average_buy_price,buy_date,upstox_ticker
-RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
-TCS.NS,5,3800.00,2023-04-15,
-INFY.NS,20,1500.00,2023-01-10,</pre>
-        </details>
+        <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px;" onclick="(function(){const csv='ticker,quantity,average_buy_price,buy_date,upstox_ticker\nRELIANCE.NS,10,2400.50,2023-06-01,INE002A01018\nTCS.NS,5,3800.00,2023-04-15,\nINFY.NS,20,1500.00,2023-01-10,';const a=document.createElement(\'a\');a.href=\'data:text/csv;charset=utf-8,\'+encodeURIComponent(csv);a.download=\'portfolio_sample.csv\';a.click();})()">
+          📥 Download Sample CSV
+        </button>
       </div>
       <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in · Not financial advice</p>
     </div>
@@ -422,28 +418,39 @@ function maximizeChart(cardId, bodyId, canvasId) {
 
   requestAnimationFrame(() => {
     const srcChart = window._chartInstances[canvasId];
-    if (srcChart && srcChart.config) {
+    if (srcChart) {
       try {
-        const cfg = srcChart.config;
-        // Strip non-serializable canvas gradients from datasets
-        const cleanDatasets = (cfg.data.datasets || []).map(ds => {
-          const d = Object.assign({}, ds);
-          if (d.backgroundColor && typeof d.backgroundColor === 'object') d.backgroundColor = 'rgba(0,0,0,0)';
-          return d;
-        });
-        const cleanData = Object.assign({}, cfg.data, { datasets: cleanDatasets });
-        // Deep-clone options and explicitly preserve scales so x-axis is not lost
-        const clonedOpts = JSON.parse(JSON.stringify(cfg.options || {}));
-        clonedOpts.animation = false;
-        clonedOpts.responsive = true;
-        clonedOpts.maintainAspectRatio = false;
-        if (cfg.options && cfg.options.scales) {
-          clonedOpts.scales = JSON.parse(JSON.stringify(cfg.options.scales));
-        }
+        // Read actual rendered data directly — always plain arrays
+        const labels = srcChart.data.labels.slice();
+        const cleanDatasets = srcChart.data.datasets.map(ds => ({
+          data: ds.data.slice(),
+          borderColor: ds.borderColor,
+          borderWidth: ds.borderWidth || 2,
+          backgroundColor: 'rgba(0,0,0,0)',
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: ds.pointHoverRadius || 5,
+          tension: ds.tension || 0.3,
+        }));
+        // Build axis config from scratch — avoids Scale instance serialization issue
+        const axisStyle = { color: '#7777a0', font: { size: 11 } };
         new Chart(bigCanvas, {
-          type: cfg.type,
-          data: JSON.parse(JSON.stringify(cleanData)),
-          options: clonedOpts,
+          type: srcChart.config.type,
+          data: { labels, datasets: cleanDatasets },
+          options: {
+            animation: false, responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false },
+              tooltip: { mode: 'index', intersect: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.03)' },
+                   border: { color: 'rgba(255,255,255,0.1)' },
+                   ticks: { ...axisStyle, maxTicksLimit: 12, maxRotation: 0, autoSkip: true } },
+              y: { grid: { color: 'rgba(255,255,255,0.03)' },
+                   border: { color: 'rgba(255,255,255,0.1)' },
+                   ticks: { ...axisStyle } },
+            },
+            interaction: { mode: 'index', intersect: false },
+          },
         });
         return;
       } catch(e) { console.warn('Chart re-render failed, falling back', e); }
