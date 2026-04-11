@@ -238,7 +238,8 @@ function parseScreenerTable(doc, sectionId) {
   if (!section) return null;
   const table = section.querySelector('table');
   if (!table) return null;
-  const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim()).filter(Boolean);
+  // Keep ALL headers (including blank first th) — slice(1) in render for year cols
+  const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
   const rows = [...table.querySelectorAll('tbody tr')].map(tr => ({
     label: tr.querySelector('td')?.textContent?.trim() || '',
     values: [...tr.querySelectorAll('td:not(:first-child)')].map(td => td.textContent.trim()),

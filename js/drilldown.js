@@ -19,7 +19,7 @@ let _currentTicker = '';
 // ── Render a financial table ──────────────────────
 function renderFinTable(tableData, note = 'Figures in ₹ Cr') {
   if (!tableData || !tableData.rows?.length) return '<div style="color:var(--text3);font-size:12px;padding:1rem 0;">No data available</div>';
-  const years = tableData.headers.slice(1); // skip row-label column
+  const years = tableData.headers.slice(1); // first th is blank row-label column
   const thead = `<tr><th>Item</th>${years.map(y => `<th>${y}</th>`).join('')}</tr>`;
   const tbody = tableData.rows.map(row => {
     const cells = row.values.map(v => {
