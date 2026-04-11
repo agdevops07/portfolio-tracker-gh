@@ -15,16 +15,24 @@ let _fundMode = 'standalone'; // standalone is default
 let _fundTab  = 'ratios';
 let _currentTicker = '';
 
-// ── Render dd-meta (sector breadcrumb under stock title, above stat cards) ──
+// ── Render dd-meta (about + sector above stat cards) ──
 function renderDDMeta(fund) {
   const metaEl  = document.getElementById('dd-meta');
   const aboutEl = document.getElementById('dd-about');
-  if (metaEl)  metaEl.innerHTML  = '';
-  if (aboutEl) aboutEl.style.display = 'none'; // about goes in ratios tab, not here
-  if (!fund) return;
-  if (metaEl && (fund.sectorBreadcrumb || fund.sector)) {
-    const txt = fund.sectorBreadcrumb || (fund.sector + (fund.industry ? ' › ' + fund.industry : ''));
-    metaEl.innerHTML = `<span>${txt}</span>`;
+  if (!fund) {
+    if (metaEl) metaEl.innerHTML = '';
+    if (aboutEl) { aboutEl.textContent = ''; aboutEl.style.display = 'none'; }
+    return;
+  }
+  // About in dd-about block (above sector, below subtitle)
+  if (aboutEl && fund.about) {
+    aboutEl.textContent = fund.about;
+    aboutEl.style.display = '';
+  } else if (aboutEl) { aboutEl.style.display = 'none'; }
+  // Sector breadcrumb in dd-meta
+  if (metaEl) {
+    const txt = fund.sectorBreadcrumb || (fund.sector ? fund.sector + (fund.industry ? ' › ' + fund.industry : '') : '');
+    metaEl.innerHTML = txt ? `<span>${txt}</span>` : '';
   }
 }
 
@@ -54,11 +62,6 @@ function renderFundTab() {
     const row = (label, val, hint='') => val
       ? `<div class="fund-item" title="${hint}"><span class="fund-label">${label}</span><span class="fund-val">${val}</span></div>` : '';
     el.innerHTML = `
-      ${_fundData.sectorBreadcrumb || _fundData.sector ? `
-      <div class="fund-sector-bar">
-        <span class="fund-sector-label">Sector</span>
-        <span class="fund-sector-val">${_fundData.sectorBreadcrumb || (_fundData.sector + (_fundData.industry ? ' › ' + _fundData.industry : ''))}</span>
-      </div>` : ''}
       <div class="fund-grid">
         ${row('Market Cap', _fundData.marketCap)}
         ${row('P/E Ratio', _fundData.peRatio, 'Stock P/E')}
@@ -71,7 +74,6 @@ function renderFundTab() {
         ${row('EPS', _fundData.eps)}
         ${row('Face Value', _fundData.faceValue)}
       </div>
-      ${_fundData.about ? `<div style="margin-top:0.6rem;font-size:11px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:0.5rem;">${_fundData.about}</div>` : ''}
       <div class="fund-table-note" style="margin-top:0.5rem;">Source: <a href="${_fundData._url}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a> · ${_fundData._mode}</div>`;
   } else if (_fundTab === 'pnl') {
     el.innerHTML = renderFinTable(_fundData.pnl, 'P&L figures in ₹ Cr');
@@ -235,10 +237,11 @@ function updateDDFilterUI(ticker, hist, from, to) {
     const chg = ((endP - startP) / startP) * 100;
     const maxP = Math.max(...Object.values(hist)); // ATH from all history
     const athChg = ((endP - maxP) / maxP) * 100;
+    const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
     const el=document.getElementById('dd-period-chg');
     if(el){
       el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% in period</span>`
-        + (Math.abs(athChg) > 0.1 ? ` <span style="color:var(--text3);font-size:11px;font-weight:500">· ${athChg.toFixed(2)}% from ATH</span>` : '');
+        + (Math.abs(athChg) > 0.01 ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">${athChg.toFixed(2)}% from ATH</span>` : '');
       el.style.color = '';
     }
   }

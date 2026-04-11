@@ -232,6 +232,22 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
 // ── Screener.in fundamentals ─────────────────────
 // Scrapes Screener.in public company page for Indian stocks.
 // No auth needed. Returns structured fundamental data.
+// ── BSE Security Code lookup for .BO tickers ─────
+// Loaded lazily from data/bse_codes.json on first use
+let _bseCodes = null;
+async function getBSECode(ticker) {
+  // Only needed for .BO tickers
+  if (!/\.BO$/i.test(ticker)) return null;
+  const sym = ticker.replace(/\.BO$/i, '').toUpperCase();
+  if (!_bseCodes) {
+    try {
+      const res = await fetch('./data/bse_codes.json');
+      _bseCodes = res.ok ? await res.json() : {};
+    } catch(e) { _bseCodes = {}; }
+  }
+  return _bseCodes[sym] || null;
+}
+
 // ── Parse a Screener financial table into {headers, rows} ──
 function parseScreenerTable(doc, sectionId) {
   const section = doc.querySelector(`#${sectionId}, section[data-src*="${sectionId}"]`);
@@ -248,7 +264,10 @@ function parseScreenerTable(doc, sectionId) {
 }
 
 export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
-  const sym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase().replace('-SM', '');
+  const rawSym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase().replace('-SM', '');
+  // For .BO tickers, use BSE Security Code as the Screener identifier (more reliable)
+  const bseCode = await getBSECode(ticker);
+  const sym = bseCode || rawSym;
   const urls = mode === 'consolidated'
     ? [`https://www.screener.in/company/${sym}/consolidated/`, `https://www.screener.in/company/${sym}/`]
     : [`https://www.screener.in/company/${sym}/`];
