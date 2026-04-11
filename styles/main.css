@@ -513,9 +513,6 @@ tr:hover td { background: var(--bg3); }
 .dd-charts-row .collapsible-body { flex: 1; }
 .dd-charts-row .chart-wrap { height: 280px !important; }
 .dd-charts-row #dd-day-wrap { height: 280px !important; }
-.dd-charts-row .chart-header {
-  min-height: 70px;
-}
 
 /* ── MOBILE — reduce wasted space on drilldown ── */
 @media (max-width: 600px) {
