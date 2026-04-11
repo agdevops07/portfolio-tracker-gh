@@ -17,9 +17,13 @@ WIPRO.NS,25,450.00,2023-07-15
 AAPL,15,175.00,2023-03-01`;
 
 // ── Wire up drag-drop & file input ───────────────
+let _handlersInited = false;
 export function initFileHandlers() {
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
+  if (!dropZone || !fileInput) return;
+  if (_handlersInited) return;
+  _handlersInited = true;
 
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -56,7 +60,7 @@ export function loadSampleData() {
 }
 
 export async function loadMyPortfolio() {
-  showToast('Loading your portfolio...');
+  showToast('Loading portfolio...');
   try {
     const csvText = await fetchPortfolioCSV();
     Papa.parse(csvText, {
@@ -65,8 +69,12 @@ export async function loadMyPortfolio() {
       complete: (r) => processCSV(r.data),
     });
   } catch (err) {
-    alert('Failed to load portfolio file. Make sure data/my_portfolio.csv exists in the repo.');
-    console.error(err);
+    // No personal portfolio file — load built-in sample
+    Papa.parse(SAMPLE_CSV, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (r) => processCSV(r.data),
+    });
   }
 }
 

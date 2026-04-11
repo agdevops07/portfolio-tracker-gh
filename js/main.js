@@ -39,10 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initFileHandlers();
 });
 
-// ── Feature 3: Paste CSV text input ─────────────
+// ── Upload tab switcher ───────────────────────────
+window.switchUploadTab = function(tab) {
+  ['file','paste','sample'].forEach(t => {
+    document.getElementById(`utab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`utab-${t}-panel`).style.display = t === tab ? 'block' : 'none';
+  });
+  // Re-init drop zone listeners if switching back to file tab
+  if (tab === 'file') initFileHandlers();
+};
+
+// ── Feature 3: Paste CSV text input (legacy, kept for compat) ──────────────
 export function toggleCsvTextInput() {
-  const wrap = document.getElementById('csv-text-wrap');
-  wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+  switchUploadTab('paste');
 }
 
 export function loadFromTextInput() {

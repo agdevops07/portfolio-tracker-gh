@@ -18,39 +18,7 @@
   <p class="hero-sub">Upload your holdings CSV and get an instant visual breakdown.</p>
 
   <div class="upload-layout">
-    <!-- Left: drop zone -->
-    <div class="upload-left">
-      <div class="drop-zone" id="drop-zone">
-        <div class="drop-icon">📂</div>
-        <div class="drop-title">Drop your CSV here</div>
-        <div class="drop-sub">ticker, quantity, average_buy_price, buy_date</div>
-        <input type="file" id="file-input" accept=".csv">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-          <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
-          <button class="btn btn-secondary" onclick="toggleCsvTextInput()">✏️ Paste CSV</button>
-        </div>
-        <div id="csv-text-wrap" style="display:none;width:100%;margin-top:0.75rem;">
-          <textarea id="csv-text-input" placeholder="Paste CSV here…
-ticker,quantity,average_buy_price,buy_date,upstox_ticker
-RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018" style="width:100%;height:120px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'SF Mono',monospace;font-size:12px;padding:0.75rem;resize:vertical;outline:none;"></textarea>
-          <button class="btn btn-primary" style="margin-top:0.5rem;width:100%" onclick="loadFromTextInput()">Load from Text →</button>
-        </div>
-        <div class="or-divider">or</div>
-        <button class="sample-btn" onclick="loadMyPortfolio()">Load sample portfolio</button>
-      </div>
-      <div class="format-hint">
-        <details>
-          <summary>📋 CSV format reference</summary>
-          <pre>ticker,quantity,average_buy_price,buy_date,upstox_ticker
-RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
-TCS.NS,5,3800.00,2023-04-15,
-INFY.NS,20,1500.00,2023-01-10,</pre>
-        </details>
-      </div>
-      <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in</p>
-    </div>
-
-    <!-- Right: feature highlights (desktop only) -->
+    <!-- Left: feature highlights -->
     <div class="upload-right">
       <div class="upload-right-title">What you get</div>
       <div class="upload-feature">
@@ -73,6 +41,57 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
         <div class="upload-feature-icon">💾</div>
         <div class="upload-feature-text"><strong>Export</strong>Download PDF reports or chart images anytime</div>
       </div>
+    </div>
+
+    <!-- Right: drop zone -->
+    <div class="upload-left">
+      <!-- Upload mode tabs -->
+      <div class="upload-tabs">
+        <button class="upload-tab active" id="utab-file" onclick="switchUploadTab('file')">📁 Upload File</button>
+        <button class="upload-tab" id="utab-paste" onclick="switchUploadTab('paste')">✏️ Paste CSV</button>
+        <button class="upload-tab" id="utab-sample" onclick="switchUploadTab('sample')">🧪 Sample</button>
+      </div>
+
+      <!-- Tab: Upload File -->
+      <div id="utab-file-panel" class="upload-tab-panel">
+        <div class="drop-zone" id="drop-zone">
+          <div class="drop-icon">📂</div>
+          <div class="drop-title">Drop your CSV here</div>
+          <div class="drop-sub">or click to browse</div>
+          <input type="file" id="file-input" accept=".csv">
+          <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
+        </div>
+      </div>
+
+      <!-- Tab: Paste CSV -->
+      <div id="utab-paste-panel" class="upload-tab-panel" style="display:none">
+        <div class="paste-panel">
+          <div class="paste-header">Paste your CSV data below</div>
+          <div class="paste-hint">ticker,quantity,average_buy_price,buy_date,upstox_ticker</div>
+          <textarea id="csv-text-input" class="paste-textarea" placeholder="RELIANCE.NS,10,2400.50,2023-06-01&#10;TCS.NS,5,3800.00,2023-04-15&#10;INFY.NS,20,1500.00,2023-01-10"></textarea>
+          <button class="btn btn-primary" style="width:100%;margin-top:0.75rem" onclick="loadFromTextInput()">Load Portfolio →</button>
+        </div>
+      </div>
+
+      <!-- Tab: Sample -->
+      <div id="utab-sample-panel" class="upload-tab-panel" style="display:none">
+        <div class="paste-panel">
+          <div class="paste-header">Try with sample data</div>
+          <div class="paste-hint">A mix of Indian & US stocks to explore all features</div>
+          <div class="sample-preview">RELIANCE.NS · TCS.NS · INFY.NS · HDFCBANK.NS · WIPRO.NS · AAPL</div>
+          <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="loadMyPortfolio()">Load Sample Portfolio →</button>
+        </div>
+      </div>
+      <div class="format-hint">
+        <details>
+          <summary>📋 CSV format reference</summary>
+          <pre>ticker,quantity,average_buy_price,buy_date,upstox_ticker
+RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
+TCS.NS,5,3800.00,2023-04-15,
+INFY.NS,20,1500.00,2023-01-10,</pre>
+        </details>
+      </div>
+      <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in</p>
     </div>
   </div>
 </div>
