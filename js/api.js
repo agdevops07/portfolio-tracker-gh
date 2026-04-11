@@ -280,11 +280,33 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
         if (label.includes('eps'))           fund.eps        = val;
       });
 
-      // About & sector
+      // About & sector — use peer comparison section for accurate data
       const about  = doc.querySelector('.company-profile p, #company-info p, .about p');
       if (about) fund.about = about.textContent.trim();
-      const sector = doc.querySelector('.company-profile .tag, .company-sector a, a[href*="/screen/"]');
-      if (sector) fund.sector = sector.textContent.trim();
+
+      // Sector & Industry from peer comparison section (most reliable source)
+      let sector = null, industry = null;
+      const peerSection = doc.querySelector('#peers, section[id*="peer"], .peers-section');
+      if (peerSection) {
+        const peerLinks = peerSection.querySelectorAll('a[href*="/screen/"]');
+        peerLinks.forEach(a => {
+          const href = a.getAttribute('href') || '';
+          const txt = a.textContent.trim();
+          if (!sector && href.includes('/screen/') && txt) sector = txt;
+        });
+      }
+      // Fallback: company profile tags
+      if (!sector) {
+        const tags = doc.querySelectorAll('.company-profile .tag, .company-links a[href*="/screen/"], .sub a[href*="/screen/"]');
+        tags.forEach(el => {
+          const href = el.getAttribute('href') || '';
+          const txt = el.textContent.trim();
+          if (!sector && txt && href.includes('/screen/')) sector = txt;
+          else if (sector && !industry && txt && href.includes('/screen/')) industry = txt;
+        });
+      }
+      if (sector) fund.sector = sector;
+      if (industry) fund.industry = industry;
 
       // Financial tables
       fund.pnl       = parseScreenerTable(doc, 'profit-loss');

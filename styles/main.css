@@ -32,9 +32,8 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .upload-feature-text { font-size: 12px; color: var(--text2); line-height: 1.45; }
 .upload-feature-text strong { color: var(--text); display: block; margin-bottom: 1px; font-size: 12px; font-weight: 600; }
 @media (max-width: 800px) {
-  .upload-layout { flex-direction: column; align-items: center; }
-  .upload-right { width: 100%; max-width: 480px; }
-}
+  /* upload layout handled at end of file */
+}}
 @media (max-width: 500px) {
   .logo { margin-bottom: 1rem; }
   .hero-title { font-size: 1.6rem; }
@@ -488,3 +487,142 @@ tr:hover td { background: var(--bg3); }
 .fund-table .positive { color: var(--green); }
 .fund-table .negative { color: var(--red); }
 .fund-table-note { font-size: 10px; color: var(--text3); margin-top: 0.4rem; text-align: right; }
+
+/* ── COMPANY META (sector/industry/about near company name) ── */
+.dd-company-meta {
+  margin-bottom: 1.25rem;
+}
+.dd-meta-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.dd-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+.dd-meta-sector {
+  background: rgba(99,102,241,0.12);
+  color: var(--accent2);
+  border: 1px solid rgba(99,102,241,0.25);
+}
+.dd-meta-industry {
+  background: rgba(16,185,129,0.1);
+  color: var(--green);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+.dd-meta-about {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.55;
+  max-width: 700px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+}
+
+/* ── MOBILE — reduce wasted border/padding on drilldown ── */
+@media (max-width: 600px) {
+  #drilldown-screen {
+    padding: 0.75rem 0.75rem;
+  }
+  .chart-card {
+    border-radius: 10px;
+    padding: 0.85rem 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+  .stat-card {
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+  }
+  .cards-grid {
+    gap: 0.5rem;
+  }
+  .dd-title {
+    font-size: 1.35rem;
+  }
+  .dd-subtitle {
+    font-size: 12px;
+  }
+  .chart-header {
+    padding: 0;
+    gap: 6px;
+  }
+  /* Two-col charts stack on mobile */
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+  .fund-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.4rem;
+  }
+  .fund-item {
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+  }
+  .back-btn {
+    margin-bottom: 0.75rem;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  .fund-tabs {
+    gap: 3px;
+  }
+  .fund-tab {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .fund-mode-btn {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  .collapse-btn {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+}
+
+/* ── UPLOAD: reverse order on mobile so drop zone appears first ── */
+@media (max-width: 800px) {
+  .upload-layout {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+  .upload-right {
+    width: 100%;
+    max-width: 480px;
+  }
+}
+
+/* ── DRILLDOWN charts row: equal height columns ── */
+.dd-charts-row {
+  align-items: stretch;
+}
+.dd-charts-row .chart-card {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dd-charts-row .collapsible-body {
+  flex: 1;
+}
+.dd-charts-row .chart-wrap {
+  height: 240px;
+}
+@media (max-width: 700px) {
+  .dd-charts-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .dd-charts-row .chart-card {
+    margin-bottom: 0;
+  }
+}

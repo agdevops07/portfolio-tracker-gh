@@ -237,7 +237,53 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
   <div class="dd-title" id="dd-ticker"></div>
   <div class="dd-subtitle" id="dd-subtitle"></div>
+  <!-- Company meta (sector/industry/about) injected here by JS -->
   <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
+
+  <!-- Price History + Today's Price side by side -->
+  <div class="two-col dd-charts-row" style="margin-bottom:1rem">
+    <!-- Stock History Chart -->
+    <div class="chart-card collapsible-card">
+      <div class="chart-header collapsible-header" onclick="toggleSection('dd-history-body','dd-history-toggle')">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="chart-title">Price History</div>
+          <span id="dd-period-chg" style="font-size:13px;font-weight:600;"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+          <div class="time-filters">
+            <button class="tf-btn dd-tf-btn" data-f="1M" onclick="setDDFilter('1M',this)">1M</button>
+            <button class="tf-btn dd-tf-btn" data-f="3M" onclick="setDDFilter('3M',this)">3M</button>
+            <button class="tf-btn dd-tf-btn active" data-f="1Y" onclick="setDDFilter('1Y',this)">1Y</button>
+            <button class="tf-btn dd-tf-btn" data-f="ALL" onclick="setDDFilter('ALL',this)">ALL</button>
+            <button class="tf-btn dd-tf-btn" data-f="CUSTOM" onclick="setDDFilter('CUSTOM',this)">Custom</button>
+          </div>
+          <button class="collapse-btn" id="dd-history-toggle">▲ Collapse</button>
+        </div>
+      </div>
+      <div id="dd-history-body" class="collapsible-body">
+        <div id="dd-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
+          <input type="date" id="dd-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <span style="color:var(--text3)">to</span>
+          <input type="date" id="dd-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <button class="tf-btn active" onclick="applyDDCustom()">Apply</button>
+        </div>
+        <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Stock Day Chart -->
+    <div class="chart-card collapsible-card">
+      <div class="chart-header collapsible-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
+        <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
+        <button class="collapse-btn" id="dd-day-toggle">▲ Collapse</button>
+      </div>
+      <div id="dd-day-body" class="collapsible-body">
+        <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
+          <canvas id="ddDayChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Fundamentals Panel -->
   <div class="chart-card collapsible-card" style="margin-bottom:1rem">
@@ -245,14 +291,13 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
       <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
         <div class="fund-mode-toggle">
-          <button class="fund-mode-btn active" id="fund-mode-cons" onclick="switchFundMode('consolidated',this)">Consolidated</button>
-          <button class="fund-mode-btn" id="fund-mode-stand" onclick="switchFundMode('standalone',this)">Standalone</button>
+          <button class="fund-mode-btn" id="fund-mode-cons" onclick="switchFundMode('consolidated',this)">Consolidated</button>
+          <button class="fund-mode-btn active" id="fund-mode-stand" onclick="switchFundMode('standalone',this)">Standalone</button>
         </div>
         <button class="collapse-btn" id="dd-fund-toggle">▲ Collapse</button>
       </div>
     </div>
     <div id="dd-fund-body" class="collapsible-body">
-      <!-- Tab nav -->
       <div class="fund-tabs" onclick="event.stopPropagation()">
         <button class="fund-tab active" data-tab="ratios" onclick="switchFundTab('ratios',this)">Key Ratios</button>
         <button class="fund-tab" data-tab="pnl" onclick="switchFundTab('pnl',this)">P&amp;L</button>
@@ -262,50 +307,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       <div id="dd-fundamentals" style="padding:0.5rem 0 0.25rem;"></div>
     </div>
   </div>
-
-  <!-- Stock History Chart -->
-  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
-    <div class="chart-header collapsible-header" onclick="toggleSection('dd-history-body','dd-history-toggle')">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <div class="chart-title">Price History</div>
-        <span id="dd-period-chg" style="font-size:13px;font-weight:600;"></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
-        <div class="time-filters">
-          <button class="tf-btn dd-tf-btn" data-f="1M" onclick="setDDFilter('1M',this)">1M</button>
-          <button class="tf-btn dd-tf-btn" data-f="3M" onclick="setDDFilter('3M',this)">3M</button>
-          <button class="tf-btn dd-tf-btn active" data-f="1Y" onclick="setDDFilter('1Y',this)">1Y</button>
-          <button class="tf-btn dd-tf-btn" data-f="ALL" onclick="setDDFilter('ALL',this)">ALL</button>
-          <button class="tf-btn dd-tf-btn" data-f="CUSTOM" onclick="setDDFilter('CUSTOM',this)">Custom</button>
-        </div>
-        <button class="collapse-btn" id="dd-history-toggle">▲ Collapse</button>
-      </div>
-    </div>
-    <div id="dd-history-body" class="collapsible-body">
-      <div id="dd-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
-        <input type="date" id="dd-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-        <span style="color:var(--text3)">to</span>
-        <input type="date" id="dd-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-        <button class="tf-btn active" onclick="applyDDCustom()">Apply</button>
-      </div>
-      <div class="chart-wrap"><canvas id="ddChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Stock Day Chart -->
-  <div class="chart-card collapsible-card">
-    <div class="chart-header collapsible-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
-      <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
-      <button class="collapse-btn" id="dd-day-toggle">▲ Collapse</button>
-    </div>
-    <div id="dd-day-body" class="collapsible-body">
-      <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
-        <canvas id="ddDayChart"></canvas>
-      </div>
-    </div>
-  </div>
 </div>
-
 <!-- HOLDINGS MODAL -->
 <div id="holdings-modal" class="modal-overlay" onclick="if(event.target===this)closeHoldingsModal()">
   <div class="modal-box">
