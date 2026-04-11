@@ -164,6 +164,10 @@ function getYahooTicker(row) {
   return row.stock.yahooTicker;
 }
 
+// ── Search results cache (avoids JSON-in-HTML-attribute) ────────────────
+// Keyed by `${rowId}:${index}` → stock object
+const _searchResultCache = new Map();
+
 // ── Search logic ────────────────────────────────
 let activeDropdownId = null;
 
@@ -211,9 +215,12 @@ window._spSearch = function(input, rowId) {
       return;
     }
 
+    // Cache results by safe key; pass only the index in the HTML attribute
+    results.forEach((s, i) => _searchResultCache.set(`${rowId}:${i}`, s));
+
     dd.innerHTML = results.map((s, i) =>
       `<div class="sp-dd-item" data-idx="${i}"
-         onmousedown="window._spSelectStock('${rowId}', ${JSON.stringify(JSON.stringify(s))})">
+         onmousedown="window._spSelectStock('${rowId}', ${i})">
          <span class="sp-badge sp-badge-${s.exchange.toLowerCase().replace('-','')}">${s.exchange}</span>
          <span class="sp-dd-sym">${s.symbol}</span>
          <span class="sp-dd-name">${s.company}</span>
@@ -245,8 +252,9 @@ window._spKeydown = function(e, rowId) {
   if (items[idx]) items[idx].classList.add('focused');
 };
 
-window._spSelectStock = function(rowId, stockJsonStr) {
-  const stock = JSON.parse(stockJsonStr);
+window._spSelectStock = function(rowId, idx) {
+  const stock = _searchResultCache.get(`${rowId}:${idx}`);
+  if (!stock) return;
   const row = pickerRows.find(r => String(r.id) === rowId);
   if (!row) return;
   row.stock = stock;
