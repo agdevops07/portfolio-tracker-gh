@@ -3,10 +3,30 @@
 // Drag-drop, file input, CSV parsing, sample data.
 // ═══════════════════════════════════════════════
 
-import { state } from './state.js';
+import { state, resetAllCaches } from './state.js';
 import { showToast, showScreen } from './utils.js';
 import { fetchPortfolioCSV } from './api.js';
 import { showPreview } from './preview.js';
+
+// ── Clear all portfolio state before loading new data ──
+function clearPortfolioState() {
+  if (typeof window._stopAutoRefresh === 'function') window._stopAutoRefresh();
+  if (typeof window._destroyAllCharts === 'function') window._destroyAllCharts();
+  if (typeof window._clearNoPortMsgs === 'function') window._clearNoPortMsgs();
+  resetAllCaches();
+  state.rawRows             = [];
+  state.holdings            = {};
+  state.portfolioTimeSeries = [];
+  state.fullTimeSeries      = [];
+  state.histories           = {};
+  state.dayHistories        = {};
+  state.currentFilter       = '1Y';
+  state.refreshPaused       = false;
+  if (state.refreshIntervalId) {
+    clearInterval(state.refreshIntervalId);
+    state.refreshIntervalId = null;
+  }
+}
 
 export const SAMPLE_CSV = `ticker,quantity,average_buy_price,buy_date
 RELIANCE.NS,10,2400.50,2023-06-01
@@ -39,6 +59,7 @@ export function initFileHandlers() {
 
 // ── Public entry points ──────────────────────────
 export function handleFile(file) {
+  clearPortfolioState();
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
@@ -48,6 +69,7 @@ export function handleFile(file) {
 }
 
 export function loadSampleData() {
+  clearPortfolioState();
   Papa.parse(SAMPLE_CSV, {
     header: true,
     skipEmptyLines: true,
@@ -56,6 +78,7 @@ export function loadSampleData() {
 }
 
 export async function loadMyPortfolio() {
+  clearPortfolioState();
   showToast('Loading your portfolio...');
   try {
     const csvText = await fetchPortfolioCSV();
