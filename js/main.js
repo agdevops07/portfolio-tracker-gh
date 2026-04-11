@@ -11,6 +11,7 @@ import { goBack, showDashboard } from './utils.js';
 import { exportHoldingsCSV, exportPDF, toggleExportMenu } from './export.js';
 import { openDrilldown } from './drilldown.js';
 import { state } from './state.js';
+import { initStockSearch } from './stockSearch.js';
 import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS } from './charts.js';
 
@@ -201,6 +202,8 @@ function renderHoldingsTable() {
 // ── Dashboard tabs ─────────────────────────────
 window.switchDashTab = function(tab, btn) {
   document.querySelectorAll('.dash-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  document.getElementById('dash-tab-overview').style.display  = tab === 'overview'  ? '' : 'none';
-  document.getElementById('dash-tab-holdings').style.display  = tab === 'holdings'  ? '' : 'none';
+  document.getElementById('dash-tab-overview').style.display     = tab === 'overview'      ? '' : 'none';
+  document.getElementById('dash-tab-holdings').style.display     = tab === 'holdings'      ? '' : 'none';
+  document.getElementById('dash-tab-stocksearch').style.display  = tab === 'stocksearch'   ? '' : 'none';
+  if (tab === 'stocksearch') initStockSearch();
 };

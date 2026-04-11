@@ -859,3 +859,26 @@ input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(
   transition: all 0.15s;
 }
 .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+/* ── Stock Search Tab ── */
+#ss-search-input:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+}
+.ss-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2rem 1rem;
+  color: var(--text2);
+  font-size: 14px;
+}
+.ss-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--accent2);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
