@@ -20,9 +20,24 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 
 /* ── UPLOAD SCREEN ── */
 #upload-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
-.logo { font-size: 13px; font-weight: 600; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 3rem; }
-.hero-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; text-align: center; line-height: 1.1; margin-bottom: 1rem; }
-.hero-sub { color: var(--text2); font-size: 1rem; text-align: center; margin-bottom: 3rem; max-width: 400px; line-height: 1.6; }
+.logo { font-size: 13px; font-weight: 600; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 2rem; }
+.hero-title { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 700; letter-spacing: -0.03em; text-align: center; line-height: 1.1; margin-bottom: 0.75rem; }
+.hero-sub { color: var(--text2); font-size: 1rem; text-align: center; margin-bottom: 2rem; max-width: 400px; line-height: 1.6; }
+.upload-layout { display: flex; gap: 2.5rem; align-items: flex-start; width: 100%; max-width: 1000px; }
+.upload-left { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.upload-right { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; gap: 1rem; }
+.upload-right-title { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.25rem; }
+.upload-feature { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+.upload-feature-icon { font-size: 18px; line-height: 1; margin-top: 1px; }
+.upload-feature-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.upload-feature-text strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 13px; }
+@media (max-width: 760px) {
+  .upload-layout { flex-direction: column; align-items: center; }
+  .upload-right { width: 100%; max-width: 520px; }
+  .logo { margin-bottom: 1.5rem; }
+  .hero-title { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .hero-sub { margin-bottom: 1.5rem; }
+}
 .drop-zone { width: 100%; max-width: 520px; border: 1.5px dashed var(--border2); border-radius: 16px; padding: 3rem 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; background: var(--bg2); }
 .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent2); background: rgba(99,102,241,0.05); }
 .drop-icon { width: 48px; height: 48px; background: var(--bg4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
@@ -307,7 +322,9 @@ tr:hover td { background: var(--bg3); }
   .modal-box { max-height: 95vh; border-radius: 14px; }
 }
 @media (max-width: 600px) {
-  .refresh-controls { display: none; }
+  .refresh-controls { gap: 4px; padding: 3px 6px; overflow-x: auto; }
+  .refresh-controls .export-btn { font-size: 11px; padding: 4px 8px; }
+  .refresh-timestamp { display: none; }
 }
 
 /* ── Chart subtitle label ── */
@@ -448,3 +465,24 @@ tr:hover td { background: var(--bg3); }
   .two-col { display: block; }
   .two-col .chart-card { break-inside: avoid !important; margin-bottom: 12px; }
 }
+
+/* ── FUND TABS & MODE TOGGLE ── */
+.fund-tabs { display: flex; gap: 4px; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; flex-wrap: wrap; }
+.fund-tab { background: none; border: 1px solid transparent; color: var(--text3); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.fund-tab.active { background: var(--bg3); border-color: var(--border2); color: var(--text); }
+.fund-tab:hover:not(.active) { color: var(--text2); }
+.fund-mode-toggle { display: flex; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.fund-mode-btn { background: none; border: none; color: var(--text3); padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.fund-mode-btn.active { background: var(--accent); color: white; }
+
+/* ── FINANCIAL TABLES (P&L, Balance Sheet, Cash Flow) ── */
+.fund-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 0.25rem; }
+.fund-table th { background: var(--bg3); color: var(--text3); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.fund-table th:first-child { text-align: left; }
+.fund-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: right; color: var(--text); white-space: nowrap; }
+.fund-table td:first-child { text-align: left; color: var(--text2); font-size: 11px; }
+.fund-table tr:last-child td { border-bottom: none; }
+.fund-table tbody tr:hover td { background: var(--bg3); }
+.fund-table .positive { color: var(--green); }
+.fund-table .negative { color: var(--red); }
+.fund-table-note { font-size: 10px; color: var(--text3); margin-top: 0.4rem; text-align: right; }

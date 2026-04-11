@@ -232,13 +232,27 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
 // ── Screener.in fundamentals ─────────────────────
 // Scrapes Screener.in public company page for Indian stocks.
 // No auth needed. Returns structured fundamental data.
-export async function fetchScreenerFundamentals(ticker) {
-  // Strip exchange suffix and get clean symbol
-  const sym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase();
-  const url = `https://www.screener.in/company/${sym}/consolidated/`;
-  const url2 = `https://www.screener.in/company/${sym}/`;
+// ── Parse a Screener financial table into {headers, rows} ──
+function parseScreenerTable(doc, sectionId) {
+  const section = doc.querySelector(`#${sectionId}, section[data-src*="${sectionId}"]`);
+  if (!section) return null;
+  const table = section.querySelector('table');
+  if (!table) return null;
+  const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim()).filter(Boolean);
+  const rows = [...table.querySelectorAll('tbody tr')].map(tr => ({
+    label: tr.querySelector('td')?.textContent?.trim() || '',
+    values: [...tr.querySelectorAll('td:not(:first-child)')].map(td => td.textContent.trim()),
+  })).filter(r => r.label);
+  return { headers, rows };
+}
 
-  for (const targetUrl of [url, url2]) {
+export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
+  const sym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase();
+  const urls = mode === 'consolidated'
+    ? [`https://www.screener.in/company/${sym}/consolidated/`, `https://www.screener.in/company/${sym}/`]
+    : [`https://www.screener.in/company/${sym}/`];
+
+  for (const targetUrl of urls) {
     try {
       const res = await fetch(proxyUrl(targetUrl));
       if (!res.ok) continue;
@@ -247,77 +261,42 @@ export async function fetchScreenerFundamentals(ticker) {
 
       const fund = {};
 
-      // ── Top ratios (the #top-ratios ul) ──
-      const ratioItems = doc.querySelectorAll('#top-ratios li, .company-ratios li');
-      ratioItems.forEach(li => {
+      // Key ratios
+      doc.querySelectorAll('#top-ratios li, .company-ratios li').forEach(li => {
         const label = li.querySelector('.name, span:first-child')?.textContent?.trim().toLowerCase() || '';
         const val   = li.querySelector('.value, .number, span:last-child')?.textContent?.trim() || '';
         if (!val) return;
-        if (label.includes('market cap'))   fund.marketCap    = val;
-        if (label.includes('current price')) fund.currentPrice = val;
+        if (label.includes('market cap'))    fund.marketCap  = val;
+        if (label.includes('current price')) fund.currentPrice= val;
         if (label.includes('high / low') || label.includes('52 week')) fund.week52HL = val;
-        if (label.includes('stock p/e'))    fund.peRatio      = val;
-        if (label.includes('book value'))   fund.bookValue    = val;
-        if (label.includes('dividend yield')) fund.divYield   = val;
-        if (label.includes('roce'))         fund.roce         = val;
-        if (label.includes('roe'))          fund.roe          = val;
-        if (label.includes('face value'))   fund.faceValue    = val;
+        if (label.includes('stock p/e'))     fund.peRatio    = val;
+        if (label.includes('book value'))    fund.bookValue  = val;
+        if (label.includes('dividend yield'))fund.divYield   = val;
+        if (label.includes('roce'))          fund.roce       = val;
+        if (label.includes('roe'))           fund.roe        = val;
+        if (label.includes('face value'))    fund.faceValue  = val;
         if (label.includes('debt / equity') || label.includes('debt/equity')) fund.debtEquity = val;
-        if (label.includes('eps'))          fund.eps          = val;
+        if (label.includes('eps'))           fund.eps        = val;
       });
 
-      // ── About / sector from meta or company-info ──
-      const about = doc.querySelector('.company-profile p, #company-info p, .about p');
-      if (about) fund.about = about.textContent.trim().slice(0, 200);
-
+      // About & sector
+      const about  = doc.querySelector('.company-profile p, #company-info p, .about p');
+      if (about) fund.about = about.textContent.trim().slice(0, 220);
       const sector = doc.querySelector('.company-profile .tag, .company-sector a, a[href*="/screen/"]');
       if (sector) fund.sector = sector.textContent.trim();
 
-      // ── BSE/NSE codes ──
-      const codes = doc.querySelectorAll('.company-links a, .bse-link, .nse-link');
-      codes.forEach(a => {
-        const href = a.href || '';
-        if (href.includes('bseindia')) fund.bseCode = a.textContent.trim();
-        if (href.includes('nseindia')) fund.nseCode  = a.textContent.trim();
-      });
+      // Financial tables
+      fund.pnl       = parseScreenerTable(doc, 'profit-loss');
+      fund.balance   = parseScreenerTable(doc, 'balance-sheet');
+      fund.cashflow  = parseScreenerTable(doc, 'cash-flow');
 
       if (Object.keys(fund).length > 2) {
         fund._source = 'screener';
         fund._url    = targetUrl;
+        fund._mode   = mode;
         return fund;
       }
-    } catch (e) {
-      console.warn('Screener fetch failed for', sym, e);
-    }
-  }
-  return null;
-}
-
-// ── Yahoo Finance v7 fundamentals (fallback) ──────
-export async function fetchYahooFundamentals(ticker) {
-  const urls = [
-    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`,
-    `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`,
-  ];
-  for (const url of urls) {
-    try {
-      const res = await fetch(proxyUrl(url));
-      if (!res.ok) continue;
-      const data = await res.json();
-      const q = data?.quoteResponse?.result?.[0];
-      if (!q) continue;
-      const fmtCr = v => v != null ? '₹' + (v / 1e7).toFixed(0) + ' Cr' : null;
-      return {
-        marketCap:    fmtCr(q.marketCap),
-        peRatio:      q.trailingPE?.toFixed(2) ?? null,
-        week52HL:     q.fiftyTwoWeekHigh != null ? `${q.fiftyTwoWeekHigh?.toFixed(0)} / ${q.fiftyTwoWeekLow?.toFixed(0)}` : null,
-        eps:          q.trailingEps?.toFixed(2) ?? null,
-        bookValue:    q.bookValue?.toFixed(2) ?? null,
-        divYield:     q.dividendYield != null ? (q.dividendYield * 100).toFixed(2) + '%' : null,
-        sector:       q.sector ?? null,
-        _source:      'yahoo',
-      };
-    } catch (e) { /* try next */ }
+    } catch (e) { console.warn('Screener fetch failed:', sym, e); }
   }
   return null;
 }
