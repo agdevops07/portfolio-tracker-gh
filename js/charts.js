@@ -58,8 +58,11 @@ function updatePortPeriodChg(series) {
     const startVal = series[0].value;
     const endVal   = series[series.length - 1].value;
     const chg = ((endVal - startVal) / startVal) * 100;
-    el.textContent = `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}% in period`;
-    el.style.color = chg >= 0 ? 'var(--green)' : 'var(--red)';
+    const maxVal = Math.max(...series.map(p => p.value));
+    const athChg = ((endVal - maxVal) / maxVal) * 100;
+    el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% in period</span>`
+      + (Math.abs(athChg) > 0.1 ? ` <span style="color:var(--text3);font-size:11px;font-weight:500">· ${athChg.toFixed(2)}% from ATH</span>` : '');
+    el.style.color = '';
   } else {
     el.textContent = '';
   }

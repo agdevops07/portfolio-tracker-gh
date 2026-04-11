@@ -15,22 +15,22 @@ let _fundMode = 'standalone'; // standalone is default
 let _fundTab  = 'ratios';
 let _currentTicker = '';
 
-// ── Render dd-meta (sector breadcrumb + about under stock title) ──
+// ── Render dd-meta (sector breadcrumb under stock title) ──
 function renderDDMeta(fund) {
-  const el = document.getElementById('dd-meta');
-  if (!el) return;
-  if (!fund) { el.innerHTML = ''; return; }
-  const parts = [];
-  if (fund.sectorBreadcrumb) {
-    parts.push(`<span>${fund.sectorBreadcrumb}</span>`);
-  } else if (fund.sector) {
-    parts.push(`<span>${fund.sector}</span>`);
-    if (fund.industry) parts.push(`<span class="sep">›</span><span>${fund.industry}</span>`);
-  }
-  el.innerHTML = parts.join('');
-  // About shown separately below meta in its own block
+  const metaEl  = document.getElementById('dd-meta');
   const aboutEl = document.getElementById('dd-about');
-  if (aboutEl) aboutEl.textContent = fund.about || '';
+  if (metaEl)  metaEl.innerHTML  = '';
+  if (aboutEl) aboutEl.textContent = '';
+  if (!fund) return;
+  // Sector breadcrumb
+  if (metaEl) {
+    const parts = [];
+    if (fund.sectorBreadcrumb) parts.push(fund.sectorBreadcrumb);
+    else if (fund.sector) parts.push(fund.sector + (fund.industry ? ' › ' + fund.industry : ''));
+    metaEl.innerHTML = parts.map(p => `<span>${p}</span>`).join('');
+  }
+  // About — full text in its own block
+  if (aboutEl && fund.about) aboutEl.textContent = fund.about;
 }
 
 // ── Render a financial table ──────────────────────
@@ -70,7 +70,6 @@ function renderFundTab() {
         ${row('Debt/Equity', _fundData.debtEquity)}
         ${row('EPS', _fundData.eps)}
         ${row('Face Value', _fundData.faceValue)}
-        ${_fundData.sector ? `<div class="fund-item fund-wide"><span class="fund-label">Sector</span><span class="fund-val">${_fundData.sector}</span></div>` : ''}
       </div>
       ${_fundData.about ? `<div style="margin-top:0.6rem;font-size:11px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:0.5rem;">${_fundData.about}</div>` : ''}
       <div class="fund-table-note" style="margin-top:0.5rem;">Source: <a href="${_fundData._url}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a> · ${_fundData._mode}</div>`;
@@ -232,9 +231,16 @@ function updateDDFilterUI(ticker, hist, from, to) {
   document.querySelectorAll('.dd-tf-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===ddFilter.value));
   const dates = Object.keys(filterHist(hist,from,to)).sort();
   if (dates.length>=2) {
-    const chg=((hist[dates[dates.length-1]]-hist[dates[0]])/hist[dates[0]])*100;
+    const startP = hist[dates[0]], endP = hist[dates[dates.length-1]];
+    const chg = ((endP - startP) / startP) * 100;
+    const maxP = Math.max(...dates.map(d => hist[d]));
+    const athChg = ((endP - maxP) / maxP) * 100;
     const el=document.getElementById('dd-period-chg');
-    if(el){el.textContent=`${chg>=0?'+':''}${chg.toFixed(2)}% in period`;el.style.color=chg>=0?'var(--green)':'var(--red)';}
+    if(el){
+      el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% in period</span>`
+        + (Math.abs(athChg) > 0.1 ? ` <span style="color:var(--text3);font-size:11px;font-weight:500">· ${athChg.toFixed(2)}% from ATH</span>` : '');
+      el.style.color = '';
+    }
   }
 }
 

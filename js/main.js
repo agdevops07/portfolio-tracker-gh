@@ -196,3 +196,10 @@ function renderHoldingsTable() {
     tbody.appendChild(tr);
   });
 }
+
+// ── Dashboard tabs ─────────────────────────────
+window.switchDashTab = function(tab, btn) {
+  document.querySelectorAll('.dash-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('dash-tab-overview').style.display  = tab === 'overview'  ? '' : 'none';
+  document.getElementById('dash-tab-holdings').style.display  = tab === 'holdings'  ? '' : 'none';
+};
