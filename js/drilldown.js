@@ -27,12 +27,10 @@ function renderDDMeta(fund) {
     parts.push(`<span>${fund.sector}</span>`);
     if (fund.industry) parts.push(`<span class="sep">›</span><span>${fund.industry}</span>`);
   }
-  if (fund.about) {
-    const short = fund.about.slice(0, 160).trim();
-    if (parts.length) parts.push(`<span class="sep">·</span>`);
-    parts.push(`<span style="color:var(--text3)">${short}${fund.about.length > 160 ? '…' : ''}</span>`);
-  }
   el.innerHTML = parts.join('');
+  // About shown separately below meta in its own block
+  const aboutEl = document.getElementById('dd-about');
+  if (aboutEl) aboutEl.textContent = fund.about || '';
 }
 
 // ── Render a financial table ──────────────────────
@@ -74,7 +72,7 @@ function renderFundTab() {
         ${row('Face Value', _fundData.faceValue)}
         ${_fundData.sector ? `<div class="fund-item fund-wide"><span class="fund-label">Sector</span><span class="fund-val">${_fundData.sector}</span></div>` : ''}
       </div>
-      ${_fundData.about ? `<div style="margin-top:0.6rem;font-size:11px;color:var(--text2);line-height:1.5;border-top:1px solid var(--border);padding-top:0.5rem;">${_fundData.about}…</div>` : ''}
+      ${_fundData.about ? `<div style="margin-top:0.6rem;font-size:11px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:0.5rem;">${_fundData.about}</div>` : ''}
       <div class="fund-table-note" style="margin-top:0.5rem;">Source: <a href="${_fundData._url}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a> · ${_fundData._mode}</div>`;
   } else if (_fundTab === 'pnl') {
     el.innerHTML = renderFinTable(_fundData.pnl, 'P&L figures in ₹ Cr');
@@ -99,12 +97,16 @@ window.switchFundMode = function(mode, btn) {
   document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const el = document.getElementById('dd-fundamentals');
+  const fundBody = document.getElementById('dd-fund-body');
+  // Lock height to prevent layout flicker during fetch
+  if (fundBody) { fundBody.style.minHeight = fundBody.offsetHeight + 'px'; }
   if (el) el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading…</div>';
   fetchScreenerFundamentals(_currentTicker, mode).then(fund => {
     _fundData = fund;
     renderDDMeta(fund);
-    if (fund) { renderFundTab(); }
-    else { renderFundFallback(_currentTicker); }
+    if (fund) { renderFundTab(); } else { renderFundFallback(_currentTicker); }
+    // Release height lock after render
+    if (fundBody) { requestAnimationFrame(() => { fundBody.style.minHeight = ''; }); }
   });
 };
 

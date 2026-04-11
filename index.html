@@ -13,30 +13,43 @@
 
 <!-- UPLOAD SCREEN -->
 <div id="upload-screen">
+  <div class="upload-bg-glow"></div>
   <div class="logo">📈 Portfolio Tracker</div>
-  <h1 class="hero-title">Your portfolio.<br>Crystal clear.</h1>
-  <p class="hero-sub">Upload your holdings CSV and get an instant visual breakdown.</p>
+  <h1 class="hero-title">Your portfolio,<br><span class="hero-accent">crystal clear.</span></h1>
+  <p class="hero-sub">Upload a CSV of your holdings and instantly see live P&L, allocation, and fundamentals.</p>
 
   <div class="upload-layout">
     <!-- Left: drop zone -->
     <div class="upload-left">
-      <div class="drop-zone" id="drop-zone">
-        <div class="drop-icon">📂</div>
-        <div class="drop-title">Drop your CSV here</div>
-        <div class="drop-sub">ticker, quantity, average_buy_price, buy_date</div>
-        <input type="file" id="file-input" accept=".csv">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-          <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse File</button>
-          <button class="btn btn-secondary" onclick="toggleCsvTextInput()">✏️ Paste CSV</button>
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Upload CSV file">
+        <div class="drop-zone-inner">
+          <div class="drop-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="drop-title">Drop your CSV here</div>
+          <div class="drop-sub">or click to browse from your device</div>
+        </div>
+        <input type="file" id="file-input" accept=".csv" aria-label="Choose CSV file">
+        <div class="upload-btn-row">
+          <button class="btn btn-primary upload-btn" id="browse-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Browse File
+          </button>
+          <button class="btn btn-secondary upload-btn" id="paste-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            Paste CSV
+          </button>
         </div>
         <div id="csv-text-wrap" style="display:none;width:100%;margin-top:0.75rem;">
-          <textarea id="csv-text-input" placeholder="Paste CSV here…
-ticker,quantity,average_buy_price,buy_date,upstox_ticker
-RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018" style="width:100%;height:120px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'SF Mono',monospace;font-size:12px;padding:0.75rem;resize:vertical;outline:none;"></textarea>
-          <button class="btn btn-primary" style="margin-top:0.5rem;width:100%" onclick="loadFromTextInput()">Load from Text →</button>
+          <textarea id="csv-text-input" placeholder="ticker,quantity,average_buy_price,buy_date,upstox_ticker&#10;RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018" style="width:100%;height:110px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'SF Mono',monospace;font-size:12px;padding:0.75rem;resize:vertical;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+          <button class="btn btn-primary" style="margin-top:0.5rem;width:100%" onclick="loadFromTextInput()">Load Portfolio →</button>
         </div>
-        <div class="or-divider">or</div>
-        <button class="sample-btn" onclick="loadMyPortfolio()">Load sample portfolio</button>
+        <div class="or-divider"><span>or</span></div>
+        <button class="sample-btn" id="demo-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Try with sample portfolio
+        </button>
+        <p class="drop-trust">🔒 Your data stays in memory — never uploaded to any server</p>
       </div>
       <div class="format-hint">
         <details>
@@ -47,7 +60,7 @@ TCS.NS,5,3800.00,2023-04-15,
 INFY.NS,20,1500.00,2023-01-10,</pre>
         </details>
       </div>
-      <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in</p>
+      <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in · Not financial advice</p>
     </div>
 
     <!-- Right: feature highlights (desktop only) -->
@@ -242,6 +255,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       <div class="dd-title" id="dd-ticker"></div>
       <div class="dd-subtitle" id="dd-subtitle"></div>
       <div class="dd-meta" id="dd-meta"></div>
+      <div class="dd-about" id="dd-about"></div>
     </div>
   </div>
 
@@ -372,43 +386,58 @@ function toggleSection(bodyId, btnId) {
   btn.textContent = collapsed ? '▼' : '▲';
 }
 
-// Maximize a chart card — expand to full-screen overlay
+// Chart registry — charts.js writes here after each render
+window._chartInstances = window._chartInstances || {};
+
+// Maximize: re-renders chart at full resolution using stored Chart.js config
 function maximizeChart(cardId, bodyId, canvasId) {
   const existing = document.getElementById('chart-maximized-overlay');
   if (existing) { existing.remove(); return; }
 
-  const card = document.getElementById(cardId);
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-
   const overlay = document.createElement('div');
   overlay.id = 'chart-maximized-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:var(--bg2);z-index:2000;display:flex;flex-direction:column;padding:1rem;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:var(--bg2);z-index:2000;display:flex;flex-direction:column;padding:1rem 1.5rem;';
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✕ Close';
   closeBtn.style.cssText = 'align-self:flex-end;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:0.75rem;';
-  closeBtn.onclick = () => { overlay.remove(); };
+  closeBtn.onclick = () => overlay.remove();
 
   const canvasWrap = document.createElement('div');
   canvasWrap.style.cssText = 'flex:1;position:relative;min-height:0;';
-
-  // Clone canvas into overlay and re-render
   const bigCanvas = document.createElement('canvas');
-  bigCanvas.id = canvasId + '_max';
-  bigCanvas.style.cssText = 'width:100%;height:100%;';
+  bigCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
   canvasWrap.appendChild(bigCanvas);
   overlay.appendChild(closeBtn);
   overlay.appendChild(canvasWrap);
   document.body.appendChild(overlay);
 
-  // Draw current canvas contents into maximized canvas
-  const ctx = bigCanvas.getContext('2d');
-  bigCanvas.width = canvasWrap.offsetWidth;
-  bigCanvas.height = canvasWrap.offsetHeight;
-  ctx.drawImage(canvas, 0, 0, bigCanvas.width, bigCanvas.height);
+  requestAnimationFrame(() => {
+    const srcChart = window._chartInstances[canvasId];
+    if (srcChart && srcChart.config) {
+      try {
+        const cfg = srcChart.config;
+        new Chart(bigCanvas, {
+          type: cfg.type,
+          data: JSON.parse(JSON.stringify(cfg.data)),
+          options: Object.assign({}, JSON.parse(JSON.stringify(cfg.options || {})),
+            { animation: false, responsive: true, maintainAspectRatio: false }),
+        });
+        return;
+      } catch(e) { console.warn('Chart re-render failed, falling back', e); }
+    }
+    // High-DPI fallback
+    const src = document.getElementById(canvasId);
+    if (!src) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvasWrap.offsetWidth, h = canvasWrap.offsetHeight;
+    bigCanvas.width = w * dpr; bigCanvas.height = h * dpr;
+    bigCanvas.style.width = w + 'px'; bigCanvas.style.height = h + 'px';
+    const ctx = bigCanvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.drawImage(src, 0, 0, w, h);
+  });
 
-  // Close on Escape
   const esc = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } };
   document.addEventListener('keydown', esc);
 }

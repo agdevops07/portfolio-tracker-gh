@@ -280,29 +280,30 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
         if (label.includes('eps'))           fund.eps        = val;
       });
 
-      // About & sector — from peer comparison <p> (most reliable on Screener)
-      const about  = doc.querySelector('.company-profile p, #company-info p, .about p');
+      // About — full text, no truncation
+      const about = doc.querySelector('.company-profile p, #company-info p, .about p');
       if (about) fund.about = about.textContent.trim();
 
-      // Sector from peer comparison breadcrumb (title attrs are reliable)
-      const peerPara = doc.querySelector('h2 + p.sub, .company-ratios + p.sub, p.sub');
+      // Sector: find <h2>Peer comparison</h2> then its next sibling <p class="sub">
+      // Screener markup: <a href="..." title="Broad Sector">Industrials</a>
+      let peerPara = null;
+      doc.querySelectorAll('h2').forEach(h2 => {
+        if (h2.textContent.trim().includes('Peer comparison')) {
+          let sib = h2.nextElementSibling;
+          while (sib && sib.tagName !== 'P') sib = sib.nextElementSibling;
+          if (sib) peerPara = sib;
+        }
+      });
       if (peerPara) {
-        const links = peerPara.querySelectorAll('a[title]');
-        const sectorParts = [];
-        links.forEach(a => {
-          const title = a.getAttribute('title');
-          const text  = a.textContent.trim();
-          if (title && text) sectorParts.push({ title, text });
+        peerPara.querySelectorAll('a[title]').forEach(a => {
+          const t = a.getAttribute('title'), v = a.textContent.trim();
+          if (t === 'Broad Sector')   fund.broadSector   = v;
+          if (t === 'Sector')         fund.sector        = v;
+          if (t === 'Broad Industry') fund.broadIndustry = v;
+          if (t === 'Industry')       fund.industry      = v;
         });
-        // Pick 'Sector' and 'Industry' specifically
-        const sec = sectorParts.find(s => s.title === 'Sector');
-        const ind = sectorParts.find(s => s.title === 'Industry');
-        const bro = sectorParts.find(s => s.title === 'Broad Sector');
-        if (sec) fund.sector   = sec.text;
-        if (ind) fund.industry = ind.text;
-        if (bro) fund.broadSector = bro.text;
-        // Full breadcrumb for display
-        if (sectorParts.length) fund.sectorBreadcrumb = sectorParts.map(s => s.text).join(' › ');
+        const parts = [fund.broadSector, fund.sector, fund.industry].filter(Boolean);
+        if (parts.length) fund.sectorBreadcrumb = parts.join(' › ');
       }
 
       // Financial tables

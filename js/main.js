@@ -37,6 +37,28 @@ window.loadFromTextInput   = loadFromTextInput;
 
 document.addEventListener('DOMContentLoaded', () => {
   initFileHandlers();
+
+  // Wire upload screen buttons (IDs changed for semantic markup)
+  const browseBtn = document.getElementById('browse-btn');
+  const pasteBtn  = document.getElementById('paste-btn');
+  const demoBtn   = document.getElementById('demo-btn');
+  if (browseBtn) browseBtn.addEventListener('click', () => document.getElementById('file-input').click());
+  if (pasteBtn)  pasteBtn.addEventListener('click', () => toggleCsvTextInput());
+  if (demoBtn)   demoBtn.addEventListener('click', () => loadMyPortfolio());
+
+  // Premium drag-drop visual feedback
+  const dz = document.getElementById('drop-zone');
+  if (dz) {
+    ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag-over'); }));
+    ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('drag-over')));
+
+    // Button click animation
+    dz.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('mousedown', () => btn.classList.add('btn-press'));
+      btn.addEventListener('mouseup',   () => btn.classList.remove('btn-press'));
+      btn.addEventListener('mouseleave',() => btn.classList.remove('btn-press'));
+    });
+  }
 });
 
 // ── Feature 3: Paste CSV text input ─────────────

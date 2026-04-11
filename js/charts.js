@@ -434,6 +434,7 @@ export function renderDrilldownChart(ticker, hist, buyDate) {
   const grad = makeGrad(ctx, 300, 'rgba(99,102,241,0.2)', 'rgba(0,0,0,0)');
   const displayLabels = dates.map(d => formatDateLabel(d));
 
+  if (!window._chartInstances) window._chartInstances = {};
   state.ddChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -468,6 +469,7 @@ export function renderDrilldownChart(ticker, hist, buyDate) {
       interaction: { mode: 'index', intersect: false },
     },
   });
+  window._chartInstances['ddChart'] = state.ddChartInstance;
 }
 
 // ── Drilldown: intraday day chart ─────────────────
@@ -490,6 +492,7 @@ export function renderDrilldownDayChart(ticker) {
   const ctx  = document.getElementById('ddDayChart').getContext('2d');
   const grad = makeGrad(ctx, 220, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
 
+  if (!window._chartInstances) window._chartInstances = {};
   state.ddDayChartInstance = new Chart(ctx, {
     type: 'line',
     data: { labels, datasets: [{ data: prices, borderColor: color,
@@ -509,6 +512,7 @@ export function renderDrilldownDayChart(ticker) {
       interaction: { mode: 'index', intersect: false },
     },
   });
+  window._chartInstances['ddDayChart'] = state.ddDayChartInstance;
 }
 
 // ── Destroy all ──────────────────────────────────
