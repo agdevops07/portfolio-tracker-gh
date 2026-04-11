@@ -10,11 +10,30 @@ import { fetchDayHistory, fetchScreenerFundamentals } from './api.js';
 const DEFAULT_FROM = '2026-03-31';
 const ddFilter = { value: 'CUSTOM', customFrom: DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
 
-// Fundamentals state
 let _fundData = null;
-let _fundMode = 'consolidated';
+let _fundMode = 'standalone'; // standalone is default
 let _fundTab  = 'ratios';
 let _currentTicker = '';
+
+// ── Render dd-meta (sector breadcrumb + about under stock title) ──
+function renderDDMeta(fund) {
+  const el = document.getElementById('dd-meta');
+  if (!el) return;
+  if (!fund) { el.innerHTML = ''; return; }
+  const parts = [];
+  if (fund.sectorBreadcrumb) {
+    parts.push(`<span>${fund.sectorBreadcrumb}</span>`);
+  } else if (fund.sector) {
+    parts.push(`<span>${fund.sector}</span>`);
+    if (fund.industry) parts.push(`<span class="sep">›</span><span>${fund.industry}</span>`);
+  }
+  if (fund.about) {
+    const short = fund.about.slice(0, 160).trim();
+    if (parts.length) parts.push(`<span class="sep">·</span>`);
+    parts.push(`<span style="color:var(--text3)">${short}${fund.about.length > 160 ? '…' : ''}</span>`);
+  }
+  el.innerHTML = parts.join('');
+}
 
 // ── Render a financial table ──────────────────────
 function renderFinTable(tableData, note = 'Figures in ₹ Cr') {
@@ -83,6 +102,7 @@ window.switchFundMode = function(mode, btn) {
   if (el) el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading…</div>';
   fetchScreenerFundamentals(_currentTicker, mode).then(fund => {
     _fundData = fund;
+    renderDDMeta(fund);
     if (fund) { renderFundTab(); }
     else { renderFundFallback(_currentTicker); }
   });
@@ -104,9 +124,10 @@ export async function openDrilldown(ticker) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   _currentTicker = ticker;
   _fundTab  = 'ratios';
-  _fundMode = 'consolidated';
+  _fundMode = 'standalone'; // default
   _fundData = null;
 
+  document.getElementById('dd-meta') && (document.getElementById('dd-meta').innerHTML = '');
   const today = new Date().toISOString().split('T')[0];
   ddFilter.value = 'CUSTOM'; ddFilter.customFrom = DEFAULT_FROM; ddFilter.customTo = today;
 
@@ -162,14 +183,16 @@ export async function openDrilldown(ticker) {
   if (cw) cw.style.display = 'flex';
   document.querySelectorAll('.dd-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === 'CUSTOM'));
   document.querySelectorAll('.fund-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'ratios'));
-  document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.toggle('active', b.id === 'fund-mode-cons'));
+  // standalone is default
+  document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.toggle('active', b.id === 'fund-mode-stand'));
 
   renderDDHistorySection(ticker);
 
-  // Fundamentals — Screener only
+  // Fundamentals — Screener only, standalone default
   const fundEl = document.getElementById('dd-fundamentals');
   if (fundEl) fundEl.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading from Screener.in…</div>';
-  _fundData = await fetchScreenerFundamentals(ticker, 'consolidated');
+  _fundData = await fetchScreenerFundamentals(ticker, 'standalone');
+  renderDDMeta(_fundData);
   if (_fundData) renderFundTab(); else renderFundFallback(ticker);
 
   // Intraday

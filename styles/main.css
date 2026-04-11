@@ -488,3 +488,29 @@ tr:hover td { background: var(--bg3); }
 .fund-table .positive { color: var(--green); }
 .fund-table .negative { color: var(--red); }
 .fund-table-note { font-size: 10px; color: var(--text3); margin-top: 0.4rem; text-align: right; }
+
+/* ── DRILLDOWN CHARTS SIDE BY SIDE ── */
+.dd-charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; align-items: start; }
+.dd-chart-half { margin-bottom: 0 !important; }
+@media (max-width: 700px) { .dd-charts-row { grid-template-columns: 1fr; } }
+
+/* ── DD HEADER META (sector/about under title) ── */
+.dd-header-row { margin-bottom: 0.75rem; }
+.dd-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 12px; color: var(--text3); }
+.dd-meta a { color: var(--text2); text-decoration: none; }
+.dd-meta a:hover { color: var(--accent2); }
+.dd-meta .sep { color: var(--text3); }
+
+/* ── ICON BUTTON (maximize) ── */
+.icon-btn { background: none; border: 1px solid var(--border); color: var(--text3); width: 26px; height: 26px; border-radius: 5px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+.icon-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── COLLAPSE BTN (shorter label) ── */
+.collapse-btn { background: none; border: 1px solid var(--border); color: var(--text2); padding: 3px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+.collapse-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── FOOTER ── */
+.app-footer { text-align: center; padding: 1.25rem 2rem; font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.app-footer a { color: var(--text3); text-decoration: none; }
+.app-footer a:hover { color: var(--accent2); }
+.footer-sep { opacity: 0.4; }

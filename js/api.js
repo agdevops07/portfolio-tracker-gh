@@ -280,11 +280,30 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
         if (label.includes('eps'))           fund.eps        = val;
       });
 
-      // About & sector
+      // About & sector — from peer comparison <p> (most reliable on Screener)
       const about  = doc.querySelector('.company-profile p, #company-info p, .about p');
       if (about) fund.about = about.textContent.trim();
-      const sector = doc.querySelector('.company-profile .tag, .company-sector a, a[href*="/screen/"]');
-      if (sector) fund.sector = sector.textContent.trim();
+
+      // Sector from peer comparison breadcrumb (title attrs are reliable)
+      const peerPara = doc.querySelector('h2 + p.sub, .company-ratios + p.sub, p.sub');
+      if (peerPara) {
+        const links = peerPara.querySelectorAll('a[title]');
+        const sectorParts = [];
+        links.forEach(a => {
+          const title = a.getAttribute('title');
+          const text  = a.textContent.trim();
+          if (title && text) sectorParts.push({ title, text });
+        });
+        // Pick 'Sector' and 'Industry' specifically
+        const sec = sectorParts.find(s => s.title === 'Sector');
+        const ind = sectorParts.find(s => s.title === 'Industry');
+        const bro = sectorParts.find(s => s.title === 'Broad Sector');
+        if (sec) fund.sector   = sec.text;
+        if (ind) fund.industry = ind.text;
+        if (bro) fund.broadSector = bro.text;
+        // Full breadcrumb for display
+        if (sectorParts.length) fund.sectorBreadcrumb = sectorParts.map(s => s.text).join(' › ');
+      }
 
       // Financial tables
       fund.pnl       = parseScreenerTable(doc, 'profit-loss');
