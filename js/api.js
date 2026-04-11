@@ -248,7 +248,7 @@ function parseScreenerTable(doc, sectionId) {
 }
 
 export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
-  const sym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase();
+  const sym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase().replace('-SM', '');
   const urls = mode === 'consolidated'
     ? [`https://www.screener.in/company/${sym}/consolidated/`, `https://www.screener.in/company/${sym}/`]
     : [`https://www.screener.in/company/${sym}/`];

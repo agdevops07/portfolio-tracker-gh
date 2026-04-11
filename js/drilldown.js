@@ -89,7 +89,7 @@ window.switchFundMode = function(mode, btn) {
 };
 
 function renderFundFallback(ticker) {
-  const sym = ticker.replace(/\.(NS|BO|BSE|NSE|-SM)$/i, '');
+  const sym = ticker.replace(/\.(NS|BO|BSE|NSE|-SM)$/i, '').replace('-SM', '');
   const el = document.getElementById('dd-fundamentals');
   if (el) el.innerHTML = `
     <div style="color:var(--text3);font-size:12px;padding:0.5rem 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
