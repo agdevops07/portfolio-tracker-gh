@@ -19,8 +19,33 @@
   <p class="hero-sub">Upload a CSV of your holdings and instantly see live P&L, allocation, and fundamentals.</p>
 
   <div class="upload-layout">
-    <!-- Left: drop zone -->
+    <!-- Left: feature highlights -->
     <div class="upload-left">
+      <div class="upload-right-title">What you get</div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">📊</div>
+        <div class="upload-feature-text"><strong>Live Portfolio Value</strong>Real-time prices with historical chart and custom date ranges</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">📈</div>
+        <div class="upload-feature-text"><strong>Intraday Tracking</strong>5-min charts for today's portfolio and individual stocks</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">🧮</div>
+        <div class="upload-feature-text"><strong>P&L Analysis</strong>Overall returns, daily change, CAGR per holding</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">📋</div>
+        <div class="upload-feature-text"><strong>Fundamentals</strong>P/E, ROCE, ROE, Balance Sheet & Cash Flows via Screener.in</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">💾</div>
+        <div class="upload-feature-text"><strong>Export</strong>Download PDF reports or chart images anytime</div>
+      </div>
+    </div>
+
+    <!-- Right: drop zone -->
+    <div class="upload-right">
       <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Upload CSV file">
         <div class="drop-zone-inner">
           <div class="drop-icon">
@@ -58,31 +83,6 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       </div>
       <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in · Not financial advice</p>
     </div>
-
-    <!-- Right: feature highlights (desktop only) -->
-    <div class="upload-right">
-      <div class="upload-right-title">What you get</div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">📊</div>
-        <div class="upload-feature-text"><strong>Live Portfolio Value</strong>Real-time prices with historical chart and custom date ranges</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">📈</div>
-        <div class="upload-feature-text"><strong>Intraday Tracking</strong>5-min charts for today's portfolio and individual stocks</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">🧮</div>
-        <div class="upload-feature-text"><strong>P&L Analysis</strong>Overall returns, daily change, CAGR per holding</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">📋</div>
-        <div class="upload-feature-text"><strong>Fundamentals</strong>P/E, ROCE, ROE, Balance Sheet & Cash Flows via Screener.in</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">💾</div>
-        <div class="upload-feature-text"><strong>Export</strong>Download PDF reports or chart images anytime</div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -104,7 +104,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     <table id="preview-table">
       <thead><tr>
         <th id="th-ticker" onclick="sortPreview('ticker')">Ticker</th>
-        <th id="th-upstoxTicker" onclick="sortPreview('upstoxTicker')">Upstox Ticker</th>
+        <th id="th-upstoxTicker" onclick="sortPreview('upstoxTicker')">ISIN</th>
         <th id="th-totalQty" onclick="sortPreview('totalQty')">Qty</th>
         <th id="th-avgBuy" onclick="sortPreview('avgBuy')">Avg Buy Price</th>
         <th id="th-invested" onclick="sortPreview('invested')">Invested</th>

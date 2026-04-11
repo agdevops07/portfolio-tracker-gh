@@ -8,7 +8,7 @@ import { showScreen } from './utils.js';
 
 const COLUMN_LABELS = {
   ticker: 'Ticker',
-  upstoxTicker: 'Upstox Ticker',
+  upstoxTicker: 'ISIN',
   totalQty: 'Qty',
   avgBuy: 'Avg Buy Price',
   invested: 'Invested',
@@ -78,10 +78,7 @@ function renderRows(holdings) {
 
     tr.innerHTML = `
       <td><strong>${h.ticker}</strong></td>
-      <td>
-        ${h.upstoxTicker ? h.upstoxTicker : '—'}
-        ${h.upstoxTicker ? '<div class="badge badge-green">UPSTOX</div>' : ''}
-      </td>
+      <td>${h.upstoxTicker ? h.upstoxTicker : '—'}</td>
       <td>${h.totalQty}</td>
       <td>${h.avgBuy.toFixed(2)}</td>
       <td>${h.invested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
