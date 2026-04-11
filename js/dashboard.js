@@ -22,6 +22,14 @@ import {
 export async function loadDashboard() {
   showScreen('dashboard-screen');
 
+  // Remove any "no portfolio" overlays injected by openStockScreener
+  if (typeof window._clearNoPortMsgs === 'function') window._clearNoPortMsgs();
+
+  // Always land on Overview tab
+  if (typeof window.switchDashTab === 'function') {
+    window.switchDashTab('overview', document.querySelector('[data-tab="overview"]'));
+  }
+
   const loadingDiv = document.getElementById('dash-loading');
   const contentDiv = document.getElementById('dash-content');
   const loadMsg   = document.getElementById('loading-msg');

@@ -39,6 +39,12 @@ window.sortHoldingsModal   = sortHoldingsModal;
 window.toggleCsvTextInput  = toggleCsvTextInput;
 window.loadFromTextInput   = loadFromTextInput;
 
+// Expose internals needed by goBack() in utils.js
+import { destroyAllCharts } from './charts.js';
+import { stopAutoRefresh } from './dashboard.js';
+window._destroyAllCharts = destroyAllCharts;
+window._stopAutoRefresh  = stopAutoRefresh;
+
 document.addEventListener('DOMContentLoaded', () => {
   initFileHandlers();
 
@@ -72,6 +78,10 @@ export function toggleCsvTextInput() {
 export function loadFromTextInput() {
   const text = document.getElementById('csv-text-input').value.trim();
   if (!text) { alert('Please paste some CSV data first.'); return; }
+  // Clear any previous portfolio before loading new data
+  if (typeof window._stopAutoRefresh === 'function') window._stopAutoRefresh();
+  if (typeof window._destroyAllCharts === 'function') window._destroyAllCharts();
+  if (typeof window._clearNoPortMsgs === 'function') window._clearNoPortMsgs();
   Papa.parse(text, {
     header: true,
     skipEmptyLines: true,

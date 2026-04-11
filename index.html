@@ -163,10 +163,10 @@
     <!-- OVERVIEW TAB -->
     <div id="dash-tab-overview">
     <!-- Stat cards -->
-    <div class="cards-grid" id="stat-cards"></div>
+    <div class="cards-grid" id="stat-cards" data-portfolio-content></div>
 
     <!-- Portfolio History Chart -->
-    <div class="chart-card collapsible-card">
+    <div class="chart-card collapsible-card" data-portfolio-content>
       <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
         <div class="chart-title">Portfolio Value Over Selected Period
           <span id="port-period-chg" style="font-size:15px;font-weight:700;"></span>
@@ -196,7 +196,7 @@
     </div>
 
     <!-- Portfolio Day Chart (collapsible) -->
-    <div class="chart-card collapsible-card">
+    <div class="chart-card collapsible-card" data-portfolio-content>
       <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
         <div class="chart-title">Today's Performance
           <span class="chart-subtitle">(Intraday 15-min delay)</span>
@@ -211,7 +211,7 @@
     </div>
 
     <!-- Allocation -->
-    <div class="chart-card collapsible-card" style="margin-bottom:1rem">
+    <div class="chart-card collapsible-card" data-portfolio-content style="margin-bottom:1rem">
       <div class="chart-header collapsible-header" onclick="toggleSection('alloc-body','alloc-toggle')">
         <div class="chart-title">Allocation</div>
         <button class="collapse-btn" id="alloc-toggle">▲ Collapse</button>
@@ -222,7 +222,7 @@
     </div>
 
     <!-- Overall P&L + Today P&L side by side -->
-    <div class="two-col">
+    <div class="two-col" data-portfolio-content>
       <div class="chart-card collapsible-card">
         <div class="chart-header collapsible-header" onclick="toggleSection('pnl-body','pnl-toggle')">
           <div class="chart-title">P&amp;L by Stock (Overall)</div>
@@ -249,11 +249,11 @@
 
     <!-- HOLDINGS TAB -->
     <div id="dash-tab-holdings" style="display:none">
-    <div class="section-header" style="margin-top:0.5rem">
+    <div class="section-header" data-portfolio-content style="margin-top:0.5rem">
       <div class="section-title">Holdings</div>
       <button class="holdings-detail-btn" onclick="openHoldingsModal()">📋 Full Holdings View</button>
     </div>
-    <div class="holdings-grid" id="holdings-grid"></div>
+    <div class="holdings-grid" id="holdings-grid" data-portfolio-content></div>
     </div><!-- /dash-tab-holdings -->
 
     <!-- STOCK SEARCH TAB -->
@@ -437,37 +437,37 @@
 
 <script>
 window.openStockScreener = function() {
-  // Show dashboard screen — skip loadDashboard entirely (no holdings needed)
   const screens = ['upload-screen','preview-screen','dashboard-screen','drilldown-screen'];
   screens.forEach(s => {
     const el = document.getElementById(s);
     if (el) el.style.display = s === 'dashboard-screen' ? 'block' : 'none';
   });
-  // Hide the loading spinner, show content directly
   const loadingDiv = document.getElementById('dash-loading');
   const contentDiv = document.getElementById('dash-content');
   if (loadingDiv) loadingDiv.style.display = 'none';
   if (contentDiv) contentDiv.style.display = 'block';
 
-  // Show "no portfolio" overlay on overview+holdings — as a sibling div, never touching their innerHTML
+  // Hide all portfolio-only content in overview and holdings tabs
+  document.querySelectorAll('[data-portfolio-content]').forEach(el => {
+    el.style.display = 'none';
+    el.setAttribute('data-pc-hidden', '1');
+  });
+
+  // Show 'no portfolio' message in overview and holdings tabs
   ['dash-tab-overview','dash-tab-holdings'].forEach(id => {
     const el = document.getElementById(id);
     if (!el || el.querySelector('.no-port-msg')) return;
     const msg = document.createElement('div');
     msg.className = 'no-port-msg';
-    msg.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;text-align:center;color:var(--text3);background:var(--bg1);z-index:10;';
-    msg.innerHTML = `<div style="font-size:2rem;margin-bottom:0.75rem;">📂</div>
-      <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:0.4rem;">No portfolio loaded</div>
-      <div style="font-size:13px;margin-bottom:1.25rem;">Load your portfolio CSV to see your holdings, P&amp;L and charts here.</div>
-      <button class="btn btn-primary" style="font-size:13px;padding:8px 20px;"
-        onclick="document.getElementById('upload-screen').style.display='flex';document.getElementById('dashboard-screen').style.display='none';">
-        ← Load Portfolio
-      </button>`;
-    el.style.position = 'relative';
-    el.appendChild(msg);
+    msg.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 1rem;text-align:center;color:var(--text3);';
+    msg.innerHTML = '<div style="font-size:2rem;margin-bottom:0.75rem;">📂</div>'
+      + '<div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:0.4rem;">No portfolio loaded</div>'
+      + '<div style="font-size:13px;margin-bottom:1.25rem;">Load your portfolio CSV to see your holdings, P&L and charts here.</div>'
+      + '<button class="btn btn-primary" style="font-size:13px;padding:8px 20px;" onclick="goBack()">&larr; Load Portfolio</button>';
+    el.insertBefore(msg, el.firstChild);
   });
 
-  // Activate stocksearch tab via existing switchDashTab (handles initStockSearch)
+  // Activate stocksearch tab
   if (typeof window.switchDashTab === 'function') {
     window.switchDashTab('stocksearch', document.querySelector('[data-tab="stocksearch"]'));
   }
@@ -486,6 +486,11 @@ window._chartInstances = window._chartInstances || {};
 // Remove screener-mode overlays when real dashboard loads
 window._clearNoPortMsgs = function() {
   document.querySelectorAll('.no-port-msg').forEach(el => el.remove());
+  // Restore portfolio content that was hidden in screener mode
+  document.querySelectorAll('[data-pc-hidden]').forEach(el => {
+    el.style.display = '';
+    el.removeAttribute('data-pc-hidden');
+  });
 };
 
 function downloadSampleCSV() {

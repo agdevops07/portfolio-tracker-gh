@@ -37,6 +37,38 @@ export function showScreen(id) {
 }
 
 export function goBack() {
+  // Stop any running auto-refresh
+  if (typeof window._stopAutoRefresh === 'function') window._stopAutoRefresh();
+
+  // Dynamically import state and reset everything
+  import('./state.js').then(({ state, resetAllCaches }) => {
+    resetAllCaches();
+    state.rawRows             = [];
+    state.holdings            = {};
+    state.portfolioTimeSeries = [];
+    state.fullTimeSeries      = [];
+    state.histories           = {};
+    state.dayHistories        = {};
+    state.currentFilter       = '1Y';
+    state.refreshPaused       = false;
+    if (state.refreshIntervalId) {
+      clearInterval(state.refreshIntervalId);
+      state.refreshIntervalId = null;
+    }
+  });
+
+  // Destroy charts
+  if (typeof window._destroyAllCharts === 'function') window._destroyAllCharts();
+
+  // Remove any no-portfolio overlays
+  if (typeof window._clearNoPortMsgs === 'function') window._clearNoPortMsgs();
+
+  // Reset upload screen UI
+  const fileInput = document.getElementById('file-input');
+  if (fileInput) fileInput.value = '';
+  const errDiv = document.getElementById('preview-error');
+  if (errDiv) errDiv.innerHTML = '';
+
   showScreen('upload-screen');
 }
 
