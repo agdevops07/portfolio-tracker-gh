@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════
 
 import { initFileHandlers, loadSampleData, loadMyPortfolio, processCSV } from './fileHandler.js';
+import { openStockPicker, closeStockPicker } from './stockPicker.js';
 import { sortPreview } from './preview.js';
 import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval } from './dashboard.js';
 import { setTimeFilter } from './charts.js';
@@ -14,6 +15,8 @@ import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS } from './charts.js';
 
 // Expose globals immediately so inline onclick attrs work
+window.openStockPicker     = openStockPicker;
+window.closeStockPicker    = closeStockPicker;
 window.loadSampleData      = loadSampleData;
 window.loadMyPortfolio     = loadMyPortfolio;
 window.loadDashboard       = loadDashboard;
@@ -40,10 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Wire upload screen buttons (IDs changed for semantic markup)
   const browseBtn = document.getElementById('browse-btn');
-  const pasteBtn  = document.getElementById('paste-btn');
   const demoBtn   = document.getElementById('demo-btn');
   if (browseBtn) browseBtn.addEventListener('click', () => document.getElementById('file-input').click());
-  if (pasteBtn)  pasteBtn.addEventListener('click', () => toggleCsvTextInput());
   if (demoBtn)   demoBtn.addEventListener('click', () => loadMyPortfolio());
 
   // Premium drag-drop visual feedback

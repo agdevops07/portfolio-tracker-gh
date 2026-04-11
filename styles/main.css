@@ -557,3 +557,305 @@ tr:hover td { background: var(--bg3); }
 #dashboard-screen { display: none; padding: 1.5rem clamp(1rem, 3vw, 2rem); max-width: min(1300px, 100%); margin: 0 auto; }
 #drilldown-screen { display: none; padding: 1.5rem clamp(1rem, 3vw, 2rem); max-width: min(1100px, 100%); margin: 0 auto; }
 .upload-layout { max-width: min(980px, 100%); }
+
+/* ════════════════════════════════════════════════
+   STOCK PICKER MODAL
+   ════════════════════════════════════════════════ */
+
+.sp-modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  width: min(780px, 96vw);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  animation: modal-in 0.2s ease;
+}
+
+.sp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sp-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sp-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sp-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.9rem 1.4rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Each holding row ── */
+.sp-row {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 0.9rem;
+  margin-bottom: 12px;
+  position: relative;
+  transition: border-color 0.15s;
+}
+.sp-row:hover { border-color: var(--border2); }
+
+.sp-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+.sp-row-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.sp-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text3);
+  transition: all 0.15s;
+}
+.sp-remove-btn:hover { background: rgba(239,68,68,0.15); color: var(--red); }
+
+/* ── Search field ── */
+.sp-field { display: flex; flex-direction: column; gap: 4px; }
+.sp-field-search { margin-bottom: 10px; }
+.sp-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sp-search-wrap { position: relative; }
+
+.sp-exchange-toggle {
+  display: inline-flex;
+  gap: 0;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--border2);
+  margin-bottom: 6px;
+}
+.sp-exch-btn {
+  background: var(--bg2);
+  border: none;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sp-exch-btn.active {
+  background: var(--accent2);
+  color: #fff;
+}
+
+.sp-search-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.sp-search-input:focus { border-color: var(--accent2); }
+
+/* ── Selected stock chip ── */
+.sp-selected-stock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--accent2);
+  border-radius: 8px;
+  padding: 7px 10px;
+  flex-wrap: wrap;
+}
+.sp-company-name {
+  font-size: 12px;
+  color: var(--text2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sp-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 13px;
+  padding: 0 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.sp-clear-btn:hover { color: var(--red); }
+
+/* ── Exchange badge ── */
+.sp-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.sp-badge-nse { background: rgba(99,102,241,0.2); color: #818cf8; }
+.sp-badge-bse { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.sp-badge-nsesme { background: rgba(16,185,129,0.18); color: #34d399; }
+
+/* ── Dropdown ── */
+.sp-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.45);
+  z-index: 9999;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+.sp-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.sp-dd-item:last-child { border-bottom: none; }
+.sp-dd-item:hover, .sp-dd-item.focused { background: var(--bg3); }
+.sp-dd-sym { font-size: 13px; font-weight: 700; color: var(--text); flex-shrink: 0; }
+.sp-dd-name { font-size: 12px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-dd-hint { padding: 10px 14px; font-size: 12px; color: var(--text3); }
+
+/* ── Fields row ── */
+.sp-fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 540px) {
+  .sp-fields-row { grid-template-columns: 1fr 1fr; }
+  .sp-fields-row .sp-field:last-child { grid-column: 1/-1; }
+}
+.sp-input {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.sp-input:focus { border-color: var(--accent2); }
+input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+
+/* ── Ticker info chips ── */
+.sp-ticker-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.sp-ticker-chip {
+  font-size: 11px;
+  color: var(--text3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+.sp-ticker-chip code {
+  color: var(--text2);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ── Add row button ── */
+.sp-add-row-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed var(--border2);
+  border-radius: 10px;
+  color: var(--text3);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.15s;
+  margin-top: 4px;
+}
+.sp-add-row-btn:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(99,102,241,0.05); }
+
+/* ── Submit button ── */
+.sp-submit-btn { gap: 6px; padding: 9px 22px; font-size: 14px; }
+
+/* ── Ghost btn ── */
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
