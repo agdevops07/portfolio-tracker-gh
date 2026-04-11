@@ -71,7 +71,7 @@ export async function loadDashboard() {
     const dayResults = await Promise.all(
       tickers.map(async (ticker) => {
         const h = state.holdings[ticker];
-        const dayData = await fetchDayHistory(h.ticker);
+        const dayData = await fetchDayHistory(h.ticker, h.upstoxTicker);
         return { ticker, dayData };
       })
     );
@@ -119,7 +119,7 @@ export async function refreshPricesOnly() {
   await Promise.all(
     tickers.map(async (ticker) => {
       const h = state.holdings[ticker];
-      state.dayHistories[ticker] = await fetchDayHistory(h.ticker);
+      state.dayHistories[ticker] = await fetchDayHistory(h.ticker, h.upstoxTicker);
     })
   );
 

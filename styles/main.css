@@ -393,7 +393,7 @@ tr:hover td { background: var(--bg3); }
   font-weight: 400;
   color: var(--text3);
   margin-left: 6px;
-} */
+}
 @media print {
   #upload-screen, #preview-screen, #drilldown-screen,
   .dash-header, .holdings-grid, #holdings-modal,
@@ -403,4 +403,48 @@ tr:hover td { background: var(--bg3); }
   .chart-card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
   body { background: white; color: black; }
   :root { --bg: white; --bg2: #f8f8f8; --bg3: #f0f0f0; --text: #111; --text2: #555; --text3: #888; --border: #ddd; }
+}
+
+/* ── UI POLISH (session 4) ── */
+
+/* Tighter stat cards */
+.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; }
+.stat-value { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+
+/* Drilldown: tighter header */
+.dd-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.15rem; }
+.dd-subtitle { color: var(--text2); font-size: 13px; margin-bottom: 1rem; }
+
+/* Fundamentals: wider row for about text */
+.fund-item.fund-wide { grid-column: 1 / -1; }
+.fund-about { margin-top: 0.5rem; font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+/* Screener link styling */
+.screener-link { color: var(--accent2); text-decoration: none; font-size: 11px; }
+.screener-link:hover { text-decoration: underline; }
+
+/* Period change badge in chart header */
+#port-period-chg {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: rgba(99,102,241,0.1);
+}
+
+/* Holdings grid — more compact rows */
+.hc-bottom { grid-template-columns: repeat(3, 1fr); }
+
+/* Modal: slightly more compact */
+.modal-box {
+  width: 92vw;
+  max-width: 1100px;
+  max-height: 80vh;
+}
+
+/* Print overrides for PDF */
+@media print {
+  .chart-card { break-inside: avoid !important; page-break-inside: avoid !important; margin-bottom: 12px; }
+  .two-col { display: block; }
+  .two-col .chart-card { break-inside: avoid !important; margin-bottom: 12px; }
 }

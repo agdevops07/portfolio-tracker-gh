@@ -5,120 +5,67 @@
 import { state } from './state.js';
 import { fmt, pct, colorPnl, showScreen } from './utils.js';
 import { renderDrilldownChart, renderDrilldownDayChart } from './charts.js';
-import { fetchDayHistory } from './api.js';
+import { fetchDayHistory, fetchScreenerFundamentals, fetchYahooFundamentals } from './api.js';
 
 // Default date range: 31 March 2026 → today
 const DEFAULT_FROM = '2026-03-31';
-
-// Track current filter per ticker
 const ddFilter = { value: 'CUSTOM', customFrom: DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
 
-// ── Fetch stock fundamentals from Yahoo Finance ──
-// NOTE FOR NEXT SESSION:
-// Yahoo Finance quoteSummary is blocked via corsproxy for Indian stocks (.NS).
-// Better alternative: scrape Screener.in which has full fundamentals for NSE stocks.
-// URL pattern: https://www.screener.in/company/{SYMBOL}/  (strip .NS from ticker)
-// Key fields available: P/E, Market Cap, 52W High/Low, Book Value, Dividend Yield,
-// ROCE, ROE, Debt/Equity, Sales/Profit growth, Promoter holding, etc.
-// The page is public (no auth needed) and scrapable via corsproxy + DOMParser.
-// Example: ticker "RELIANCE.NS" → fetch "https://www.screener.in/company/RELIANCE/"
-//
-// Yahoo Finance alternative endpoint (sometimes works):
-// https://query1.finance.yahoo.com/v7/finance/quote?symbols=TICKER
-// (returns marketCap, trailingPE, fiftyTwoWeekHigh/Low in a single call)
-async function fetchFundamentals(ticker) {
-  const PROXY = 'https://corsproxy.io/?url=';
-
-  // Try Yahoo v7/finance/quote first (lighter, more reliable than quoteSummary)
-  const v7urls = [
-    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=marketCap,trailingPE,fiftyTwoWeekHigh,fiftyTwoWeekLow,trailingEps,priceToBook,beta,averageVolume,dividendYield`,
-    `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&fields=marketCap,trailingPE,fiftyTwoWeekHigh,fiftyTwoWeekLow,trailingEps,priceToBook,beta,averageVolume,dividendYield`,
-  ];
-
-  for (const url of v7urls) {
-    try {
-      const res = await fetch(PROXY + encodeURIComponent(url));
-      if (!res.ok) continue;
-      const data = await res.json();
-      const q = data?.quoteResponse?.result?.[0];
-      if (!q) continue;
-
-      const fmt = (v, decimals = 2) => v != null ? Number(v).toFixed(decimals) : null;
-      const fmtLarge = (v) => {
-        if (v == null) return null;
-        if (v >= 1e12) return (v / 1e12).toFixed(2) + 'T';
-        if (v >= 1e9)  return (v / 1e9).toFixed(2) + 'B';
-        if (v >= 1e7)  return '₹' + (v / 1e7).toFixed(1) + 'Cr';
-        return v.toLocaleString('en-IN');
-      };
-
-      return {
-        marketCap:     fmtLarge(q.marketCap),
-        peRatio:       fmt(q.trailingPE),
-        week52High:    fmt(q.fiftyTwoWeekHigh),
-        week52Low:     fmt(q.fiftyTwoWeekLow),
-        eps:           fmt(q.trailingEps),
-        priceToBook:   fmt(q.priceToBook),
-        beta:          fmt(q.beta),
-        avgVolume:     q.averageVolume ? Number(q.averageVolume).toLocaleString('en-IN') : null,
-        dividendYield: q.dividendYield != null ? (q.dividendYield * 100).toFixed(2) + '%' : null,
-        sector:        q.sector || null,
-        industry:      q.industry || null,
-      };
-    } catch (e) { /* try next */ }
-  }
-
-  // TODO (next session): scrape Screener.in as fallback
-  // const sym = ticker.replace('.NS','').replace('.BO','');
-  // const screenerUrl = `https://www.screener.in/company/${sym}/`;
-  // const html = await fetch(PROXY + encodeURIComponent(screenerUrl)).then(r => r.text());
-  // parse with DOMParser — li[data-source] items contain all ratios
-
-  return null;
-}
-
+// ── Render fundamentals panel ─────────────────────
 function renderFundamentals(ticker, fund) {
   const el = document.getElementById('dd-fundamentals');
   if (!el) return;
 
   if (!fund) {
-    const sym = ticker.replace('.NS','').replace('.BO','').replace('-SM', '');
-    el.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">
-      Fundamentals unavailable via API for this stock.
-      <a href="https://www.screener.in/company/${sym}/" target="_blank"
-         style="color:var(--accent2);text-decoration:none;margin-left:6px;">
-        View on Screener.in ↗
-      </a>
-    </div>`;
+    const sym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '');
+    el.innerHTML = `
+      <div style="color:var(--text3);font-size:12px;padding:0.5rem 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span>Fundamentals could not be loaded automatically.</span>
+        <a href="https://www.screener.in/company/${sym}/" target="_blank"
+           style="color:var(--accent2);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+          View on Screener.in ↗
+        </a>
+        <a href="https://finance.yahoo.com/quote/${ticker}" target="_blank"
+           style="color:var(--accent2);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+          Yahoo Finance ↗
+        </a>
+      </div>`;
     return;
   }
 
   const row = (label, val, hint = '') => val
-    ? `<div class="fund-item"><span class="fund-label">${label}</span><span class="fund-val" title="${hint}">${val}</span></div>`
+    ? `<div class="fund-item" title="${hint}"><span class="fund-label">${label}</span><span class="fund-val">${val}</span></div>`
     : '';
 
+  const src = fund._source === 'screener'
+    ? `<a href="${fund._url}" target="_blank" style="color:var(--text3);font-size:10px;text-decoration:none;">Screener.in ↗</a>`
+    : `<span style="color:var(--text3);font-size:10px;">Yahoo Finance</span>`;
+
   el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+      <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;">Source: ${src}</span>
+    </div>
     <div class="fund-grid">
       ${row('Market Cap', fund.marketCap)}
       ${row('P/E Ratio', fund.peRatio, 'Trailing P/E')}
-      ${row('52W High', fund.week52High)}
-      ${row('52W Low', fund.week52Low)}
-      ${row('EPS', fund.eps, 'Trailing EPS')}
-      ${row('P/B Ratio', fund.priceToBook, 'Price to Book')}
+      ${row('52W High / Low', fund.week52HL)}
+      ${row('EPS', fund.eps)}
       ${row('Book Value', fund.bookValue)}
-      ${row('Beta', fund.beta)}
-      ${row('Div Yield', fund.dividendYield)}
-      ${row('Avg Volume', fund.avgVolume)}
+      ${row('ROCE', fund.roce, 'Return on Capital Employed')}
+      ${row('ROE', fund.roe, 'Return on Equity')}
+      ${row('Div Yield', fund.divYield)}
+      ${row('Debt/Equity', fund.debtEquity)}
+      ${row('Face Value', fund.faceValue)}
       ${fund.sector ? `<div class="fund-item fund-wide"><span class="fund-label">Sector</span><span class="fund-val">${fund.sector}</span></div>` : ''}
-      ${fund.industry ? `<div class="fund-item fund-wide"><span class="fund-label">Industry</span><span class="fund-val fund-industry">${fund.industry}</span></div>` : ''}
-    </div>`;
+    </div>
+    ${fund.about ? `<div style="margin-top:0.6rem;font-size:11px;color:var(--text2);line-height:1.5;border-top:1px solid var(--border);padding-top:0.5rem;">${fund.about}…</div>` : ''}`;
 }
 
+// ── Open drilldown for a ticker ───────────────────
 export async function openDrilldown(ticker) {
   showScreen('drilldown-screen');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Reset filter to default range (31 Mar 2026 → today)
   const today = new Date().toISOString().split('T')[0];
   ddFilter.value = 'CUSTOM';
   ddFilter.customFrom = DEFAULT_FROM;
@@ -127,7 +74,7 @@ export async function openDrilldown(ticker) {
   const h = state.holdings[ticker];
   document.getElementById('dd-ticker').textContent = ticker;
   document.getElementById('dd-subtitle').textContent =
-    `${h.totalQty} shares · Avg buy: ${h.avgBuy.toFixed(2)} · Invested: ₹${h.invested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+    `${h.totalQty} shares · Avg buy ₹${h.avgBuy.toFixed(2)} · Invested ₹${h.invested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   const lp  = state.livePrices[ticker];
   const pc  = state.prevClosePrices[ticker];
@@ -137,6 +84,7 @@ export async function openDrilldown(ticker) {
   const todayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
   const todayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
 
+  // CAGR
   let cagr = null;
   if (h.earliestDate && lp) {
     const days = (Date.now() - new Date(h.earliestDate)) / (1000 * 60 * 60 * 24);
@@ -144,11 +92,12 @@ export async function openDrilldown(ticker) {
     if (years > 0.1) cagr = (Math.pow(lp / h.avgBuy, 1 / years) - 1) * 100;
   }
 
+  // Cards — CAGR placed inline with Current Value to avoid empty card
   document.getElementById('dd-cards').innerHTML = `
     <div class="stat-card">
       <div class="stat-label">Current Price</div>
-      <div class="stat-value">${lp ? lp.toFixed(2) : '—'}</div>
-      ${pc ? `<div class="stat-sub">Prev close: ${pc.toFixed(2)}</div>` : ''}
+      <div class="stat-value">${lp ? '₹' + lp.toFixed(2) : '—'}</div>
+      ${pc ? `<div class="stat-sub">Prev close: ₹${pc.toFixed(2)}</div>` : ''}
     </div>
     <div class="stat-card">
       <div class="stat-label">Today's Change</div>
@@ -160,7 +109,7 @@ export async function openDrilldown(ticker) {
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">P&amp;L (Overall)</div>
+      <div class="stat-label">Overall P&amp;L</div>
       <div class="stat-value" style="color:${pnlVal != null ? colorPnl(pnlVal) : 'inherit'}">
         ${pnlVal != null ? (pnlVal >= 0 ? '+' : '') + fmt(Math.abs(pnlVal)) : '—'}
       </div>
@@ -169,40 +118,41 @@ export async function openDrilldown(ticker) {
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Current Value</div>
+      <div class="stat-label">Current Value${cagr != null ? ' · CAGR' : ''}</div>
       <div class="stat-value">${currentVal ? fmt(currentVal) : '—'}</div>
-    </div>
-    ${cagr != null ? `<div class="stat-card">
-      <div class="stat-label">CAGR</div>
-      <div class="stat-value" style="color:${colorPnl(cagr)}">${pct(cagr)}</div>
-    </div>` : ''}`;
+      ${cagr != null
+        ? `<div class="stat-sub" style="color:${colorPnl(cagr)}">CAGR: ${pct(cagr)}</div>`
+        : ''}
+    </div>`;
 
-  // Sync custom date inputs to default range
+  // Sync date inputs
   const fromInput = document.getElementById('dd-from');
   const toInput   = document.getElementById('dd-to');
   if (fromInput) fromInput.value = DEFAULT_FROM;
   if (toInput)   toInput.value   = today;
 
-  // Show custom wrap by default, update filter buttons
+  // Show custom wrap, update filter buttons
   const customWrap = document.getElementById('dd-custom-wrap');
   if (customWrap) customWrap.style.display = 'flex';
   document.querySelectorAll('.dd-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === 'CUSTOM'));
 
-  // Render history chart with default date range
+  // Render history chart
   renderDDHistorySection(ticker);
 
-  // Load fundamentals asynchronously
+  // Fundamentals — try Screener first, then Yahoo
   const fundEl = document.getElementById('dd-fundamentals');
   if (fundEl) fundEl.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading fundamentals…</div>';
-  fetchFundamentals(h.ticker).then(fund => renderFundamentals(ticker, fund));
+  const fund = await fetchScreenerFundamentals(ticker) || await fetchYahooFundamentals(ticker);
+  renderFundamentals(ticker, fund);
 
   // Intraday
   if (!state.dayHistories[ticker]?.length) {
-    state.dayHistories[ticker] = await fetchDayHistory(h.ticker);
+    state.dayHistories[ticker] = await fetchDayHistory(h.ticker, h.upstoxTicker);
   }
   renderDrilldownDayChart(ticker);
 }
 
+// ── History section renderer ──────────────────────
 function renderDDHistorySection(ticker) {
   const hist = state.histories?.[ticker];
   if (!hist || !Object.keys(hist).length) return;
@@ -220,10 +170,10 @@ function renderDDHistorySection(ticker) {
   }
 
   const last = new Date(allDates[allDates.length - 1]);
-  if (ddFilter.value === '1M') { const d = new Date(last); d.setMonth(d.getMonth()-1); from = d.toISOString().split('T')[0]; }
-  else if (ddFilter.value === '3M') { const d = new Date(last); d.setMonth(d.getMonth()-3); from = d.toISOString().split('T')[0]; }
-  else if (ddFilter.value === '1Y') { const d = new Date(last); d.setFullYear(d.getFullYear()-1); from = d.toISOString().split('T')[0]; }
-  else from = allDates[0]; // ALL
+  if      (ddFilter.value === '1M')  { const d = new Date(last); d.setMonth(d.getMonth()-1);          from = d.toISOString().split('T')[0]; }
+  else if (ddFilter.value === '3M')  { const d = new Date(last); d.setMonth(d.getMonth()-3);          from = d.toISOString().split('T')[0]; }
+  else if (ddFilter.value === '1Y')  { const d = new Date(last); d.setFullYear(d.getFullYear()-1);    from = d.toISOString().split('T')[0]; }
+  // ALL: from = allDates[0] (already set)
 
   const filtered = filterHist(hist, from, today);
   renderDrilldownChart(ticker, filtered);
@@ -238,12 +188,9 @@ function filterHist(hist, from, to) {
 
 function updateDDFilterUI(ticker, hist, from, to) {
   document.querySelectorAll('.dd-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === ddFilter.value));
-
   const dates = Object.keys(filterHist(hist, from, to)).sort();
   if (dates.length >= 2) {
-    const startPrice = hist[dates[0]];
-    const endPrice   = hist[dates[dates.length - 1]];
-    const chg = ((endPrice - startPrice) / startPrice) * 100;
+    const chg = ((hist[dates[dates.length - 1]] - hist[dates[0]]) / hist[dates[0]]) * 100;
     const el = document.getElementById('dd-period-chg');
     if (el) {
       el.textContent = `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}% in period`;
@@ -268,7 +215,8 @@ window.applyDDCustom = function() {
   const from = document.getElementById('dd-from').value;
   const to   = document.getElementById('dd-to').value;
   if (!from || !to) return;
-  ddFilter.customFrom = from; ddFilter.customTo = to;
+  ddFilter.customFrom = from;
+  ddFilter.customTo   = to;
   const ticker = document.getElementById('dd-ticker').textContent;
   renderDDHistorySection(ticker);
 };
