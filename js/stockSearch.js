@@ -9,7 +9,9 @@ import { pct, colorPnl } from './utils.js';
 let _ssDB = null, _ssLoaded = false, _ssTimeout = null;
 let _ssTicker = '', _ssFundData = null, _ssFundTab = 'ratios', _ssFundMode = 'standalone';
 let _ssHistFull = {}, _ssChartInst = null, _ssDayInst = null;
-let _ssFilter = { value: '1Y', customFrom: '', customTo: '' };
+const SS_DEFAULT_FROM = '2026-03-31';
+let _ssFilter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
+let _ssLastMeta = null; // store last picked meta
 
 // ── Public init ──────────────────────────────────
 export function initStockSearch() {
@@ -48,6 +50,11 @@ async function loadSSDB() {
 function onSSInput(e) {
   clearTimeout(_ssTimeout);
   const q = e.target.value.trim().toUpperCase();
+  // Show/hide clear button
+  const clr = document.getElementById('ss-clear-btn');
+  if (clr) clr.style.display = e.target.value ? 'block' : 'none';
+  // If user clears or modifies input, reset loaded ticker so submit works fresh
+  if (!q || !q.includes('—')) { _ssTicker = ''; _ssLastMeta = null; }
   const dd = document.getElementById('ss-dropdown');
   if (!q) { if (dd) dd.style.display = 'none'; return; }
   _ssTimeout = setTimeout(() => {
@@ -79,6 +86,9 @@ window._ssPickResult = function(idx) {
     : (stock.yahooTicker || stock.symbol + '.NS');
   const inp = document.getElementById('ss-search-input');
   if (inp) { inp.value = `${stock.symbol}  —  ${stock.company}`; inp.blur(); }
+  _ssLastMeta = stock;
+  const clr = document.getElementById('ss-clear-btn');
+  if (clr) clr.style.display = 'block';
   loadSSStock(ticker, stock);
 };
 
@@ -86,22 +96,32 @@ window._ssSubmit = function() {
   const raw = document.getElementById('ss-search-input')?.value?.trim().toUpperCase();
   if (!raw) return;
   closeSSDropdown();
-  // strip company name appended from dropdown pick
-  const ticker = raw.includes('—') ? raw.split('—')[0].trim() : raw;
-  loadSSStock(ticker, null);
+  // If input contains "—", it's a dropdown pick already loaded — do nothing
+  if (raw.includes('—')) return;
+  _ssLastMeta = null;
+  loadSSStock(raw, null);
 };
 
 // ── Main loader ──────────────────────────────────
 async function loadSSStock(ticker, meta) {
   _ssTicker = ticker;
   _ssFundData = null; _ssFundTab = 'ratios'; _ssFundMode = 'standalone';
-  _ssFilter = { value: '1Y', customFrom: '', customTo: '' };
+  const today = new Date().toISOString().split('T')[0];
+  _ssFilter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: today };
 
   // Destroy old charts before touching DOM
   if (_ssChartInst) { _ssChartInst.destroy(); _ssChartInst = null; }
   if (_ssDayInst)   { _ssDayInst.destroy();   _ssDayInst   = null; }
 
-  renderSSSkeleton(ticker, meta);
+  // Collapse hero to just the search bar when a stock is loaded
+  const hero = document.getElementById('ss-hero');
+  if (hero) {
+    hero.querySelectorAll(':scope > div:not(#ss-search-wrap)').forEach(el => el.style.display = 'none');
+    hero.style.padding = '0.75rem 0 1rem';
+    hero.style.textAlign = 'left';
+    hero.style.maxWidth = '';
+  }
+  renderSSSkeleton(ticker, meta, today);
 
   const [livePrice, hist, fund, dayHist] = await Promise.all([
     fetchPrice(ticker),
@@ -124,7 +144,7 @@ async function loadSSStock(ticker, meta) {
 }
 
 // ── Skeleton ─────────────────────────────────────
-function renderSSSkeleton(ticker, meta) {
+function renderSSSkeleton(ticker, meta, today) {
   const panel = document.getElementById('ss-result-panel');
   if (!panel) return;
   panel.style.display = 'block';
@@ -145,8 +165,8 @@ function renderSSSkeleton(ticker, meta) {
     </div>
 
     <div class="dd-charts-row">
-      <div class="chart-card collapsible-card dd-chart-half">
-        <div class="chart-header">
+      <div class="chart-card collapsible-card dd-chart-half" id="ss-history-card">
+        <div class="chart-header" onclick="toggleSection('ss-history-body','ss-history-toggle')">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <div class="chart-title">Price History</div>
             <span id="ss-period-chg" style="font-size:12px;font-weight:600;"></span>
@@ -154,20 +174,21 @@ function renderSSSkeleton(ticker, meta) {
           <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
             <div class="time-filters">
               ${['1M','3M','1Y','ALL','CUSTOM'].map(f =>
-                `<button class="tf-btn ss-tf-btn${f==='1Y'?' active':''}" data-f="${f}"
+                `<button class="tf-btn ss-tf-btn${f==='CUSTOM'?' active':''}" data-f="${f}"
                    onclick="window._ssSetFilter('${f}',this)">${f}</button>`
               ).join('')}
             </div>
+            <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-history-card','ss-history-body','ssChart')">⤢</button>
             <button class="collapse-btn" id="ss-history-toggle"
-              onclick="toggleSection('ss-history-body','ss-history-toggle')">▲ Collapse</button>
+              onclick="toggleSection('ss-history-body','ss-history-toggle')">▲</button>
           </div>
         </div>
         <div id="ss-history-body" class="collapsible-body">
-          <div id="ss-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.4rem 0 0.6rem;flex-wrap:wrap;">
-            <input type="date" id="ss-from" name="ss-from"
+          <div id="ss-custom-wrap" style="display:flex;align-items:center;gap:8px;padding:0.4rem 0 0.6rem;flex-wrap:wrap;">
+            <input type="date" id="ss-from" name="ss-from" value="${SS_DEFAULT_FROM}"
               style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
             <span style="color:var(--text3)">to</span>
-            <input type="date" id="ss-to" name="ss-to"
+            <input type="date" id="ss-to" name="ss-to" value="${today}"
               style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
             <button class="tf-btn active" onclick="window._ssApplyCustom()">Apply</button>
           </div>
@@ -175,11 +196,14 @@ function renderSSSkeleton(ticker, meta) {
         </div>
       </div>
 
-      <div class="chart-card collapsible-card dd-chart-half">
-        <div class="chart-header">
+      <div class="chart-card collapsible-card dd-chart-half" id="ss-day-card">
+        <div class="chart-header" onclick="toggleSection('ss-day-body','ss-day-toggle')">
           <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
-          <button class="collapse-btn" id="ss-day-toggle"
-            onclick="toggleSection('ss-day-body','ss-day-toggle')">▲ Collapse</button>
+          <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
+            <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-day-card','ss-day-body','ssDayChart')">⤢</button>
+            <button class="collapse-btn" id="ss-day-toggle"
+              onclick="toggleSection('ss-day-body','ss-day-toggle')">▲</button>
+          </div>
         </div>
         <div id="ss-day-body" class="collapsible-body">
           <div id="ss-day-wrap" style="position:relative;width:100%;height:260px;">
@@ -209,6 +233,7 @@ function renderSSSkeleton(ticker, meta) {
           <button class="fund-tab"        data-tab="pnl"      onclick="window._ssSwitchFundTab('pnl',this)">P&amp;L</button>
           <button class="fund-tab"        data-tab="balance"  onclick="window._ssSwitchFundTab('balance',this)">Balance Sheet</button>
           <button class="fund-tab"        data-tab="cashflow" onclick="window._ssSwitchFundTab('cashflow',this)">Cash Flow</button>
+          <button class="fund-tab"        data-tab="quarterly" onclick="window._ssSwitchFundTab('quarterly',this)">Quarterly Results</button>
         </div>
         <div id="ss-fundamentals" style="padding:0.5rem 0 0.25rem;">
           <div class="ss-loading"><div class="ss-spinner"></div><span>Loading fundamentals…</span></div>
@@ -306,6 +331,8 @@ function renderSSChart() {
       interaction: { mode:'index', intersect:false },
     },
   });
+  if (!window._chartInstances) window._chartInstances = {};
+  window._chartInstances['ssChart'] = _ssChartInst;
 }
 
 // ── Intraday chart ───────────────────────────────
@@ -346,6 +373,8 @@ function renderSSDayChart(ticker) {
       interaction:{mode:'index',intersect:false},
     },
   });
+  if (!window._chartInstances) window._chartInstances = {};
+  window._chartInstances['ssDayChart'] = _ssDayInst;
 }
 
 // ── Fundamentals — identical to drilldown ────────
@@ -372,8 +401,8 @@ function renderSSFundTab() {
       ${row('EPS',f.eps)}${row('Face Value',f.faceValue)}
     </div><div class="fund-table-note" style="margin-top:0.5rem;">Source: ${src} · ${f._mode}</div>`;
   } else {
-    const key  = _ssFundTab === 'pnl' ? 'pnl' : _ssFundTab === 'balance' ? 'balance' : 'cashflow';
-    const note = _ssFundTab === 'pnl' ? 'P&L figures in ₹ Cr' : _ssFundTab === 'balance' ? 'Balance Sheet in ₹ Cr' : 'Cash Flow in ₹ Cr';
+    const key  = _ssFundTab === 'pnl' ? 'pnl' : _ssFundTab === 'balance' ? 'balance' : _ssFundTab === 'cashflow' ? 'cashflow' : 'quarterly';
+    const note = _ssFundTab === 'pnl' ? 'P&L figures in ₹ Cr' : _ssFundTab === 'balance' ? 'Balance Sheet in ₹ Cr' : _ssFundTab === 'cashflow' ? 'Cash Flow in ₹ Cr' : 'Quarterly Results in ₹ Cr';
     const td   = f[key];
     if (!td?.rows?.length) { el.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:1rem 0;">No data available · ${src}</div>`; return; }
     const years = td.headers.slice(1);
@@ -392,6 +421,10 @@ function syncSSFilterUI() {
   document.querySelectorAll('.ss-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === _ssFilter.value));
   const cw = document.getElementById('ss-custom-wrap');
   if (cw) cw.style.display = _ssFilter.value === 'CUSTOM' ? 'flex' : 'none';
+  // Sync date inputs
+  const fi = document.getElementById('ss-from'), ti = document.getElementById('ss-to');
+  if (fi && _ssFilter.customFrom) fi.value = _ssFilter.customFrom;
+  if (ti && _ssFilter.customTo)   ti.value = _ssFilter.customTo;
 }
 
 function filterSSHist() {
@@ -409,6 +442,16 @@ function filterSSHist() {
   const from = _ssFilter.value === 'ALL' ? dates[0] : ref.toISOString().split('T')[0];
   return Object.fromEntries(Object.entries(all).filter(([d]) => d >= from));
 }
+
+window._ssClear = function() {
+  const inp = document.getElementById('ss-search-input');
+  if (inp) { inp.value = ''; inp.focus(); }
+  const clr = document.getElementById('ss-clear-btn');
+  if (clr) clr.style.display = 'none';
+  closeSSDropdown();
+  // Only reset ticker state so next pick/search loads fresh — keep results visible
+  _ssTicker = ''; _ssLastMeta = null;
+};
 
 window._ssSetFilter = function(f, btn) {
   _ssFilter.value = f;
