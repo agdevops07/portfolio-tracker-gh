@@ -169,7 +169,7 @@
     <!-- Portfolio History Chart -->
     <div class="chart-card collapsible-card">
       <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
-        <div class="chart-title">Portfolio Value Over Time
+        <div class="chart-title">Portfolio Value Selected Period
           <span id="port-period-chg" style="font-size:15px;font-weight:700;"></span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -199,7 +199,7 @@
     <!-- Portfolio Day Chart (collapsible) -->
     <div class="chart-card collapsible-card">
       <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
-        <div class="chart-title">Today's Performance<span class="chart-subtitle">(Intraday 5-min)</span></div>
+        <div class="chart-title">Today's Performance<span class="chart-subtitle">(Intraday 15-min delay)</span></div>
         <button class="collapse-btn" id="day-chart-toggle">▲ Collapse</button>
       </div>
       <div id="day-chart-body" class="collapsible-body">
@@ -308,7 +308,7 @@
     <!-- Today's Price -->
     <div class="chart-card collapsible-card dd-chart-half" id="dd-day-card">
       <div class="chart-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
-        <div class="chart-title">Price Intraday <span class="chart-subtitle">(Delayed..)</span></div>
+        <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
         <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
           <button class="icon-btn" title="Maximize" onclick="maximizeChart('dd-day-card','dd-day-body','ddDayChart')">⤢</button>
           <button class="collapse-btn" id="dd-day-toggle" onclick="toggleSection('dd-day-body','dd-day-toggle')">▲</button>
