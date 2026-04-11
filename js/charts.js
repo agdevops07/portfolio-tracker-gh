@@ -64,7 +64,7 @@ function updatePortPeriodChg(series) {
     const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
     const athTxt = Math.abs(athChg) > 0.01
       ? ` <span style="color:${athColor};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH</span>` : '';
-    el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% in period</span>${athTxt}`;
+    el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% </span>${athTxt}`;
     el.style.color = '';
   } else {
     el.textContent = '';

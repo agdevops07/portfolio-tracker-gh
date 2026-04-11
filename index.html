@@ -16,7 +16,7 @@
   <div class="upload-bg-glow"></div>
   <div class="logo">📈 Portfolio Tracker</div>
   <h1 class="hero-title">Your portfolio,<br><span class="hero-accent">crystal clear.</span></h1>
-  <p class="hero-sub">Upload a CSV of your holdings and instantly see live P&L, allocation, and fundamentals.</p>
+  <p class="hero-sub">Upload a CSV or add holdings manually to unlock live P&L, allocation, performance trends, and fundamentals.</p>
 
   <div class="upload-layout">
     <!-- Left: feature highlights -->
@@ -28,7 +28,7 @@
       </div>
       <div class="upload-feature">
         <div class="upload-feature-icon">📊</div>
-        <div class="upload-feature-text"><strong>Portfolio Value Over Time</strong>Historical chart of your total portfolio value with custom date ranges</div>
+        <div class="upload-feature-text"><strong>Portfolio Value Over Selected Period</strong>Historical chart of your total portfolio value with custom date ranges</div>
       </div>
       <div class="upload-feature">
         <div class="upload-feature-icon">💹</div>
@@ -199,7 +199,7 @@
     <!-- Portfolio Day Chart (collapsible) -->
     <div class="chart-card collapsible-card">
       <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
-        <div class="chart-title">Portfolio Today<span class="chart-subtitle">(Intraday 5-min)</span></div>
+        <div class="chart-title">Today's Performance<span class="chart-subtitle">(Intraday 5-min)</span></div>
         <button class="collapse-btn" id="day-chart-toggle">▲ Collapse</button>
       </div>
       <div id="day-chart-body" class="collapsible-body">
@@ -233,7 +233,7 @@
       </div>
       <div class="chart-card collapsible-card">
         <div class="chart-header collapsible-header" onclick="toggleSection('today-pnl-body','today-pnl-toggle')">
-          <div class="chart-title">Today's P&amp;L <span class="chart-subtitle">(vs Prev Close)</span></div>
+          <div class="chart-title">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
           <button class="collapse-btn" id="today-pnl-toggle">▲ Collapse</button>
         </div>
         <div id="today-pnl-body" class="collapsible-body">
@@ -279,7 +279,7 @@
     <div class="chart-card collapsible-card dd-chart-half" id="dd-history-card">
       <div class="chart-header" onclick="toggleSection('dd-history-body','dd-history-toggle')">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div class="chart-title">Price History</div>
+          <div class="chart-title">Price History Over Selected Period </div>
           <span id="dd-period-chg" style="font-size:12px;font-weight:600;"></span>
         </div>
         <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
@@ -308,7 +308,7 @@
     <!-- Today's Price -->
     <div class="chart-card collapsible-card dd-chart-half" id="dd-day-card">
       <div class="chart-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
-        <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday)</span></div>
+        <div class="chart-title">Price Intraday <span class="chart-subtitle">(Delayed..)</span></div>
         <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
           <button class="icon-btn" title="Maximize" onclick="maximizeChart('dd-day-card','dd-day-body','ddDayChart')">⤢</button>
           <button class="collapse-btn" id="dd-day-toggle" onclick="toggleSection('dd-day-body','dd-day-toggle')">▲</button>

@@ -160,7 +160,7 @@ export async function openDrilldown(ticker) {
       ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
     </div>
     <div class="stat-card">
-      <div class="stat-label">Today's Change</div>
+      <div class="stat-label">Day's Change</div>
       <div class="stat-value" style="color:${todayAbs!=null?colorPnl(todayAbs):'var(--text2)'}">
         ${todayAbs!=null?(todayAbs>=0?'+':'')+fmt(Math.abs(todayAbs)):'—'}</div>
       <div class="stat-sub" style="color:${todayPct!=null?colorPnl(todayPct):'var(--text2)'}">
@@ -240,7 +240,7 @@ function updateDDFilterUI(ticker, hist, from, to) {
     const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
     const el=document.getElementById('dd-period-chg');
     if(el){
-      el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% in period</span>`
+      el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% </span>`
         + (Math.abs(athChg) > 0.01 ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">${athChg.toFixed(2)}% from ATH</span>` : '');
       el.style.color = '';
     }

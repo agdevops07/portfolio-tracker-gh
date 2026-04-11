@@ -249,7 +249,7 @@ function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Today's Change</div>
+      <div class="stat-label">Day's Change</div>
       <div class="stat-value" style="color:${hasPrevClose ? colorPnl(todayChange) : 'var(--text2)'}">
         ${hasPrevClose ? (todayChange >= 0 ? '+' : '') + fmt(Math.abs(todayChange)) : '—'}
       </div>
