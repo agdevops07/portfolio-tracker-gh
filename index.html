@@ -226,8 +226,10 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     <!-- Holdings -->
     <div class="section-header">
       <div class="section-title">Holdings</div>
-      <button class="holdings-detail-btn" onclick="openHoldingsModal()">📋 Full Holdings View</button>
-    </div>
+        <button class="holdings-detail-btn" onclick="event.stopPropagation(); openHoldingsModal()">
+          📋 Full Holdings View
+        </button>  
+      </div>
     <div class="holdings-grid" id="holdings-grid"></div>
   </div>
 </div>
@@ -275,20 +277,8 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <!-- Stock Day Chart -->
   <div class="chart-card collapsible-card">
     <div class="chart-header collapsible-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
-      
-      <!-- Row 1 -->
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="chart-title">
-          Today's Price <span class="chart-subtitle">(Intraday 5-min)</span>
-        </div>
-      </div>
-
-      <!-- Row 2 (spacer to match left chart height) -->
-      <div style="height:28px;"></div>
-
-      <!-- Controls -->
+      <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
       <button class="collapse-btn" id="dd-day-toggle">▲ Collapse</button>
-
     </div>
     <div id="dd-day-body" class="collapsible-body">
       <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
@@ -299,6 +289,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
 </div>
 
   <!-- Fundamentals Panel -->
+
   <div class="chart-card collapsible-card" style="margin-bottom:1rem">
     <div class="chart-header collapsible-header" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">
       <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
