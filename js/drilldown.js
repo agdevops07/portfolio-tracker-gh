@@ -15,22 +15,17 @@ let _fundMode = 'standalone'; // standalone is default
 let _fundTab  = 'ratios';
 let _currentTicker = '';
 
-// ── Render dd-meta (sector breadcrumb under stock title) ──
+// ── Render dd-meta (sector breadcrumb under stock title, above stat cards) ──
 function renderDDMeta(fund) {
   const metaEl  = document.getElementById('dd-meta');
   const aboutEl = document.getElementById('dd-about');
   if (metaEl)  metaEl.innerHTML  = '';
-  if (aboutEl) aboutEl.textContent = '';
+  if (aboutEl) aboutEl.style.display = 'none'; // about goes in ratios tab, not here
   if (!fund) return;
-  // Sector breadcrumb
-  if (metaEl) {
-    const parts = [];
-    if (fund.sectorBreadcrumb) parts.push(fund.sectorBreadcrumb);
-    else if (fund.sector) parts.push(fund.sector + (fund.industry ? ' › ' + fund.industry : ''));
-    metaEl.innerHTML = parts.map(p => `<span>${p}</span>`).join('');
+  if (metaEl && (fund.sectorBreadcrumb || fund.sector)) {
+    const txt = fund.sectorBreadcrumb || (fund.sector + (fund.industry ? ' › ' + fund.industry : ''));
+    metaEl.innerHTML = `<span>${txt}</span>`;
   }
-  // About — full text in its own block
-  if (aboutEl && fund.about) aboutEl.textContent = fund.about;
 }
 
 // ── Render a financial table ──────────────────────
@@ -59,6 +54,11 @@ function renderFundTab() {
     const row = (label, val, hint='') => val
       ? `<div class="fund-item" title="${hint}"><span class="fund-label">${label}</span><span class="fund-val">${val}</span></div>` : '';
     el.innerHTML = `
+      ${_fundData.sectorBreadcrumb || _fundData.sector ? `
+      <div class="fund-sector-bar">
+        <span class="fund-sector-label">Sector</span>
+        <span class="fund-sector-val">${_fundData.sectorBreadcrumb || (_fundData.sector + (_fundData.industry ? ' › ' + _fundData.industry : ''))}</span>
+      </div>` : ''}
       <div class="fund-grid">
         ${row('Market Cap', _fundData.marketCap)}
         ${row('P/E Ratio', _fundData.peRatio, 'Stock P/E')}
@@ -233,7 +233,7 @@ function updateDDFilterUI(ticker, hist, from, to) {
   if (dates.length>=2) {
     const startP = hist[dates[0]], endP = hist[dates[dates.length-1]];
     const chg = ((endP - startP) / startP) * 100;
-    const maxP = Math.max(...dates.map(d => hist[d]));
+    const maxP = Math.max(...Object.values(hist)); // ATH from all history
     const athChg = ((endP - maxP) / maxP) * 100;
     const el=document.getElementById('dd-period-chg');
     if(el){

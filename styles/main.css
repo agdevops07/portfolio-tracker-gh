@@ -546,3 +546,14 @@ tr:hover td { background: var(--bg3); }
 .dash-tab { background: none; border: 1px solid transparent; color: var(--text3); padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
 .dash-tab.active { background: var(--bg3); border-color: var(--border2); color: var(--text); }
 .dash-tab:hover:not(.active) { color: var(--text2); border-color: var(--border); }
+
+/* ── FUND SECTOR BAR (top of Key Ratios) ── */
+.fund-sector-bar { display: flex; align-items: baseline; gap: 10px; padding: 0.5rem 0.75rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.75rem; }
+.fund-sector-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text3); flex-shrink: 0; }
+.fund-sector-val { font-size: 13px; font-weight: 600; color: var(--text); }
+
+/* ── ZOOM / RESPONSIVE FIX ── */
+/* Replace fixed max-widths with fluid ones so zoom-out scales correctly */
+#dashboard-screen { display: none; padding: 1.5rem clamp(1rem, 3vw, 2rem); max-width: min(1300px, 100%); margin: 0 auto; }
+#drilldown-screen { display: none; padding: 1.5rem clamp(1rem, 3vw, 2rem); max-width: min(1100px, 100%); margin: 0 auto; }
+.upload-layout { max-width: min(980px, 100%); }
