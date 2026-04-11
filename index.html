@@ -237,6 +237,8 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
   <div class="dd-title" id="dd-ticker"></div>
   <div class="dd-subtitle" id="dd-subtitle"></div>
+  <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
+
 
   <!-- Price History + Today's Price (side by side) -->
   <div class="two-col dd-charts-row" style="margin-bottom:1rem">
@@ -282,11 +284,9 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       </div>
     </div>
   </div>
-
-    <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
+</div>
 
   <!-- Fundamentals Panel -->
-   
   <div class="chart-card collapsible-card" style="margin-bottom:1rem">
     <div class="chart-header collapsible-header" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">
       <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
@@ -309,10 +309,6 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       <div id="dd-fundamentals" style="padding:0.5rem 0 0.25rem;"></div>
     </div>
   </div>
-
-
-
-</div>
 
 <!-- HOLDINGS MODAL -->
 <div id="holdings-modal" class="modal-overlay" onclick="if(event.target===this)closeHoldingsModal()">
