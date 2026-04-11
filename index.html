@@ -226,11 +226,11 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
     <!-- Holdings -->
     <div class="section-header">
       <div class="section-title">Holdings</div>
-      <button type="button" class="holdings-detail-btn" onclick="event.preventDefault(); openHoldingsModal();">📋 Full Holdings View</button>
+      <button class="holdings-detail-btn" onclick="openHoldingsModal()">📋 Full Holdings View</button>
     </div>
     <div class="holdings-grid" id="holdings-grid"></div>
   </div>
-</div>  
+</div>
 
 <!-- DRILLDOWN SCREEN -->
 <div id="drilldown-screen">
@@ -304,10 +304,10 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
         <button class="fund-tab" data-tab="pnl" onclick="switchFundTab('pnl',this)">P&amp;L</button>
         <button class="fund-tab" data-tab="balance" onclick="switchFundTab('balance',this)">Balance Sheet</button>
         <button class="fund-tab" data-tab="cashflow" onclick="switchFundTab('cashflow',this)">Cash Flow</button>
-      </div>
-      <div class="fund-mode-toggle">
+        <div class="fund-mode-toggle">
           <button class="fund-mode-btn" id="fund-mode-cons" onclick="switchFundMode('consolidated',this)">Consolidated</button>
           <button class="fund-mode-btn active" id="fund-mode-stand" onclick="switchFundMode('standalone',this)">Standalone</button>
+        </div>
       </div>
       <div id="dd-fundamentals" style="padding:0.5rem 0 0.25rem;"></div>
     </div>
