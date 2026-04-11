@@ -287,22 +287,24 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
       // Sector & Industry — use peer comparison section (most reliable on Screener)
       {
         let sector = null, industry = null;
-        // Primary: peer comparison section has screen links for sector/industry
-        const peerSection = doc.querySelector('#peers, section[id*="peer"]');
-        if (peerSection) {
-          peerSection.querySelectorAll('a[href*="/screen/"]').forEach(a => {
+        // Use company-links or sub section which lists Sector / Industry as pill links
+        // These are the small tag-like links near the company name on Screener
+        const companyLinks = doc.querySelector('.company-links, .company-profile .links, .sub');
+        if (companyLinks) {
+          companyLinks.querySelectorAll('a[href*="/screen/"]').forEach(a => {
             const txt = a.textContent.trim();
-            if (!sector && txt) sector = txt;
-            else if (sector && !industry && txt) industry = txt;
+            if (!txt || txt.length > 60) return; // skip long CTA text
+            if (!sector) sector = txt;
+            else if (!industry) industry = txt;
           });
         }
-        // Fallback: company profile tags
+        // Fallback: peer comparison section - look for industry/sector labels
         if (!sector) {
-          doc.querySelectorAll('.company-profile .tag, .company-links a[href*="/screen/"], .sub a[href*="/screen/"], a[href*="/screen/"]').forEach(a => {
-            const txt = a.textContent.trim();
-            if (!sector && txt) sector = txt;
-            else if (sector && !industry && txt) industry = txt;
-          });
+          const peerSection = doc.querySelector('#peers');
+          if (peerSection) {
+            const industryEl = peerSection.querySelector('.industry-name, .sub a[href*="/screen/"], a[href*="/screen/"]');
+            if (industryEl) sector = industryEl.textContent.trim();
+          }
         }
         if (sector) fund.sector = sector;
         if (industry) fund.industry = industry;

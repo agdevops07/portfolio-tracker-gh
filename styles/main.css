@@ -373,8 +373,8 @@ tr:hover td { background: var(--bg3); }
 /* ── FUNDAMENTALS ── */
 .fund-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.6rem;
   padding: 0.25rem 0;
 }
 .fund-item {
@@ -509,7 +509,10 @@ tr:hover td { background: var(--bg3); }
 
 /* ── DRILLDOWN two-col chart row ── */
 .dd-charts-row { align-items: stretch; }
-.dd-charts-row .chart-card { margin-bottom: 0; }
+.dd-charts-row .chart-card { margin-bottom: 0; display: flex; flex-direction: column; }
+.dd-charts-row .collapsible-body { flex: 1; }
+.dd-charts-row .chart-wrap { height: 280px !important; }
+.dd-charts-row #dd-day-wrap { height: 280px !important; }
 
 /* ── MOBILE — reduce wasted space on drilldown ── */
 @media (max-width: 600px) {
