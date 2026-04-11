@@ -80,14 +80,6 @@
     </div>
   </div>
 
-  <!-- Footer pinned inside upload screen -->
-  <footer class="app-footer" style="position:absolute;bottom:0;left:0;right:0;margin-top:0;z-index:2;">
-    <span>📈 Portfolio Tracker</span>
-    <span class="footer-sep">·</span>
-    <span>Data via <a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> &amp; <a href="https://www.screener.in" target="_blank">Screener.in</a></span>
-    <span class="footer-sep">·</span>
-    <span>Prices delayed · Not financial advice</span>
-  </footer>
 </div>
 
 
@@ -199,7 +191,9 @@
     <!-- Portfolio Day Chart (collapsible) -->
     <div class="chart-card collapsible-card">
       <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
-        <div class="chart-title">Today's Performance<span class="chart-subtitle">(Intraday 15-min delay)</span></div>
+        <div class="chart-title">Today's Performance
+          <span class="chart-subtitle">(Intraday 15-min delay)</span>
+        </div>
         <button class="collapse-btn" id="day-chart-toggle">▲ Collapse</button>
       </div>
       <div id="day-chart-body" class="collapsible-body">
@@ -380,6 +374,15 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Footer pinned inside upload screen -->
+<footer class="app-footer" style="position:absolute;bottom:0;left:0;right:0;margin-top:0;z-index:2;">
+  <span>📈 Portfolio Tracker</span>
+  <span class="footer-sep">·</span>
+  <span>Data via <a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> &amp; <a href="https://www.screener.in" target="_blank">Screener.in</a></span>
+  <span class="footer-sep">·</span>
+  <span>Prices delayed · Not financial advice</span>
+</footer>
 
 <script>
 function toggleSection(bodyId, btnId) {
