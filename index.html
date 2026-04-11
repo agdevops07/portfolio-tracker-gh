@@ -275,8 +275,20 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <!-- Stock Day Chart -->
   <div class="chart-card collapsible-card">
     <div class="chart-header collapsible-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
-      <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
+      
+      <!-- Row 1 -->
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="chart-title">
+          Today's Price <span class="chart-subtitle">(Intraday 5-min)</span>
+        </div>
+      </div>
+
+      <!-- Row 2 (spacer to match left chart height) -->
+      <div style="height:28px;"></div>
+
+      <!-- Controls -->
       <button class="collapse-btn" id="dd-day-toggle">▲ Collapse</button>
+
     </div>
     <div id="dd-day-body" class="collapsible-body">
       <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
