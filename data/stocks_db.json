@@ -22160,7 +22160,7 @@
         "bseTicker": "ZYDUSWELL.BO"
     },
     {
-        "symbol": "VIVIDEL",
+        "symbol": "VIVIDEL-ST",
         "company": "Vivid Electromech Limited",
         "exchange": "NSE-SME",
         "isin": "INE24H301028",
@@ -22169,7 +22169,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FALTECH-RE",
+        "symbol": "FALTECH-RE-ST",
         "company": "Falcon Technoprojects India Limited-RE",
         "exchange": "NSE-SME",
         "isin": "INE0PQK20013",
@@ -22178,7 +22178,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SUNREST-RE",
+        "symbol": "SUNREST-RE-ST",
         "company": "Sunrest Lifescience Ltd-RE",
         "exchange": "NSE-SME",
         "isin": "INE0PLZ20012",
@@ -22187,7 +22187,7 @@
         "bseCode": null
     },
     {
-        "symbol": "APSISAERO",
+        "symbol": "APSISAERO-SM",
         "company": "Apsis Aerocom Limited",
         "exchange": "NSE-SME",
         "isin": "INE1OOJ01011",
@@ -22196,7 +22196,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPCON",
+        "symbol": "SPCON-SM",
         "company": "Srinibas Pradhan Constructions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TPJ01019",
@@ -22205,7 +22205,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ACETEC",
+        "symbol": "ACETEC-SM",
         "company": "Acetech E-Commerce Limited",
         "exchange": "NSE-SME",
         "isin": "INE1J6M01010",
@@ -22214,7 +22214,7 @@
         "bseCode": null
     },
     {
-        "symbol": "STRIDERS",
+        "symbol": "STRIDERS-SM",
         "company": "Striders Impex Limited",
         "exchange": "NSE-SME",
         "isin": "INE1XWN01017",
@@ -22223,7 +22223,7 @@
         "bseCode": null
     },
     {
-        "symbol": "YAAP",
+        "symbol": "YAAP-SM",
         "company": "Yaap Digital Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U0J01015",
@@ -22232,7 +22232,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MOBILISE",
+        "symbol": "MOBILISE-SM",
         "company": "Mobilise App Lab Limited",
         "exchange": "NSE-SME",
         "isin": "INE1YNB01019",
@@ -22241,7 +22241,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MANILAM",
+        "symbol": "MANILAM-SM",
         "company": "Manilam Industries India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1ERK01013",
@@ -22250,7 +22250,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MARUSHIKA",
+        "symbol": "MARUSHIKA-SM",
         "company": "Marushika Technology Limited",
         "exchange": "NSE-SME",
         "isin": "INE0X7G01013",
@@ -22259,7 +22259,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BIOPOL",
+        "symbol": "BIOPOL-SM",
         "company": "Biopol Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XW001014",
@@ -22268,7 +22268,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GJL",
+        "symbol": "GJL-ST",
         "company": "Grover Jewells Limited",
         "exchange": "NSE-SME",
         "isin": "INE1TY801010",
@@ -22277,7 +22277,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BRANDMAN",
+        "symbol": "BRANDMAN-SM",
         "company": "Brandman Retail Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XUD01014",
@@ -22286,7 +22286,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CKKRETAIL",
+        "symbol": "CKKRETAIL-ST",
         "company": "C K K Retail Mart Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMX01019",
@@ -22295,7 +22295,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KRMAYURVED",
+        "symbol": "KRMAYURVED-SM",
         "company": "KRM Ayurveda Limited",
         "exchange": "NSE-SME",
         "isin": "INE1MTV01019",
@@ -22304,7 +22304,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARMOUR",
+        "symbol": "ARMOUR-SM",
         "company": "Armour Security (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TZX01019",
@@ -22313,7 +22313,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AVANA",
+        "symbol": "AVANA-SM",
         "company": "Avana Electrosystems Limited",
         "exchange": "NSE-SME",
         "isin": "INE1KU201016",
@@ -22322,7 +22322,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VICTORYEV",
+        "symbol": "VICTORYEV-SM",
         "company": "Victory Electric Vehicles International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0F8901022",
@@ -22331,7 +22331,7 @@
         "bseCode": null
     },
     {
-        "symbol": "E2ERAIL",
+        "symbol": "E2ERAIL-SM",
         "company": "E To E Transportation Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CEJ01017",
@@ -22340,7 +22340,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DHARARAIL",
+        "symbol": "DHARARAIL-SM",
         "company": "Dhara Rail Projects Limited",
         "exchange": "NSE-SME",
         "isin": "INE2HJL01019",
@@ -22349,7 +22349,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EPWINDIA",
+        "symbol": "EPWINDIA-SM",
         "company": "EPW India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1KEC01023",
@@ -22358,7 +22358,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHYAMDHANI",
+        "symbol": "SHYAMDHANI-SM",
         "company": "Shyam Dhani Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CRP01016",
@@ -22367,7 +22367,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SOCL",
+        "symbol": "SOCL-SM",
         "company": "Sundrex Oil Company Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CTB01014",
@@ -22376,7 +22376,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MARC",
+        "symbol": "MARC-SM",
         "company": "Marc Technocrats Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TD401015",
@@ -22385,7 +22385,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ASHWINI",
+        "symbol": "ASHWINI-SM",
         "company": "Ashwini Container Movers Limited",
         "exchange": "NSE-SME",
         "isin": "INE1A6Q01010",
@@ -22394,7 +22394,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EXIMROUTES",
+        "symbol": "EXIMROUTES-ST",
         "company": "Exim Routes Limited",
         "exchange": "NSE-SME",
         "isin": "INE19I001020",
@@ -22403,7 +22403,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ENCOMPAS",
+        "symbol": "ENCOMPAS-SM",
         "company": "Encompass Design India Limited",
         "exchange": "NSE-SME",
         "isin": "INE433T01015",
@@ -22412,7 +22412,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FWSTC",
+        "symbol": "FWSTC-SM",
         "company": "Flywings Simulator Training Centre Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SQZ01015",
@@ -22421,7 +22421,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHRIKANHA",
+        "symbol": "SHRIKANHA-SM",
         "company": "Shri Kanha Stainless Limited",
         "exchange": "NSE-SME",
         "isin": "INE1V4601019",
@@ -22430,7 +22430,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NEOCHEM",
+        "symbol": "NEOCHEM-SM",
         "company": "Neochem Bio Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE21UM01018",
@@ -22439,7 +22439,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INVICTA",
+        "symbol": "INVICTA-SM",
         "company": "Invicta Diagnostic Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XJ501010",
@@ -22448,7 +22448,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CSSL",
+        "symbol": "CSSL-SM",
         "company": "Clear Secured Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE1EF801010",
@@ -22457,7 +22457,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPEB",
+        "symbol": "SPEB-SM",
         "company": "Speb Adhesives Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CW901027",
@@ -22466,7 +22466,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CURIS",
+        "symbol": "CURIS-SM",
         "company": "Curis Lifesciences Limited",
         "exchange": "NSE-SME",
         "isin": "INE1BZN01016",
@@ -22475,7 +22475,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FINBUD",
+        "symbol": "FINBUD-SM",
         "company": "Finbud Financial Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0EDU01014",
@@ -22484,7 +22484,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHETHJI",
+        "symbol": "SHETHJI-SM",
         "company": "Shreeji Global FMCG Limited",
         "exchange": "NSE-SME",
         "isin": "INE1FL101016",
@@ -22493,7 +22493,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JAYESH",
+        "symbol": "JAYESH-SM",
         "company": "Jayesh Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE1AE401014",
@@ -22502,7 +22502,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GREENLEAF",
+        "symbol": "GREENLEAF-SM",
         "company": "Greenleaf Envirotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PLX01017",
@@ -22511,7 +22511,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHEEL",
+        "symbol": "SHEEL-SM",
         "company": "Sheel Biotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YJV01017",
@@ -22520,7 +22520,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BAGDIGITAL",
+        "symbol": "BAGDIGITAL-SM",
         "company": "B.A.G. Convergence Limited",
         "exchange": "NSE-SME",
         "isin": "INE17CQ01015",
@@ -22529,7 +22529,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MUNISH",
+        "symbol": "MUNISH-SM",
         "company": "Munish Forge Limited",
         "exchange": "NSE-SME",
         "isin": "INE1K8Y01018",
@@ -22538,7 +22538,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SUBAHOTELS",
+        "symbol": "SUBAHOTELS-SM",
         "company": "Suba Hotels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RYR01018",
@@ -22547,7 +22547,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VIJAYPD",
+        "symbol": "VIJAYPD-ST",
         "company": "Vijaypd Ceutical Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WL901019",
@@ -22556,7 +22556,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MPEL",
+        "symbol": "MPEL-SM",
         "company": "Manas Polymers and Energies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U4H01011",
@@ -22565,7 +22565,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GURUNANAK",
+        "symbol": "GURUNANAK-SM",
         "company": "Gurunanak Agriculture India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CCX01012",
@@ -22574,7 +22574,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ECOLINE",
+        "symbol": "ECOLINE-SM",
         "company": "Ecoline Exim Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VBS01016",
@@ -22583,7 +22583,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MGSL",
+        "symbol": "MGSL-SM",
         "company": "Matrix Geo Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE132901013",
@@ -22592,7 +22592,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRIMECAB",
+        "symbol": "PRIMECAB-SM",
         "company": "Prime Cable Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CQA01020",
@@ -22601,7 +22601,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SIDDHICOTS",
+        "symbol": "SIDDHICOTS-ST",
         "company": "Siddhi Cotspin Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SVO01019",
@@ -22610,7 +22610,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TECHD",
+        "symbol": "TECHD-SM",
         "company": "TechD Cybersecurity Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Y5H01014",
@@ -22619,7 +22619,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GML",
+        "symbol": "GML-ST",
         "company": "Galaxy Medicare Limited",
         "exchange": "NSE-SME",
         "isin": "INE09A801015",
@@ -22628,7 +22628,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TAURIAN",
+        "symbol": "TAURIAN-SM",
         "company": "Taurian MPS Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XWS01018",
@@ -22637,7 +22637,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VIGOR",
+        "symbol": "VIGOR-SM",
         "company": "Vigor Plast India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1DM601016",
@@ -22646,7 +22646,7 @@
         "bseCode": null
     },
     {
-        "symbol": "OPTIVALUE",
+        "symbol": "OPTIVALUE-SM",
         "company": "Optivalue Tek Consulting Limited",
         "exchange": "NSE-SME",
         "isin": "INE15B101011",
@@ -22655,7 +22655,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SNEHAA",
+        "symbol": "SNEHAA-SM",
         "company": "Snehaa Organics Limited",
         "exchange": "NSE-SME",
         "isin": "INE1OIC01018",
@@ -22664,7 +22664,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SATTVAENGG",
+        "symbol": "SATTVAENGG-SM",
         "company": "Sattva Engineering Construction Limited",
         "exchange": "NSE-SME",
         "isin": "INE14DW01018",
@@ -22673,7 +22673,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CURRENT",
+        "symbol": "CURRENT-SM",
         "company": "Current Infraprojects Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CRQ01014",
@@ -22682,7 +22682,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CLASSICEIL",
+        "symbol": "CLASSICEIL-SM",
         "company": "Classic Electrodes (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UQ601012",
@@ -22691,7 +22691,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHIVASHRIT",
+        "symbol": "SHIVASHRIT-SM",
         "company": "Shivashrit Foods Limited",
         "exchange": "NSE-SME",
         "isin": "INE1DLF01018",
@@ -22700,7 +22700,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ANONDITA",
+        "symbol": "ANONDITA-SM",
         "company": "Anondita Medicare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VTV01012",
@@ -22709,7 +22709,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARCIIL",
+        "symbol": "ARCIIL-SM",
         "company": "ARC Insulation & Insulators Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YDV01010",
@@ -22718,7 +22718,7 @@
         "bseCode": null
     },
     {
-        "symbol": "STUDIOLSD",
+        "symbol": "STUDIOLSD-SM",
         "company": "Studio LSD Limited",
         "exchange": "NSE-SME",
         "isin": "INE17VO01028",
@@ -22727,7 +22727,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MRIL",
+        "symbol": "MRIL-SM",
         "company": "Mahendra Realtors & Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE632Q01018",
@@ -22736,7 +22736,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MEDISTEP",
+        "symbol": "MEDISTEP-ST",
         "company": "Medistep Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UOY01019",
@@ -22745,7 +22745,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AMCL",
+        "symbol": "AMCL-SM",
         "company": "ANB Metal Cast Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VG001016",
@@ -22754,7 +22754,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAWALIYA",
+        "symbol": "SAWALIYA-SM",
         "company": "Sawaliya Food Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE10VS01016",
@@ -22763,7 +22763,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CONNPLEX",
+        "symbol": "CONNPLEX-SM",
         "company": "Connplex Cinemas Limited",
         "exchange": "NSE-SME",
         "isin": "INE0EAS01014",
@@ -22772,7 +22772,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BHADORA",
+        "symbol": "BHADORA-SM",
         "company": "Bhadora Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZRC01017",
@@ -22781,7 +22781,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARTH",
+        "symbol": "PARTH-ST",
         "company": "Parth Electricals & Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE1H7V01011",
@@ -22790,7 +22790,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AARADHYA",
+        "symbol": "AARADHYA-SM",
         "company": "Aaradhya Disposal Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE124401014",
@@ -22799,7 +22799,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JYOTIGLOBL",
+        "symbol": "JYOTIGLOBL-ST",
         "company": "Jyoti Global Plast Limited",
         "exchange": "NSE-SME",
         "isin": "INE1M3T01017",
@@ -22808,7 +22808,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FLYSBS",
+        "symbol": "FLYSBS-SM",
         "company": "FlySBS Aviation Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VCK01011",
@@ -22817,7 +22817,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RNPL",
+        "symbol": "RNPL-SM",
         "company": "Renol Polychem Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VZX01015",
@@ -22826,7 +22826,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CUDML",
+        "symbol": "CUDML-SM",
         "company": "Cash Ur Drive Marketing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WL201014",
@@ -22835,7 +22835,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KAYTEX",
+        "symbol": "KAYTEX-SM",
         "company": "Kaytex Fabrics Limited",
         "exchange": "NSE-SME",
         "isin": "INE13ZD01013",
@@ -22844,7 +22844,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SELLOWRAP",
+        "symbol": "SELLOWRAP-SM",
         "company": "Sellowrap Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IJF01013",
@@ -22853,7 +22853,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TSC",
+        "symbol": "TSC-SM",
         "company": "TSC India Limited",
         "exchange": "NSE-SME",
         "isin": "INE16VK01010",
@@ -22862,7 +22862,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAVY",
+        "symbol": "SAVY-SM",
         "company": "Savy Infra and Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UCN01017",
@@ -22871,7 +22871,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPUNWEB",
+        "symbol": "SPUNWEB-SM",
         "company": "Spunweb Nonwoven Limited",
         "exchange": "NSE-SME",
         "isin": "INE19QH01010",
@@ -22880,7 +22880,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SMARTEN",
+        "symbol": "SMARTEN-SM",
         "company": "Smarten Power Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE14GK01016",
@@ -22889,7 +22889,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WHITEFORCE",
+        "symbol": "WHITEFORCE-SM",
         "company": "Happy Square Outsourcing Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TLP01015",
@@ -22898,7 +22898,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ETL",
+        "symbol": "ETL-SM",
         "company": "Emkay Tools Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PXC01024",
@@ -22907,7 +22907,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CEDAAR",
+        "symbol": "CEDAAR-SM",
         "company": "Cedaar Textile Limited",
         "exchange": "NSE-SME",
         "isin": "INE11J101017",
@@ -22916,7 +22916,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PUSHPA",
+        "symbol": "PUSHPA-SM",
         "company": "Pushpa Jewellers Limited",
         "exchange": "NSE-SME",
         "isin": "INE154801018",
@@ -22925,7 +22925,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SILKY",
+        "symbol": "SILKY-SM",
         "company": "Silky Overseas Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SN801015",
@@ -22934,7 +22934,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MMEL",
+        "symbol": "MMEL-SM",
         "company": "Moving Media Entertainment Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XM301010",
@@ -22943,7 +22943,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PROFX",
+        "symbol": "PROFX-SM",
         "company": "Pro FX Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VJT01017",
@@ -22952,7 +22952,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RTL",
+        "symbol": "RTL-ST",
         "company": "Rama Telecom Limited",
         "exchange": "NSE-SME",
         "isin": "INE14W901010",
@@ -22961,7 +22961,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SUNTECH",
+        "symbol": "SUNTECH-SM",
         "company": "Suntech Infra Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SGZ01016",
@@ -22970,7 +22970,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHKSIL",
+        "symbol": "SHKSIL-SM",
         "company": "Shri Hare-Krishna Sponge Iron Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NON01025",
@@ -22979,7 +22979,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAYASHEEL",
+        "symbol": "MAYASHEEL-SM",
         "company": "Mayasheel Ventures Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZTO01018",
@@ -22988,7 +22988,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AAKAAR",
+        "symbol": "AAKAAR-ST",
         "company": "Aakaar Medical Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE1GYP01013",
@@ -22997,7 +22997,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAFEENTP",
+        "symbol": "SAFEENTP-SM",
         "company": "Safe Enterprises Retail Fixtures Limited",
         "exchange": "NSE-SME",
         "isin": "INE17D601016",
@@ -23006,7 +23006,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INFLUX",
+        "symbol": "INFLUX-SM",
         "company": "Influx Healthtech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MYZ01012",
@@ -23015,7 +23015,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EEPL",
+        "symbol": "EEPL-SM",
         "company": "Eppeltone Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE11HF01010",
@@ -23024,7 +23024,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PATILAUTOM",
+        "symbol": "PATILAUTOM-SM",
         "company": "Patil Automation Limited",
         "exchange": "NSE-SME",
         "isin": "INE17GV01016",
@@ -23033,7 +23033,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAMAY",
+        "symbol": "SAMAY-SM",
         "company": "Samay Project Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE124101010",
@@ -23042,7 +23042,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MONOLITH",
+        "symbol": "MONOLITH-SM",
         "company": "Monolithisch India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1DV401010",
@@ -23051,7 +23051,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JAINIK",
+        "symbol": "JAINIK-SM",
         "company": "Jainik Power Cables Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XIL01012",
@@ -23060,7 +23060,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SACHEEROME",
+        "symbol": "SACHEEROME-SM",
         "company": "Sacheerome Limited",
         "exchange": "NSE-SME",
         "isin": "INE1ARD01016",
@@ -23069,7 +23069,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GANGABATH",
+        "symbol": "GANGABATH-SM",
         "company": "Ganga Bath Fittings Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZI101018",
@@ -23078,7 +23078,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NEPTUNE",
+        "symbol": "NEPTUNE-ST",
         "company": "Neptune Petrochemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE156901014",
@@ -23087,7 +23087,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NRVANDANA",
+        "symbol": "NRVANDANA-SM",
         "company": "N R Vandana Tex Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE104101014",
@@ -23096,7 +23096,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BLUEWATER",
+        "symbol": "BLUEWATER-SM",
         "company": "Blue Water Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0X3M01010",
@@ -23105,7 +23105,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NIKITA",
+        "symbol": "NIKITA-SM",
         "company": "NIKITA GREENTECH RECYCLING LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0FLF01015",
@@ -23114,7 +23114,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DCCL",
+        "symbol": "DCCL-SM",
         "company": "Dar Credit & Capital Limited",
         "exchange": "NSE-SME",
         "isin": "INE04Q901010",
@@ -23123,7 +23123,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ACCPL",
+        "symbol": "ACCPL-SM",
         "company": "Accretion Pharmaceuticals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T8T01010",
@@ -23132,7 +23132,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INTEGRITY",
+        "symbol": "INTEGRITY-SM",
         "company": "Integrity Infrabuild Developers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YSH01017",
@@ -23141,7 +23141,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VGINFOTECH",
+        "symbol": "VGINFOTECH-SM",
         "company": "Virtual Galaxy Infotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VRH01015",
@@ -23150,7 +23150,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARUNAYA",
+        "symbol": "ARUNAYA-SM",
         "company": "Arunaya Organics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TTG01017",
@@ -23159,7 +23159,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IWARE",
+        "symbol": "IWARE-ST",
         "company": "Iware Supplychain Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE1AII01014",
@@ -23168,7 +23168,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TANKUP",
+        "symbol": "TANKUP-SM",
         "company": "Tankup Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Z7N01017",
@@ -23177,7 +23177,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ATCENERGY",
+        "symbol": "ATCENERGY-SM",
         "company": "ATC Energies System Limited",
         "exchange": "NSE-SME",
         "isin": "INE0V0Q01019",
@@ -23186,7 +23186,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHRIAHIMSA",
+        "symbol": "SHRIAHIMSA-SM",
         "company": "Shri Ahimsa Naturals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DM401012",
@@ -23195,7 +23195,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RAPIDFLEET",
+        "symbol": "RAPIDFLEET-SM",
         "company": "Rapid Fleet Management Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QX901013",
@@ -23204,7 +23204,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ACTIVEINFR",
+        "symbol": "ACTIVEINFR-SM",
         "company": "Active Infrastructures Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KLO01025",
@@ -23213,7 +23213,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GCHOTELS",
+        "symbol": "GCHOTELS-SM",
         "company": "Grand Continent Hotels Limited",
         "exchange": "NSE-SME",
         "isin": "INE12E301017",
@@ -23222,7 +23222,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DIVINEHIRA",
+        "symbol": "DIVINEHIRA-ST",
         "company": "Divine Hira Jewellers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NA501011",
@@ -23231,7 +23231,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BALAJIPHOS",
+        "symbol": "BALAJIPHOS-SM",
         "company": "Balaji Phosphates Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PQ601019",
@@ -23240,7 +23240,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HPTL",
+        "symbol": "HPTL-SM",
         "company": "HP Telecom India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VA601019",
@@ -23249,7 +23249,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TEJASCARGO",
+        "symbol": "TEJASCARGO-SM",
         "company": "Tejas Cargo India Limited",
         "exchange": "NSE-SME",
         "isin": "INE17WC01013",
@@ -23258,7 +23258,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ROYALARC",
+        "symbol": "ROYALARC-SM",
         "company": "Royal Arc Electrodes Limited",
         "exchange": "NSE-SME",
         "isin": "INE0EO401019",
@@ -23267,7 +23267,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PSRAJ",
+        "symbol": "PSRAJ-SM",
         "company": "P S Raj Steels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XUS01012",
@@ -23276,7 +23276,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VOLERCAR",
+        "symbol": "VOLERCAR-SM",
         "company": "Voler Car Limited",
         "exchange": "NSE-SME",
         "isin": "INE241X01014",
@@ -23285,7 +23285,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAXVOLT",
+        "symbol": "MAXVOLT-SM",
         "company": "Maxvolt Energy Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE10A501018",
@@ -23294,7 +23294,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CHANDAN",
+        "symbol": "CHANDAN-SM",
         "company": "Chandan Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0B2N01016",
@@ -23303,7 +23303,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ELGNZ",
+        "symbol": "ELGNZ-SM",
         "company": "Eleganz Interiors Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R9101015",
@@ -23312,7 +23312,7 @@
         "bseCode": null
     },
     {
-        "symbol": "READYMIX",
+        "symbol": "READYMIX-SM",
         "company": "Readymix Construction Machinery Limited",
         "exchange": "NSE-SME",
         "isin": "INE10QL01011",
@@ -23321,7 +23321,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KEN",
+        "symbol": "KEN-SM",
         "company": "Ken Enterprises Limited",
         "exchange": "NSE-SME",
         "isin": "INE15DO01012",
@@ -23330,7 +23330,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CHAMUNDA",
+        "symbol": "CHAMUNDA-SM",
         "company": "Chamunda Electrical Limited",
         "exchange": "NSE-SME",
         "isin": "INE11HG01018",
@@ -23339,7 +23339,7 @@
         "bseCode": null
     },
     {
-        "symbol": "REXPRO",
+        "symbol": "REXPRO-SM",
         "company": "Rexpro Enterprises Limited",
         "exchange": "NSE-SME",
         "isin": "INE113601012",
@@ -23348,7 +23348,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EMAPARTNER",
+        "symbol": "EMAPARTNER-SM",
         "company": "EMA Partners India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZOL01023",
@@ -23357,7 +23357,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KKJEWELS",
+        "symbol": "KKJEWELS-SM",
         "company": "Kabra Jewels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XOW01017",
@@ -23366,7 +23366,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BARFLEX",
+        "symbol": "BARFLEX-SM",
         "company": "Barflex Polyfilms Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QX401014",
@@ -23375,7 +23375,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SATKARTAR",
+        "symbol": "SATKARTAR-SM",
         "company": "Sat Kartar Shopping Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NB801022",
@@ -23384,7 +23384,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DELTIC",
+        "symbol": "DELTIC-SM",
         "company": "Delta Autocorp Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XRN01019",
@@ -23393,7 +23393,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ANYA",
+        "symbol": "ANYA-SM",
         "company": "Anya Polytech & Fertilizers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SI601032",
@@ -23402,7 +23402,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NMSTEEL",
+        "symbol": "NMSTEEL-SM",
         "company": "Newmalayalam Steel Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TP801012",
@@ -23411,7 +23411,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IDENTICAL",
+        "symbol": "IDENTICAL-SM",
         "company": "Identical Brains Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TD101011",
@@ -23420,7 +23420,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PURPLEUTED",
+        "symbol": "PURPLEUTED-SM",
         "company": "Purple United Sales Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P5R01014",
@@ -23429,7 +23429,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SFML",
+        "symbol": "SFML-SM",
         "company": "Supreme Facility Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U6N01014",
@@ -23438,7 +23438,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DHANLAXMI",
+        "symbol": "DHANLAXMI-SM",
         "company": "Dhanlaxmi Crop Science Limited",
         "exchange": "NSE-SME",
         "isin": "INE0V9V01010",
@@ -23447,7 +23447,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ETML",
+        "symbol": "ETML-SM",
         "company": "Emerald Tyre Manufacturers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RHD01013",
@@ -23456,7 +23456,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GANESHIN",
+        "symbol": "GANESHIN-SM",
         "company": "Ganesh Infraworld Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TVT01024",
@@ -23465,7 +23465,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AGARWALTUF",
+        "symbol": "AGARWALTUF-SM",
         "company": "Agarwal Toughened Glass India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P8X01016",
@@ -23474,7 +23474,7 @@
         "bseCode": null
     },
     {
-        "symbol": "APEXECO",
+        "symbol": "APEXECO-SM",
         "company": "Apex Ecotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T4V01015",
@@ -23483,7 +23483,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ABHAPOWER",
+        "symbol": "ABHAPOWER-SM",
         "company": "Abha Power and Steel Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UYG01015",
@@ -23492,7 +23492,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RAJPUTANA",
+        "symbol": "RAJPUTANA-SM",
         "company": "Rajputana Biodiesel Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VHU01019",
@@ -23501,7 +23501,7 @@
         "bseCode": null
     },
     {
-        "symbol": "C2C",
+        "symbol": "C2C-SM",
         "company": "C2C Advanced Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U7V01015",
@@ -23510,7 +23510,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ITTL",
+        "symbol": "ITTL-ST",
         "company": "Innovative Tyres & Tubes Limited",
         "exchange": "NSE-SME",
         "isin": "INE070Y01023",
@@ -23519,7 +23519,7 @@
         "bseCode": null
     },
     {
-        "symbol": "LAMOSAIC",
+        "symbol": "LAMOSAIC-SM",
         "company": "Lamosaic India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R0201012",
@@ -23528,7 +23528,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ONYX",
+        "symbol": "ONYX-SM",
         "company": "Onyx Biotec Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WVU01018",
@@ -23537,7 +23537,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NEELAM",
+        "symbol": "NEELAM-SM",
         "company": "Neelam Linens and Garments (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N1401016",
@@ -23546,7 +23546,7 @@
         "bseCode": null
     },
     {
-        "symbol": "USHAFIN",
+        "symbol": "USHAFIN-SM",
         "company": "Usha Financial Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LS001014",
@@ -23555,7 +23555,7 @@
         "bseCode": null
     },
     {
-        "symbol": "OBSCP",
+        "symbol": "OBSCP-SM",
         "company": "OBSC Perfection Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YHV01011",
@@ -23564,7 +23564,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UHTL",
+        "symbol": "UHTL-SM",
         "company": "United Heat Transfer Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMR01011",
@@ -23573,7 +23573,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DANISH",
+        "symbol": "DANISH-SM",
         "company": "Danish Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YU901016",
@@ -23582,7 +23582,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PREMIUM",
+        "symbol": "PREMIUM-SM",
         "company": "Premium Plast Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M1F01011",
@@ -23591,7 +23591,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FRESHARA",
+        "symbol": "FRESHARA-ST",
         "company": "Freshara Agro Exports Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SFW01015",
@@ -23600,7 +23600,7 @@
         "bseCode": null
     },
     {
-        "symbol": "LAKSHYA",
+        "symbol": "LAKSHYA-SM",
         "company": "Lakshya Powertech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VZS01015",
@@ -23609,7 +23609,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRANIK",
+        "symbol": "PRANIK-SM",
         "company": "Pranik Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VJG01014",
@@ -23618,7 +23618,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARAMOUNT",
+        "symbol": "PARAMOUNT-SM",
         "company": "Paramount Dye Tec Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TG801013",
@@ -23627,7 +23627,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HVAX",
+        "symbol": "HVAX-SM",
         "company": "HVAX Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TO501019",
@@ -23636,7 +23636,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAJHOTELS",
+        "symbol": "SAJHOTELS-SM",
         "company": "Saj Hotels Limited",
         "exchange": "NSE-SME",
         "isin": "INE00MT01022",
@@ -23645,7 +23645,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAHASRA",
+        "symbol": "SAHASRA-SM",
         "company": "Sahasra Electronic Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RBQ01018",
@@ -23654,7 +23654,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DIVYADHAN",
+        "symbol": "DIVYADHAN-SM",
         "company": "Divyadhan Recycling Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QYI01019",
@@ -23663,7 +23663,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FORGEAUTO",
+        "symbol": "FORGEAUTO-SM",
         "company": "Forge Auto International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YKW01013",
@@ -23672,7 +23672,7 @@
         "bseCode": null
     },
     {
-        "symbol": "THESL",
+        "symbol": "THESL-SM",
         "company": "Thinking Hats Entertainment Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SHE01019",
@@ -23681,7 +23681,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UNILEX",
+        "symbol": "UNILEX-SM",
         "company": "Unilex Colours and Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0B2801011",
@@ -23690,7 +23690,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TECHERA",
+        "symbol": "TECHERA-SM",
         "company": "TechEra Engineering (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JQS01019",
@@ -23699,7 +23699,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WOL3D",
+        "symbol": "WOL3D-SM",
         "company": "Wol 3D India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OO201011",
@@ -23708,7 +23708,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RAPPID",
+        "symbol": "RAPPID-SM",
         "company": "Rappid Valves (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MVO01012",
@@ -23717,7 +23717,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BIKEWO",
+        "symbol": "BIKEWO-ST",
         "company": "Bikewo Green Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SQH01013",
@@ -23726,7 +23726,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AVIANSH",
+        "symbol": "AVIANSH-SM",
         "company": "Avi Ansh Textile Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TFB01017",
@@ -23735,7 +23735,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PHOGLOBAL",
+        "symbol": "PHOGLOBAL-SM",
         "company": "Phoenix Overseas Limited",
         "exchange": "NSE-SME",
         "isin": "INE0FPO01018",
@@ -23744,7 +23744,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SDREAMS",
+        "symbol": "SDREAMS-SM",
         "company": "S D Retail Limited",
         "exchange": "NSE-SME",
         "isin": "INE0X6F01017",
@@ -23753,7 +23753,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KALANA",
+        "symbol": "KALANA-ST",
         "company": "Kalana Ispat Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T0L01014",
@@ -23762,7 +23762,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PSFL",
+        "symbol": "PSFL-SM",
         "company": "Paramount Speciality Forgings Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q6001012",
@@ -23771,7 +23771,7 @@
         "bseCode": null
     },
     {
-        "symbol": "OSELDEVICE",
+        "symbol": "OSELDEVICE-SM",
         "company": "Osel Devices Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RMF01018",
@@ -23780,7 +23780,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DECCANTRAN",
+        "symbol": "DECCANTRAN-SM",
         "company": "Deccan Transcon Leasing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S7C01019",
@@ -23789,7 +23789,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ENVIRO",
+        "symbol": "ENVIRO-SM",
         "company": "Envirotech Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SUH01015",
@@ -23798,7 +23798,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PELATRO",
+        "symbol": "PELATRO-SM",
         "company": "Pelatro Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VG601013",
@@ -23807,7 +23807,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EXCELLENT",
+        "symbol": "EXCELLENT-ST",
         "company": "Excellent Wires and Packaging Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Y4801011",
@@ -23816,7 +23816,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INNOMET",
+        "symbol": "INNOMET-SM",
         "company": "Innomet Advanced Materials Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S1D01010",
@@ -23825,7 +23825,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPPPOLY",
+        "symbol": "SPPPOLY-SM",
         "company": "SPP Polymer Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QR801013",
@@ -23834,7 +23834,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AUSL",
+        "symbol": "AUSL-SM",
         "company": "Aditya Ultra Steel Limited",
         "exchange": "NSE-SME",
         "isin": "INE01YQ01013",
@@ -23843,7 +23843,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GAJANAND",
+        "symbol": "GAJANAND-SM",
         "company": "Gajanand International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QTE01018",
@@ -23852,7 +23852,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHUBHSHREE",
+        "symbol": "SHUBHSHREE-SM",
         "company": "Shubhshree Biofuels Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UL701015",
@@ -23861,7 +23861,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VIESL",
+        "symbol": "VIESL-SM",
         "company": "Vision Infra Equipment Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TR001017",
@@ -23870,7 +23870,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MYMUDRA",
+        "symbol": "MYMUDRA-SM",
         "company": "My Mudra Fincorp Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RVQ01016",
@@ -23879,7 +23879,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NAMOEWASTE",
+        "symbol": "NAMOEWASTE-SM",
         "company": "Namo eWaste Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE08NZ01012",
@@ -23888,7 +23888,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JEYYAM",
+        "symbol": "JEYYAM-SM",
         "company": "Jeyyam Global Foods Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RXB01022",
@@ -23897,7 +23897,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BOSS",
+        "symbol": "BOSS-SM",
         "company": "Boss Packaging Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QNI01012",
@@ -23906,7 +23906,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AERON",
+        "symbol": "AERON-SM",
         "company": "Aeron Composite Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WL801011",
@@ -23915,7 +23915,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARAMATRIX",
+        "symbol": "PARAMATRIX-SM",
         "company": "Paramatrix Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S2W01018",
@@ -23924,7 +23924,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IPHL",
+        "symbol": "IPHL-SM",
         "company": "Indian Phosphate Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DHF01018",
@@ -23933,7 +23933,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JAYBEE",
+        "symbol": "JAYBEE-SM",
         "company": "Jay Bee Laminations Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMY01017",
@@ -23942,7 +23942,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VDEAL",
+        "symbol": "VDEAL-SM",
         "company": "Vdeal System Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U2M01015",
@@ -23951,7 +23951,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IDEALTECHO",
+        "symbol": "IDEALTECHO-SM",
         "company": "Ideal Technoplast Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T9I01011",
@@ -23960,7 +23960,7 @@
         "bseCode": null
     },
     {
-        "symbol": "QVCEL",
+        "symbol": "QVCEL-SM",
         "company": "QVC Exports Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KZF01015",
@@ -23969,7 +23969,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FORCAS",
+        "symbol": "FORCAS-SM",
         "company": "Forcas Studio Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U2501017",
@@ -23978,7 +23978,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BRACEPORT",
+        "symbol": "BRACEPORT-SM",
         "company": "Brace Port Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R4Z01018",
@@ -23987,7 +23987,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BALCO",
+        "symbol": "BALCO-SM",
         "company": "Solve Plastic Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U0201016",
@@ -23996,7 +23996,7 @@
         "bseCode": null
     },
     {
-        "symbol": "POSITRON",
+        "symbol": "POSITRON-SM",
         "company": "Positron Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S3H01017",
@@ -24005,7 +24005,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SUNLITE",
+        "symbol": "SUNLITE-SM",
         "company": "Sunlite Recycling Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U2N01013",
@@ -24014,7 +24014,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AESTHETIK",
+        "symbol": "AESTHETIK-SM",
         "company": "Aesthetik Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TSF01011",
@@ -24023,7 +24023,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PPSL",
+        "symbol": "PPSL-SM",
         "company": "Picturepost Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YAL01017",
@@ -24032,7 +24032,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DHARIWAL",
+        "symbol": "DHARIWAL-ST",
         "company": "Dhariwalcorp Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YRN01025",
@@ -24041,7 +24041,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UTSSAV",
+        "symbol": "UTSSAV-SM",
         "company": "Utssav CZ Gold Jewels Limited",
         "exchange": "NSE-SME",
         "isin": "INE06IJ01010",
@@ -24050,7 +24050,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ASHALOG",
+        "symbol": "ASHALOG-SM",
         "company": "Ashapura Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LAA01017",
@@ -24059,7 +24059,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RAJINDLTD",
+        "symbol": "RAJINDLTD-SM",
         "company": "Rajputana Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PCU01012",
@@ -24068,7 +24068,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SSEGL",
+        "symbol": "SSEGL-SM",
         "company": "Sathlokhar Synergys E&C Global Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RFP01011",
@@ -24077,7 +24077,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BULKCORP",
+        "symbol": "BULKCORP-SM",
         "company": "Bulkcorp International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SZ301012",
@@ -24086,7 +24086,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SATECH",
+        "symbol": "SATECH-SM",
         "company": "S A Tech Software India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BSN01013",
@@ -24095,7 +24095,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ESPRIT",
+        "symbol": "ESPRIT-SM",
         "company": "Esprit Stones Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SBP01018",
@@ -24104,7 +24104,7 @@
         "bseCode": null
     },
     {
-        "symbol": "APRAMEYA",
+        "symbol": "APRAMEYA-SM",
         "company": "Aprameya Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LQG01010",
@@ -24113,7 +24113,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TROM",
+        "symbol": "TROM-SM",
         "company": "Trom Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SYV01018",
@@ -24122,7 +24122,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MIEL",
+        "symbol": "MIEL-SM",
         "company": "Manglam Infra & Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R3101011",
@@ -24131,7 +24131,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CHETANA",
+        "symbol": "CHETANA-SM",
         "company": "Chetana Education Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U1T01012",
@@ -24140,7 +24140,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VLINFRA",
+        "symbol": "VLINFRA-SM",
         "company": "V.L.Infraprojects Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QXL01015",
@@ -24149,7 +24149,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RNFI",
+        "symbol": "RNFI-SM",
         "company": "RNFI Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SA001017",
@@ -24158,7 +24158,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MACOBSTECH",
+        "symbol": "MACOBSTECH-SM",
         "company": "Macobs Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R0J01010",
@@ -24167,7 +24167,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KATARIA",
+        "symbol": "KATARIA-SM",
         "company": "Kataria Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SVY01018",
@@ -24176,7 +24176,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TUNWAL",
+        "symbol": "TUNWAL-SM",
         "company": "Tunwal E-Motors Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OXV01027",
@@ -24185,7 +24185,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SATIPOLY",
+        "symbol": "SATIPOLY-SM",
         "company": "Sati Poly Plast Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RPM01017",
@@ -24194,7 +24194,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRIZOR",
+        "symbol": "PRIZOR-ST",
         "company": "Prizor Viztech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0V9N01017",
@@ -24203,7 +24203,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAHAJSOLAR",
+        "symbol": "SAHAJSOLAR-SM",
         "company": "Sahaj Solar Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P4701011",
@@ -24212,7 +24212,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GGBL",
+        "symbol": "GGBL-SM",
         "company": "Ganesh Green Bharat Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R8C01018",
@@ -24221,7 +24221,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EFFWA",
+        "symbol": "EFFWA-SM",
         "company": "Effwa Infra & Research Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U9101019",
@@ -24230,7 +24230,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AMBEY",
+        "symbol": "AMBEY-SM",
         "company": "Ambey Laboratories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M3I01029",
@@ -24239,7 +24239,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NEPHROCARE",
+        "symbol": "NEPHROCARE-SM",
         "company": "Nephro Care India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SUN01013",
@@ -24248,7 +24248,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DTL",
+        "symbol": "DTL-SM",
         "company": "Diensten Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JRD01019",
@@ -24257,7 +24257,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DPEL",
+        "symbol": "DPEL-SM",
         "company": "Divine Power Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SCO01019",
@@ -24266,7 +24266,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AKIKO",
+        "symbol": "AKIKO-ST",
         "company": "Akiko Global Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PMR01017",
@@ -24275,7 +24275,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PCCL",
+        "symbol": "PCCL-SM",
         "company": "Petro Carbon and Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE998U01015",
@@ -24284,7 +24284,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MASON",
+        "symbol": "MASON-SM",
         "company": "Mason Infratech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SH001010",
@@ -24293,7 +24293,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPCL",
+        "symbol": "SPCL-SM",
         "company": "Shivalic Power Control Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T7B01010",
@@ -24302,7 +24302,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VISAMAN",
+        "symbol": "VISAMAN-ST",
         "company": "Visaman Global Sales Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BHK01012",
@@ -24311,7 +24311,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SYLVANPLY",
+        "symbol": "SYLVANPLY-SM",
         "company": "Sylvan Plyboard (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE01IH01015",
@@ -24320,7 +24320,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MEDIORG",
+        "symbol": "MEDIORG-SM",
         "company": "Medicamen Organics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PE401018",
@@ -24329,7 +24329,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WINNY",
+        "symbol": "WINNY-SM",
         "company": "Winny Immigration & Education Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S9101013",
@@ -24338,7 +24338,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FALCONTECH",
+        "symbol": "FALCONTECH-SM",
         "company": "Falcon Technoprojects India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PQK01013",
@@ -24347,7 +24347,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DURLAX",
+        "symbol": "DURLAX-SM",
         "company": "Durlax Top Surface Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OUW01013",
@@ -24356,7 +24356,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GPECO",
+        "symbol": "GPECO-SM",
         "company": "GP Eco Solutions India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S7E01015",
@@ -24365,7 +24365,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TBI",
+        "symbol": "TBI-SM",
         "company": "TBI Corn Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N2D01013",
@@ -24374,7 +24374,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AIMTRON",
+        "symbol": "AIMTRON-SM",
         "company": "Aimtron Electronics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RUV01018",
@@ -24383,7 +24383,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ZTECH",
+        "symbol": "ZTECH-SM",
         "company": "Z-Tech (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ISZ01012",
@@ -24392,7 +24392,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BEACON",
+        "symbol": "BEACON-SM",
         "company": "Beacon Trusteeship Limited",
         "exchange": "NSE-SME",
         "isin": "INE639X01027",
@@ -24401,7 +24401,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VILAS",
+        "symbol": "VILAS-SM",
         "company": "Vilas Transcore Limited",
         "exchange": "NSE-SME",
         "isin": "INE0AZY01017",
@@ -24410,7 +24410,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GSMFOILS",
+        "symbol": "GSMFOILS-SM",
         "company": "GSM Foils Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SQY01018",
@@ -24419,7 +24419,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RULKA",
+        "symbol": "RULKA-SM",
         "company": "Rulka Electricals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R7301013",
@@ -24428,7 +24428,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HOACFOODS",
+        "symbol": "HOACFOODS-ST",
         "company": "Hoac Foods India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S6S01017",
@@ -24437,7 +24437,7 @@
         "bseCode": null
     },
     {
-        "symbol": "QUESTLAB",
+        "symbol": "QUESTLAB-ST",
         "company": "Quest Laboratories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TNW01017",
@@ -24446,7 +24446,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IEML",
+        "symbol": "IEML-SM",
         "company": "Indian Emulsifiers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RRU01016",
@@ -24455,7 +24455,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ABSMARINE",
+        "symbol": "ABSMARINE-SM",
         "company": "ABS Marine Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QRV01016",
@@ -24464,7 +24464,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MANDEEP",
+        "symbol": "MANDEEP-SM",
         "company": "Mandeep Auto Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R3T01013",
@@ -24473,7 +24473,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VERITAAS",
+        "symbol": "VERITAAS-SM",
         "company": "Veritaas Advertising Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SRI01019",
@@ -24482,7 +24482,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRLIND",
+        "symbol": "PRLIND-SM",
         "company": "Premier Roadlines Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CFG01012",
@@ -24491,7 +24491,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EMMIL",
+        "symbol": "EMMIL-SM",
         "company": "Energy Mission Machineries (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S1L01013",
@@ -24500,7 +24500,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SILKFLEX",
+        "symbol": "SILKFLEX-ST",
         "company": "Silkflex Polymers (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0STN01015",
@@ -24509,7 +24509,7 @@
         "bseCode": null
     },
     {
-        "symbol": "REFRACTORY",
+        "symbol": "REFRACTORY-SM",
         "company": "Refractory Shapes Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TNX01015",
@@ -24518,7 +24518,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WINSOL",
+        "symbol": "WINSOL-SM",
         "company": "Winsol Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S3D01016",
@@ -24527,7 +24527,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SLONE",
+        "symbol": "SLONE-SM",
         "company": "Slone Infosystems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMA01017",
@@ -24536,7 +24536,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RBS",
+        "symbol": "RBS-SM",
         "company": "Ramdevbaba Solvent Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RJH01010",
@@ -24545,7 +24545,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BIRDYS",
+        "symbol": "BIRDYS-SM",
         "company": "Grill Splendour Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PC901019",
@@ -24554,7 +24554,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TGL",
+        "symbol": "TGL-ST",
         "company": "Teerth Gopicon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0K6601012",
@@ -24563,7 +24563,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DCG",
+        "symbol": "DCG-SM",
         "company": "DCG Cables & Wires Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S8401018",
@@ -24572,7 +24572,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DRSCARGO",
+        "symbol": "DRSCARGO-SM",
         "company": "DRS Cargo Movers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QZM01018",
@@ -24581,7 +24581,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ALUWIND",
+        "symbol": "ALUWIND-SM",
         "company": "ALUWIND INFRA-TECH LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0STM01017",
@@ -24590,7 +24590,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CGRAPHICS",
+        "symbol": "CGRAPHICS-SM",
         "company": "Creative Graphics Solutions India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R7401011",
@@ -24599,7 +24599,7 @@
         "bseCode": null
     },
     {
-        "symbol": "K2INFRA",
+        "symbol": "K2INFRA-SM",
         "company": "K2 Infragen Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DEZ01013",
@@ -24608,7 +24608,7 @@
         "bseCode": null
     },
     {
-        "symbol": "YASHOPTICS",
+        "symbol": "YASHOPTICS-SM",
         "company": "Yash Optics & Lens Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TO601017",
@@ -24617,7 +24617,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RADIOWALLA",
+        "symbol": "RADIOWALLA-SM",
         "company": "Radiowalla Network Limited",
         "exchange": "NSE-SME",
         "isin": "INE430U01019",
@@ -24626,7 +24626,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TAC",
+        "symbol": "TAC-SM",
         "company": "TAC Infosec Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SOY01013",
@@ -24635,7 +24635,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TRUST",
+        "symbol": "TRUST-SM",
         "company": "Trust Fintech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SWN01019",
@@ -24644,7 +24644,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BLUEPEBBLE",
+        "symbol": "BLUEPEBBLE-ST",
         "company": "Blue Pebble Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SAK01011",
@@ -24653,7 +24653,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ASPIRE",
+        "symbol": "ASPIRE-SM",
         "company": "Aspire & Innovative Advertising Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S7801010",
@@ -24662,7 +24662,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NAMAN",
+        "symbol": "NAMAN-SM",
         "company": "Naman Industries Proxima Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RJM01010",
@@ -24671,7 +24671,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VISHWAS",
+        "symbol": "VISHWAS-SM",
         "company": "Vishwas Agri Seeds Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S2E01016",
@@ -24680,7 +24680,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ENFUSE",
+        "symbol": "ENFUSE-SM",
         "company": "Enfuse Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S3X01014",
@@ -24689,7 +24689,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ENSER",
+        "symbol": "ENSER-SM",
         "company": "Enser Communications Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R9I01021",
@@ -24698,7 +24698,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AVPINFRA",
+        "symbol": "AVPINFRA-SM",
         "company": "AVP Infracon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R9401019",
@@ -24707,7 +24707,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SIGNORIA",
+        "symbol": "SIGNORIA-SM",
         "company": "Signoria Creation Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RDE01010",
@@ -24716,7 +24716,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRATHAM",
+        "symbol": "PRATHAM-SM",
         "company": "Pratham EPC Projects Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QA601016",
@@ -24725,7 +24725,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHREEKARNI",
+        "symbol": "SHREEKARNI-SM",
         "company": "Shree Karni Fabcom Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S4Y01010",
@@ -24734,7 +24734,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SONAMAC",
+        "symbol": "SONAMAC-SM",
         "company": "Sona Machinery Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q6H01012",
@@ -24743,7 +24743,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VR",
+        "symbol": "VR-SM",
         "company": "V R Infraspace Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QQM01017",
@@ -24752,7 +24752,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MVKAGRO",
+        "symbol": "MVKAGRO-SM",
         "company": "M.V.K. Agro Food Product Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SGC01015",
@@ -24761,7 +24761,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PURVFLEXI",
+        "symbol": "PURVFLEXI-SM",
         "company": "Purv Flexipack Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R6C01012",
@@ -24770,7 +24770,7 @@
         "bseCode": null
     },
     {
-        "symbol": "OWAIS",
+        "symbol": "OWAIS-SM",
         "company": "Owais Metal And Mineral Processing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R8M01017",
@@ -24779,7 +24779,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SADHAV",
+        "symbol": "SADHAV-SM",
         "company": "Sadhav Shipping Limited",
         "exchange": "NSE-SME",
         "isin": "INE0K5H01010",
@@ -24788,7 +24788,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DEEM",
+        "symbol": "DEEM-SM",
         "company": "Deem Roll Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE586O01011",
@@ -24797,7 +24797,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ZENITHDRUG",
+        "symbol": "ZENITHDRUG-SM",
         "company": "Zenith Drugs Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QWN01013",
@@ -24806,7 +24806,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ATMASTCO",
+        "symbol": "ATMASTCO-SM",
         "company": "Atmastco Limited",
         "exchange": "NSE-SME",
         "isin": "INE05DH01017",
@@ -24815,7 +24815,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TCL",
+        "symbol": "TCL-SM",
         "company": "Thaai Casting Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QJL01014",
@@ -24824,7 +24824,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ESCONET",
+        "symbol": "ESCONET-SM",
         "company": "Esconet Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RQZ01017",
@@ -24833,7 +24833,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INM",
+        "symbol": "INM-SM",
         "company": "Interiors & More Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OPC01015",
@@ -24842,7 +24842,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WTICAB",
+        "symbol": "WTICAB-SM",
         "company": "Wise Travel India Limited",
         "exchange": "NSE-SME",
         "isin": "INE623Y01011",
@@ -24851,7 +24851,7 @@
         "bseCode": null
     },
     {
-        "symbol": "POLYSIL",
+        "symbol": "POLYSIL-ST",
         "company": "Polysil Irrigation Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE517M01028",
@@ -24860,7 +24860,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ALPEXSOLAR",
+        "symbol": "ALPEXSOLAR-SM",
         "company": "Alpex Solar Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R4701017",
@@ -24869,7 +24869,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ITALIANE",
+        "symbol": "ITALIANE-ST",
         "company": "Italian Edibles Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R7R01018",
@@ -24878,7 +24878,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BAWEJA",
+        "symbol": "BAWEJA-SM",
         "company": "Baweja Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JFJ01011",
@@ -24887,7 +24887,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MEGATHERM",
+        "symbol": "MEGATHERM-SM",
         "company": "Megatherm Induction Limited",
         "exchange": "NSE-SME",
         "isin": "INE531R01010",
@@ -24896,7 +24896,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FONEBOX",
+        "symbol": "FONEBOX-SM",
         "company": "Fonebox Retail Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q4701019",
@@ -24905,7 +24905,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DHTL",
+        "symbol": "DHTL-SM",
         "company": "Docmode Health Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OGG01015",
@@ -24914,7 +24914,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DELAPLEX",
+        "symbol": "DELAPLEX-SM",
         "company": "Delaplex Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SK801018",
@@ -24923,7 +24923,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KONSTELEC",
+        "symbol": "KONSTELEC-SM",
         "company": "Konstelec Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QEI01011",
@@ -24932,7 +24932,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ADDICTIVE",
+        "symbol": "ADDICTIVE-SM",
         "company": "Addictive Learning Technology Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RDH01021",
@@ -24941,7 +24941,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAXPOSURE",
+        "symbol": "MAXPOSURE-SM",
         "company": "Maxposure Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ECC01022",
@@ -24950,7 +24950,7 @@
         "bseCode": null
     },
     {
-        "symbol": "APS",
+        "symbol": "APS-SM",
         "company": "Australian Premium Solar (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P0001010",
@@ -24959,7 +24959,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IBLFL",
+        "symbol": "IBLFL-SM",
         "company": "IBL Finance Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7401018",
@@ -24968,7 +24968,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KLL",
+        "symbol": "KLL-SM",
         "company": "Kaushalya Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q2V01012",
@@ -24977,7 +24977,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KCEIL",
+        "symbol": "KCEIL-SM",
         "company": "Kay Cee Energy & Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RCG01017",
@@ -24986,7 +24986,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HRHNEXT",
+        "symbol": "HRHNEXT-SM",
         "company": "HRH Next Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R3501012",
@@ -24995,7 +24995,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AKANKSHA",
+        "symbol": "AKANKSHA-SM",
         "company": "Akanksha Power and Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PCY01014",
@@ -25004,7 +25004,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAIFL",
+        "symbol": "SAIFL-SM",
         "company": "Sameera Agro And Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PZA01015",
@@ -25013,7 +25013,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TECHLABS",
+        "symbol": "TECHLABS-SM",
         "company": "Trident Techlabs Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QD201012",
@@ -25022,7 +25022,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INDIFRA",
+        "symbol": "INDIFRA-SM",
         "company": "Indifra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PS301014",
@@ -25031,7 +25031,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SUPREMEPWR",
+        "symbol": "SUPREMEPWR-SM",
         "company": "Supreme Power Equipment Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QHG01026",
@@ -25040,7 +25040,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EFORCE",
+        "symbol": "EFORCE-SM",
         "company": "Electro Force (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q1W01012",
@@ -25049,7 +25049,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHREEOSFM",
+        "symbol": "SHREEOSFM-SM",
         "company": "Shree OSFM E-Mobility Limited",
         "exchange": "NSE-SME",
         "isin": "INE02S501018",
@@ -25058,7 +25058,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SJLOGISTIC",
+        "symbol": "SJLOGISTIC-SM",
         "company": "S J Logistics (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0F3301020",
@@ -25067,7 +25067,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRESSTONIC",
+        "symbol": "PRESSTONIC-ST",
         "company": "Presstonic Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R1601012",
@@ -25076,7 +25076,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ACCENTMIC",
+        "symbol": "ACCENTMIC-SM",
         "company": "Accent Microcell Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q5D01013",
@@ -25085,7 +25085,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GRAPHISAD",
+        "symbol": "GRAPHISAD-ST",
         "company": "Graphisads Limited",
         "exchange": "NSE-SME",
         "isin": "INE0POU01017",
@@ -25094,7 +25094,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHEETAL",
+        "symbol": "SHEETAL-ST",
         "company": "Sheetal Universal Limited",
         "exchange": "NSE-SME",
         "isin": "INE04VX01019",
@@ -25103,7 +25103,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MARINETRAN",
+        "symbol": "MARINETRAN-SM",
         "company": "Marinetrans India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P1P01017",
@@ -25112,7 +25112,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CBAZAAR",
+        "symbol": "CBAZAAR-SM",
         "company": "Net Avenue Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE518X01015",
@@ -25121,7 +25121,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ROCKINGDCE",
+        "symbol": "ROCKINGDCE-SM",
         "company": "Rockingdeals Circular Economy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PTR01012",
@@ -25130,7 +25130,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SUNREST",
+        "symbol": "SUNREST-SM",
         "company": "Sunrest Lifescience Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PLZ01012",
@@ -25139,7 +25139,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ROXHITECH",
+        "symbol": "ROXHITECH-SM",
         "company": "Rox Hi Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PDJ01013",
@@ -25148,7 +25148,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BABAFP",
+        "symbol": "BABAFP-SM",
         "company": "Baba Food Processing (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QW501012",
@@ -25157,7 +25157,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MICROPRO",
+        "symbol": "MICROPRO-SM",
         "company": "Micropro Software Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PZK01014",
@@ -25166,7 +25166,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SARTELE",
+        "symbol": "SARTELE-SM",
         "company": "Sar Televenture Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PUC01020",
@@ -25175,7 +25175,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAITREYA",
+        "symbol": "MAITREYA-SM",
         "company": "Maitreya Medicare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PLQ01011",
@@ -25184,7 +25184,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TRANSTEEL",
+        "symbol": "TRANSTEEL-SM",
         "company": "Transteel Seating Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NVI01020",
@@ -25193,7 +25193,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHANTHALA",
+        "symbol": "SHANTHALA-SM",
         "company": "Shanthala FMCG Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q9Q01017",
@@ -25202,7 +25202,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARAGON",
+        "symbol": "PARAGON-SM",
         "company": "Paragon Fine and Speciality Chemical Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N4G01012",
@@ -25211,7 +25211,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ONDOOR",
+        "symbol": "ONDOOR-SM",
         "company": "On Door Concepts Limited",
         "exchange": "NSE-SME",
         "isin": "INE00ER01015",
@@ -25220,7 +25220,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RCDL",
+        "symbol": "RCDL-SM",
         "company": "Rajgor Castor Derivatives Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BZQ01011",
@@ -25229,7 +25229,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WOMANCART",
+        "symbol": "WOMANCART-SM",
         "company": "Womancart Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q9601016",
@@ -25238,7 +25238,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARVINDPORT",
+        "symbol": "ARVINDPORT-SM",
         "company": "ARVIND PORT AND INFRA LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0P4T01013",
@@ -25247,7 +25247,7 @@
         "bseCode": null
     },
     {
-        "symbol": "COMMITTED",
+        "symbol": "COMMITTED-SM",
         "company": "Committed Cargo Care Limited",
         "exchange": "NSE-SME",
         "isin": "INE597Z01014",
@@ -25256,7 +25256,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PLADAINFO",
+        "symbol": "PLADAINFO-SM",
         "company": "Plada Infotech Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PXD01014",
@@ -25265,7 +25265,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KARNIKA",
+        "symbol": "KARNIKA-SM",
         "company": "Karnika Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MGA01012",
@@ -25274,7 +25274,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SCML",
+        "symbol": "SCML-SM",
         "company": "Sharp Chucks and Machines Limited",
         "exchange": "NSE-SME",
         "isin": "INE460Q01014",
@@ -25283,7 +25283,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CANARYS",
+        "symbol": "CANARYS-SM",
         "company": "Canarys Automations Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QG301017",
@@ -25292,7 +25292,7 @@
         "bseCode": null
     },
     {
-        "symbol": "OLIL",
+        "symbol": "OLIL-SM",
         "company": "Oneclick Logistics India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OPS01011",
@@ -25301,7 +25301,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GOYALSALT",
+        "symbol": "GOYALSALT-SM",
         "company": "Goyal Salt Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QFE01017",
@@ -25310,7 +25310,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VISHNUINFR",
+        "symbol": "VISHNUINFR-SM",
         "company": "Vishnusurya Projects and Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PQ001012",
@@ -25319,7 +25319,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KONTOR",
+        "symbol": "KONTOR-SM",
         "company": "Kontor Space Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KZ301010",
@@ -25328,7 +25328,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EFACTOR",
+        "symbol": "EFACTOR-SM",
         "company": "E Factor Experiences Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KFF01017",
@@ -25337,7 +25337,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARABIAN",
+        "symbol": "ARABIAN-SM",
         "company": "Arabian Petroleum Limited",
         "exchange": "NSE-SME",
         "isin": "INE08NJ01024",
@@ -25346,7 +25346,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VINYAS",
+        "symbol": "VINYAS-SM",
         "company": "Vinyas Innovative Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OLS01010",
@@ -25355,7 +25355,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NEWJAISA",
+        "symbol": "NEWJAISA-SM",
         "company": "Newjaisa Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PW501021",
@@ -25364,7 +25364,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INSPIRE",
+        "symbol": "INSPIRE-SM",
         "company": "Inspire Films Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NDX01019",
@@ -25373,7 +25373,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DIGIKORE",
+        "symbol": "DIGIKORE-SM",
         "company": "Digikore Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QJ901011",
@@ -25382,7 +25382,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAL",
+        "symbol": "MAL-SM",
         "company": "Mangalam Alloys Limited",
         "exchange": "NSE-SME",
         "isin": "INE00C401011",
@@ -25391,7 +25391,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAAKSHI",
+        "symbol": "SAAKSHI-SM",
         "company": "Saakshi Medtech and Panels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PSK01027",
@@ -25400,7 +25400,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MASTER",
+        "symbol": "MASTER-SM",
         "company": "Master Components Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OJM01017",
@@ -25409,7 +25409,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HIGREEN",
+        "symbol": "HIGREEN-SM",
         "company": "Hi-Green Carbon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PIC01017",
@@ -25418,7 +25418,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CELLECOR",
+        "symbol": "CELLECOR-SM",
         "company": "Cellecor Gadgets Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OMO01025",
@@ -25427,7 +25427,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MARCO",
+        "symbol": "MARCO-SM",
         "company": "Marco Cables & Conductors Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QP001012",
@@ -25436,7 +25436,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KODYTECH",
+        "symbol": "KODYTECH-ST",
         "company": "Kody Technolab Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q7P01013",
@@ -25445,7 +25445,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KEL",
+        "symbol": "KEL-SM",
         "company": "Kundan Edifice Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OWX01025",
@@ -25454,7 +25454,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MADHUSUDAN",
+        "symbol": "MADHUSUDAN-SM",
         "company": "Madhusudan Masala Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P6701019",
@@ -25463,7 +25463,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CHAVDA",
+        "symbol": "CHAVDA-SM",
         "company": "Chavda Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PT101017",
@@ -25472,7 +25472,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HOLMARC",
+        "symbol": "HOLMARC-SM",
         "company": "Holmarc Opto-Mechatronics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LXA01019",
@@ -25481,7 +25481,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UNIHEALTH",
+        "symbol": "UNIHEALTH-ST",
         "company": "Unihealth Hospitals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PRF01011",
@@ -25490,7 +25490,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JIWANRAM",
+        "symbol": "JIWANRAM-SM",
         "company": "Jiwanram Sheoduttrai Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N5H01017",
@@ -25499,7 +25499,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAROJA",
+        "symbol": "SAROJA-SM",
         "company": "Saroja Pharma Industries India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PCL01011",
@@ -25508,7 +25508,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRAMARA",
+        "symbol": "PRAMARA-SM",
         "company": "Pramara Promotions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7A01017",
@@ -25517,7 +25517,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BASILIC",
+        "symbol": "BASILIC-SM",
         "company": "Basilic Fly Studio Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OCC01013",
@@ -25526,7 +25526,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MONOPHARMA",
+        "symbol": "MONOPHARMA-SM",
         "company": "Mono Pharmacare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OIP01012",
@@ -25535,7 +25535,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CPS",
+        "symbol": "CPS-SM",
         "company": "C P S Shapers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QBU01012",
@@ -25544,7 +25544,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SEL",
+        "symbol": "SEL-SM",
         "company": "Sungarner Energies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O3O01017",
@@ -25553,7 +25553,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CLSL",
+        "symbol": "CLSL-SM",
         "company": "Crop Life Science Limited",
         "exchange": "NSE-SME",
         "isin": "INE00NH01017",
@@ -25562,7 +25562,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SSFL",
+        "symbol": "SSFL-SM",
         "company": "Srivari Spices And Foods Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ON201012",
@@ -25571,7 +25571,7 @@
         "bseCode": null
     },
     {
-        "symbol": "YUDIZ",
+        "symbol": "YUDIZ-ST",
         "company": "Yudiz Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE09FA01019",
@@ -25580,7 +25580,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SANGANI",
+        "symbol": "SANGANI-SM",
         "company": "Sangani Hospitals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OVI01010",
@@ -25589,7 +25589,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ORIANA",
+        "symbol": "ORIANA-SM",
         "company": "Oriana Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OUT01019",
@@ -25598,7 +25598,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VINSYS",
+        "symbol": "VINSYS-SM",
         "company": "Vinsys IT Services India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OSJ01014",
@@ -25607,7 +25607,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ZEAL",
+        "symbol": "ZEAL-SM",
         "company": "Zeal Global Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PPS01018",
@@ -25616,7 +25616,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHRITECH",
+        "symbol": "SHRITECH-SM",
         "company": "Shri Techtex Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OMF01015",
@@ -25625,7 +25625,7 @@
         "bseCode": null
     },
     {
-        "symbol": "YCCL",
+        "symbol": "YCCL-SM",
         "company": "Yasons Chemex Care Limited",
         "exchange": "NSE-SME",
         "isin": "INE08S201019",
@@ -25634,7 +25634,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SERVICE",
+        "symbol": "SERVICE-ST",
         "company": "Service Care Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P1Q01015",
@@ -25643,7 +25643,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DRONE",
+        "symbol": "DRONE-SM",
         "company": "Drone Destination Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P7201019",
@@ -25652,7 +25652,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SYNOPTICS",
+        "symbol": "SYNOPTICS-SM",
         "company": "Synoptics Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BTR01012",
@@ -25661,7 +25661,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TRIDHYA",
+        "symbol": "TRIDHYA-SM",
         "company": "Tridhya Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LWY01029",
@@ -25670,7 +25670,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GLOBALPET",
+        "symbol": "GLOBALPET-SM",
         "company": "Global Pet Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PS501019",
@@ -25679,7 +25679,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PENTAGON",
+        "symbol": "PENTAGON-SM",
         "company": "Pentagon Rubber Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ORS01017",
@@ -25688,7 +25688,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAGSON",
+        "symbol": "MAGSON-SM",
         "company": "Magson Retail And Distribution Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O1S01012",
@@ -25697,7 +25697,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ESFL",
+        "symbol": "ESFL-SM",
         "company": "Essen Speciality Films Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ITO01014",
@@ -25706,7 +25706,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GREENCHEF",
+        "symbol": "GREENCHEF-SM",
         "company": "Greenchef Appliances Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7P01015",
@@ -25715,7 +25715,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AATMAJ",
+        "symbol": "AATMAJ-SM",
         "company": "Aatmaj Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OB201016",
@@ -25724,7 +25724,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VILINBIO",
+        "symbol": "VILINBIO-ST",
         "company": "Vilin Bio Med Limited",
         "exchange": "NSE-SME",
         "isin": "INE0L4V01013",
@@ -25733,7 +25733,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CELLPOINT",
+        "symbol": "CELLPOINT-SM",
         "company": "Cell Point (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O0001013",
@@ -25742,7 +25742,7 @@
         "bseCode": null
     },
     {
-        "symbol": "URBAN",
+        "symbol": "URBAN-SM",
         "company": "Urban Enviro Waste Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O0201019",
@@ -25751,7 +25751,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPECTSTM",
+        "symbol": "SPECTSTM-SM",
         "company": "Spectrum Talent Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OL001018",
@@ -25760,7 +25760,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KDL",
+        "symbol": "KDL-ST",
         "company": "Kore Digital Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O4R01018",
@@ -25769,7 +25769,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SAHANA",
+        "symbol": "SAHANA-SM",
         "company": "Sahana System Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LEX01011",
@@ -25778,7 +25778,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INFOLLION",
+        "symbol": "INFOLLION-SM",
         "company": "Infollion Research Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NNZ01013",
@@ -25787,7 +25787,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PROV",
+        "symbol": "PROV-SM",
         "company": "Proventus Agrocom Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ONE01016",
@@ -25796,7 +25796,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CRAYONS",
+        "symbol": "CRAYONS-SM",
         "company": "Crayons Advertising Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OFK01019",
@@ -25805,7 +25805,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DENTALKART",
+        "symbol": "DENTALKART-SM",
         "company": "Vasa Denticity Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N5801013",
@@ -25814,7 +25814,7 @@
         "bseCode": null
     },
     {
-        "symbol": "REMUS",
+        "symbol": "REMUS-SM",
         "company": "Remus Pharmaceuticals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O5T01011",
@@ -25823,7 +25823,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KRISHCA",
+        "symbol": "KRISHCA-SM",
         "company": "Krishca Strapping Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NR701018",
@@ -25832,7 +25832,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AUROIMPEX",
+        "symbol": "AUROIMPEX-SM",
         "company": "Auro Impex  & Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NUL01018",
@@ -25841,7 +25841,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DENEERS",
+        "symbol": "DENEERS-ST",
         "company": "De Neers Tools Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JWV01011",
@@ -25850,7 +25850,7 @@
         "bseCode": null
     },
     {
-        "symbol": "QUICKTOUCH",
+        "symbol": "QUICKTOUCH-SM",
         "company": "Quicktouch Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0K4D01020",
@@ -25859,7 +25859,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AGUL",
+        "symbol": "AGUL-SM",
         "company": "A G Universal Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O6N01012",
@@ -25868,7 +25868,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PATTECH",
+        "symbol": "PATTECH-SM",
         "company": "Pattech Fitwell Tube Components Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NZW01014",
@@ -25877,7 +25877,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MOS",
+        "symbol": "MOS-SM",
         "company": "Mos Utility Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N7S01028",
@@ -25886,7 +25886,7 @@
         "bseCode": null
     },
     {
-        "symbol": "INFINIUM",
+        "symbol": "INFINIUM-SM",
         "company": "Infinium Pharmachem Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MRE01011",
@@ -25895,7 +25895,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SOTAC",
+        "symbol": "SOTAC-SM",
         "company": "Sotac Pharmaceuticals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O2D01012",
@@ -25904,7 +25904,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NIRMAN",
+        "symbol": "NIRMAN-ST",
         "company": "Nirman Agri Genetics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OK701014",
@@ -25913,7 +25913,7 @@
         "bseCode": null
     },
     {
-        "symbol": "QFIL",
+        "symbol": "QFIL-SM",
         "company": "Quality Foils (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O1M01015",
@@ -25922,7 +25922,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VELS",
+        "symbol": "VELS-SM",
         "company": "Vels Film International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0I3H01019",
@@ -25931,7 +25931,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MCON",
+        "symbol": "MCON-SM",
         "company": "Mcon Rasayan India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O4M01019",
@@ -25940,7 +25940,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SYSTANGO",
+        "symbol": "SYSTANGO-SM",
         "company": "Systango Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7R01011",
@@ -25949,7 +25949,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VERTEXPLUS",
+        "symbol": "VERTEXPLUS-SM",
         "company": "Vertexplus Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NLB01018",
@@ -25958,7 +25958,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SRIVASAVI",
+        "symbol": "SRIVASAVI-SM",
         "company": "Srivasavi Adhesive Tapes Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NPI01014",
@@ -25967,7 +25967,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VIAZ",
+        "symbol": "VIAZ-SM",
         "company": "Viaz Tyres Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MO401019",
@@ -25976,7 +25976,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AGARWALFT",
+        "symbol": "AGARWALFT-SM",
         "company": "Agarwal Float Glass India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MLA01012",
@@ -25985,7 +25985,7 @@
         "bseCode": null
     },
     {
-        "symbol": "LRRPL",
+        "symbol": "LRRPL-SM",
         "company": "Lead Reclaim And Rubber Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE0H4B01011",
@@ -25994,7 +25994,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHERA",
+        "symbol": "SHERA-SM",
         "company": "Shera Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MM001019",
@@ -26003,7 +26003,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GRCL",
+        "symbol": "GRCL-SM",
         "company": "Gayatri Rubbers And Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LVM01018",
@@ -26012,7 +26012,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARISTO",
+        "symbol": "ARISTO-SM",
         "company": "Aristo Bio-Tech And Lifescience Limited",
         "exchange": "NSE-SME",
         "isin": "INE082101010",
@@ -26021,7 +26021,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DUCOL",
+        "symbol": "DUCOL-SM",
         "company": "Ducol Organics And Colours Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LZO01015",
@@ -26030,7 +26030,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CMNL",
+        "symbol": "CMNL-SM",
         "company": "Chaman Metallics Limited",
         "exchange": "NSE-SME",
         "isin": "INE06PV01010",
@@ -26039,7 +26039,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ANLON",
+        "symbol": "ANLON-SM",
         "company": "Anlon Technology Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LR101013",
@@ -26048,7 +26048,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RBMINFRA",
+        "symbol": "RBMINFRA-SM",
         "company": "Rbm Infracon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NA301016",
@@ -26057,7 +26057,7 @@
         "bseCode": null
     },
     {
-        "symbol": "HOMESFY",
+        "symbol": "HOMESFY-SM",
         "company": "Homesfy Realty Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N7F01017",
@@ -26066,7 +26066,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MOXSH",
+        "symbol": "MOXSH-ST",
         "company": "Moxsh Overseas Educon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N6D01014",
@@ -26075,7 +26075,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UMA",
+        "symbol": "UMA-SM",
         "company": "Uma Converter Limited",
         "exchange": "NSE-SME",
         "isin": "INE067901012",
@@ -26084,7 +26084,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARIHANTACA",
+        "symbol": "ARIHANTACA-SM",
         "company": "Arihant Academy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NCC01015",
@@ -26093,7 +26093,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DOLLEX",
+        "symbol": "DOLLEX-SM",
         "company": "Dollex Agrotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JHH01011",
@@ -26102,7 +26102,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ALLETEC",
+        "symbol": "ALLETEC-SM",
         "company": "All E Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M2X01012",
@@ -26111,7 +26111,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ARHAM",
+        "symbol": "ARHAM-SM",
         "company": "Arham Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0L2Y01011",
@@ -26120,7 +26120,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BAHETI",
+        "symbol": "BAHETI-SM",
         "company": "Baheti Recycling Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE029Q01017",
@@ -26129,7 +26129,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRITIKA",
+        "symbol": "PRITIKA-SM",
         "company": "Pritika Engineering Components Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MJQ01020",
@@ -26138,7 +26138,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AMIABLE",
+        "symbol": "AMIABLE-ST",
         "company": "Amiable Logistics (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MTP01013",
@@ -26147,7 +26147,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RITEZONE",
+        "symbol": "RITEZONE-SM",
         "company": "Rite Zone Chemcon India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MRA01019",
@@ -26156,7 +26156,7 @@
         "bseCode": null
     },
     {
-        "symbol": "IPSL",
+        "symbol": "IPSL-SM",
         "company": "Integrated Personnel Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE02EE01019",
@@ -26165,7 +26165,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PHANTOMFX",
+        "symbol": "PHANTOMFX-SM",
         "company": "Phantom Digital Effects Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MLZ01019",
@@ -26174,7 +26174,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FROG",
+        "symbol": "FROG-SM",
         "company": "Frog Innovations Limited",
         "exchange": "NSE-SME",
         "isin": "INE385O01018",
@@ -26183,7 +26183,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SWASTIK",
+        "symbol": "SWASTIK-SM",
         "company": "Swastik Pipe Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DGC01025",
@@ -26192,7 +26192,7 @@
         "bseCode": null
     },
     {
-        "symbol": "LLOYDS",
+        "symbol": "LLOYDS-SM",
         "company": "Lloyds Luxuries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DTQ01028",
@@ -26201,7 +26201,7 @@
         "bseCode": null
     },
     {
-        "symbol": "QMSMEDI",
+        "symbol": "QMSMEDI-SM",
         "company": "QMS Medical Allied Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0FMW01018",
@@ -26210,7 +26210,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CMRSL",
+        "symbol": "CMRSL-SM",
         "company": "Cyber Media Research & Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE075Z01011",
@@ -26219,7 +26219,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KANDARP",
+        "symbol": "KANDARP-SM",
         "company": "Kandarp Digi Smart BPO Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MOT01016",
@@ -26228,7 +26228,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAKS",
+        "symbol": "MAKS-SM",
         "company": "Maks Energy Solutions India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CDK01019",
@@ -26237,7 +26237,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ANNAPURNA",
+        "symbol": "ANNAPURNA-SM",
         "company": "Annapurna Swadisht Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MGM01017",
@@ -26246,7 +26246,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TAPIFRUIT",
+        "symbol": "TAPIFRUIT-SM",
         "company": "Tapi Fruit Processing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M7001010",
@@ -26255,7 +26255,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ISHAN",
+        "symbol": "ISHAN-SM",
         "company": "Ishan International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LCW01025",
@@ -26264,7 +26264,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SABAR",
+        "symbol": "SABAR-ST",
         "company": "Sabar Flex India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DZ101013",
@@ -26273,7 +26273,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MEGAFLEX",
+        "symbol": "MEGAFLEX-ST",
         "company": "Mega Flex Plastics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0G1D01014",
@@ -26282,7 +26282,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VIVIANA",
+        "symbol": "VIVIANA-SM",
         "company": "Viviana Power Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MEG01014",
@@ -26291,7 +26291,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KORE",
+        "symbol": "KORE-SM",
         "company": "Jay Jalaram Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J6801010",
@@ -26300,7 +26300,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JFLLIFE",
+        "symbol": "JFLLIFE-SM",
         "company": "Jfl Life Sciences Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LA901015",
@@ -26309,7 +26309,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AMEYA",
+        "symbol": "AMEYA-SM",
         "company": "Ameya Precision Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KT901015",
@@ -26318,7 +26318,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VEEKAYEM",
+        "symbol": "VEEKAYEM-SM",
         "company": "Veekayem Fashion and Apparels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KTW01013",
@@ -26327,7 +26327,7 @@
         "bseCode": null
     },
     {
-        "symbol": "USASEEDS",
+        "symbol": "USASEEDS-SM",
         "company": "Upsurge Seeds Of Agriculture Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CBM01019",
@@ -26336,7 +26336,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AGNI",
+        "symbol": "AGNI-SM",
         "company": "Agni Green Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LF301013",
@@ -26345,7 +26345,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SKP",
+        "symbol": "SKP-SM",
         "company": "SKP Bearing Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KZA01016",
@@ -26354,7 +26354,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KCK",
+        "symbol": "KCK-SM",
         "company": "Kck Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J1E01027",
@@ -26363,7 +26363,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RILINFRA",
+        "symbol": "RILINFRA-SM",
         "company": "Rachana Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE02OY01016",
@@ -26372,7 +26372,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FIDEL",
+        "symbol": "FIDEL-SM",
         "company": "Fidel Softech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LQQ01019",
@@ -26381,7 +26381,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GSTL",
+        "symbol": "GSTL-ST",
         "company": "Globesecure Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE00WS01056",
@@ -26390,7 +26390,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SONUINFRA",
+        "symbol": "SONUINFRA-SM",
         "company": "Sonu Infratech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JZA01018",
@@ -26399,7 +26399,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PROPEQUITY",
+        "symbol": "PROPEQUITY-SM",
         "company": "P. E. Analytics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KN801013",
@@ -26408,7 +26408,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SWARAJ",
+        "symbol": "SWARAJ-SM",
         "company": "Swaraj Suiting Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GMR01016",
@@ -26417,7 +26417,7 @@
         "bseCode": null
     },
     {
-        "symbol": "COOLCAPS",
+        "symbol": "COOLCAPS-SM",
         "company": "Cool Caps Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0HS001028",
@@ -26426,7 +26426,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SPRL",
+        "symbol": "SPRL-SM",
         "company": "Sp Refractories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JW501011",
@@ -26435,7 +26435,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHIGAN",
+        "symbol": "SHIGAN-ST",
         "company": "Shigan Quantum Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE03KJ01013",
@@ -26444,7 +26444,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MADHAVBAUG",
+        "symbol": "MADHAVBAUG-SM",
         "company": "Vaidya Sane Ayurved Laboratories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JR301013",
@@ -26453,7 +26453,7 @@
         "bseCode": null
     },
     {
-        "symbol": "RICHA",
+        "symbol": "RICHA-SM",
         "company": "Richa Info Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J1P01015",
@@ -26462,7 +26462,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PRECISION",
+        "symbol": "PRECISION-SM",
         "company": "Precision Metaliks Limited",
         "exchange": "NSE-SME",
         "isin": "INE0HKW01018",
@@ -26471,7 +26471,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TIMESCAN",
+        "symbol": "TIMESCAN-SM",
         "company": "Timescan Logistics (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IJY01014",
@@ -26480,7 +26480,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VIVO",
+        "symbol": "VIVO-SM",
         "company": "Vivo Collaboration Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IA701014",
@@ -26489,7 +26489,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FOCE",
+        "symbol": "FOCE-SM",
         "company": "Foce India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0I7D01019",
@@ -26498,7 +26498,7 @@
         "bseCode": null
     },
     {
-        "symbol": "NIDAN",
+        "symbol": "NIDAN-SM",
         "company": "Nidan Laboratories and Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J6L01013",
@@ -26507,7 +26507,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DKEGL",
+        "symbol": "DKEGL-SM",
         "company": "D.K. Enterprises Global Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GN101014",
@@ -26516,7 +26516,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DYNAMIC",
+        "symbol": "DYNAMIC-SM",
         "company": "Dynamic Services & Security Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DZ701010",
@@ -26525,7 +26525,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DESTINY",
+        "symbol": "DESTINY-SM",
         "company": "Destiny Logistics & Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IGO01011",
@@ -26534,7 +26534,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BMETRICS",
+        "symbol": "BMETRICS-SM",
         "company": "Bombay Metrics Supply Chain Limited",
         "exchange": "NSE-SME",
         "isin": "INE0I3Y01014",
@@ -26543,7 +26543,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JAINAM",
+        "symbol": "JAINAM-SM",
         "company": "Jainam Ferro Alloys (I) Limited",
         "exchange": "NSE-SME",
         "isin": "INE02KC01010",
@@ -26552,7 +26552,7 @@
         "bseCode": null
     },
     {
-        "symbol": "QUADPRO",
+        "symbol": "QUADPRO-SM",
         "company": "Quadpro Ites Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GOJ01027",
@@ -26561,7 +26561,7 @@
         "bseCode": null
     },
     {
-        "symbol": "BEWLTD",
+        "symbol": "BEWLTD-SM",
         "company": "BEW Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0HQI01014",
@@ -26570,7 +26570,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DUGLOBAL",
+        "symbol": "DUGLOBAL-SM",
         "company": "DUDIGITAL GLOBAL LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0HPK01020",
@@ -26579,7 +26579,7 @@
         "bseCode": null
     },
     {
-        "symbol": "REXPIPES",
+        "symbol": "REXPIPES-SM",
         "company": "Rex Pipes And Cables Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE00D001018",
@@ -26588,7 +26588,7 @@
         "bseCode": null
     },
     {
-        "symbol": "WALPAR",
+        "symbol": "WALPAR-SM",
         "company": "Walpar Nutritions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0G2G01015",
@@ -26597,7 +26597,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AILIMITED",
+        "symbol": "AILIMITED-SM",
         "company": "Abhishek Integrations Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CAJ01017",
@@ -26606,7 +26606,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VMARCIND",
+        "symbol": "VMARCIND-SM",
         "company": "V Marc India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GXK01018",
@@ -26615,7 +26615,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SIDDHIKA",
+        "symbol": "SIDDHIKA-SM",
         "company": "Siddhika Coatings Limited",
         "exchange": "NSE-SME",
         "isin": "INE0A1E01018",
@@ -26624,7 +26624,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARTYCRUS",
+        "symbol": "PARTYCRUS-SM",
         "company": "Party Cruisers Limited",
         "exchange": "NSE-SME",
         "isin": "INE06ZX01015",
@@ -26633,7 +26633,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ASCOM",
+        "symbol": "ASCOM-ST",
         "company": "Ascom Leasing & Investments Limited",
         "exchange": "NSE-SME",
         "isin": "INE08KD01015",
@@ -26642,7 +26642,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GOLDKART",
+        "symbol": "GOLDKART-SM",
         "company": "Goldkart Jewels Limited",
         "exchange": "NSE-SME",
         "isin": "INE06MH01016",
@@ -26651,7 +26651,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KHFM",
+        "symbol": "KHFM-SM",
         "company": "Khfm Hospitality And Facility Management Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE00UG01014",
@@ -26660,7 +26660,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MINDPOOL",
+        "symbol": "MINDPOOL-SM",
         "company": "Mindpool Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE00RQ01019",
@@ -26669,7 +26669,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SURANI",
+        "symbol": "SURANI-ST",
         "company": "Surani Steel Tubes Limited",
         "exchange": "NSE-SME",
         "isin": "INE01ZJ01015",
@@ -26678,7 +26678,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DRSDILIP",
+        "symbol": "DRSDILIP-ST",
         "company": "DRS Dilip Roadlines Limited",
         "exchange": "NSE-SME",
         "isin": "INE02CV01017",
@@ -26687,7 +26687,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHUBHLAXMI",
+        "symbol": "SHUBHLAXMI-SM",
         "company": "Shubhlaxmi Jewel Art Limited",
         "exchange": "NSE-SME",
         "isin": "INE01Z401013",
@@ -26696,7 +26696,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UWCSL",
+        "symbol": "UWCSL-SM",
         "company": "Ultra Wiring Connectivity System Limited",
         "exchange": "NSE-SME",
         "isin": "INE00F301010",
@@ -26705,7 +26705,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARIN",
+        "symbol": "PARIN-SM",
         "company": "Parin Enterprises Limited",
         "exchange": "NSE-SME",
         "isin": "INE00U801010",
@@ -26714,7 +26714,7 @@
         "bseCode": null
     },
     {
-        "symbol": "UCL",
+        "symbol": "UCL-ST",
         "company": "Ushanti Colour Chem Limited",
         "exchange": "NSE-SME",
         "isin": "INE00NI01015",
@@ -26723,7 +26723,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AMBANIORGO",
+        "symbol": "AMBANIORGO-ST",
         "company": "AMBANI ORGOCHEM LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE00C501018",
@@ -26732,7 +26732,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JAKHARIA",
+        "symbol": "JAKHARIA-ST",
         "company": "JAKHARIA FABRIC LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE00N401018",
@@ -26741,7 +26741,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MAHICKRA",
+        "symbol": "MAHICKRA-ST",
         "company": "Mahickra Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE961Y01015",
@@ -26750,7 +26750,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VERA",
+        "symbol": "VERA-SM",
         "company": "Vera Synthetic Limited",
         "exchange": "NSE-SME",
         "isin": "INE709Z01015",
@@ -26759,7 +26759,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CONTI",
+        "symbol": "CONTI-SM",
         "company": "Continental Seeds and Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE340Z01019",
@@ -26768,7 +26768,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GIRIRAJ",
+        "symbol": "GIRIRAJ-ST",
         "company": "Giriraj Civil Developers Limited",
         "exchange": "NSE-SME",
         "isin": "INE614Z01017",
@@ -26777,7 +26777,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MDL",
+        "symbol": "MDL-SM",
         "company": "Marvel Decor Limited",
         "exchange": "NSE-SME",
         "isin": "INE575Z01010",
@@ -26786,7 +26786,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MHHL",
+        "symbol": "MHHL-SM",
         "company": "Mohini Health & Hygiene Limited",
         "exchange": "NSE-SME",
         "isin": "INE450S01011",
@@ -26795,7 +26795,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PARAMPARA",
+        "symbol": "PARAMPARA-ST",
         "company": "PARAMPARA DAIRY DELIGHTS LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE749Y01014",
@@ -26804,7 +26804,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VASA",
+        "symbol": "VASA-SM",
         "company": "Vasa Retail and Overseas Ltd",
         "exchange": "NSE-SME",
         "isin": "INE068Z01016",
@@ -26813,7 +26813,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SMVD",
+        "symbol": "SMVD-ST",
         "company": "SMVD Poly Pack Limited",
         "exchange": "NSE-SME",
         "isin": "INE702Y01013",
@@ -26822,7 +26822,7 @@
         "bseCode": null
     },
     {
-        "symbol": "FELIX",
+        "symbol": "FELIX-SM",
         "company": "Felix Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE901X01013",
@@ -26831,7 +26831,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PULZ",
+        "symbol": "PULZ-SM",
         "company": "Pulz Electronics Limited",
         "exchange": "NSE-SME",
         "isin": "INE335X01014",
@@ -26840,7 +26840,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AISL",
+        "symbol": "AISL-SM",
         "company": "ANI Integrated Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE635Y01015",
@@ -26849,7 +26849,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MILTON",
+        "symbol": "MILTON-ST",
         "company": "Milton Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE376Y01016",
@@ -26858,7 +26858,7 @@
         "bseCode": null
     },
     {
-        "symbol": "OMFURN",
+        "symbol": "OMFURN-SM",
         "company": "Omfurn India Limited",
         "exchange": "NSE-SME",
         "isin": "INE338Y01016",
@@ -26867,7 +26867,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GOLDSTAR",
+        "symbol": "GOLDSTAR-ST",
         "company": "Goldstar Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE405Y01021",
@@ -26876,7 +26876,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TIRUPATI",
+        "symbol": "TIRUPATI-SM",
         "company": "Shree Tirupati Balajee FIBC Limited",
         "exchange": "NSE-SME",
         "isin": "INE238Y01018",
@@ -26885,7 +26885,7 @@
         "bseCode": null
     },
     {
-        "symbol": "CADSYS",
+        "symbol": "CADSYS-SM",
         "company": "Cadsys (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE090Y01013",
@@ -26894,7 +26894,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MPTODAY",
+        "symbol": "MPTODAY-SM",
         "company": "Madhya Pradesh Today Media Limited",
         "exchange": "NSE-SME",
         "isin": "INE105Y01019",
@@ -26903,7 +26903,7 @@
         "bseCode": null
     },
     {
-        "symbol": "MANAV",
+        "symbol": "MANAV-ST",
         "company": "Manav Infra Projects Limited",
         "exchange": "NSE-SME",
         "isin": "INE104Y01012",
@@ -26912,7 +26912,7 @@
         "bseCode": null
     },
     {
-        "symbol": "TRANSWIND",
+        "symbol": "TRANSWIND-SM",
         "company": "Transwind Infrastructures Limited",
         "exchange": "NSE-SME",
         "isin": "INE792X01016",
@@ -26921,7 +26921,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ACCORD",
+        "symbol": "ACCORD-SM",
         "company": "Accord Synergy Limited",
         "exchange": "NSE-SME",
         "isin": "INE113X01015",
@@ -26930,7 +26930,7 @@
         "bseCode": null
     },
     {
-        "symbol": "VSCL",
+        "symbol": "VSCL-SM",
         "company": "Vadivarhe Speciality Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE551Q01028",
@@ -26939,7 +26939,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JALAN",
+        "symbol": "JALAN-SM",
         "company": "Jalan Transolutions (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE349X01015",
@@ -26948,7 +26948,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ASLIND",
+        "symbol": "ASLIND-SM",
         "company": "ASL Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE617I01024",
@@ -26957,7 +26957,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PROLIFE",
+        "symbol": "PROLIFE-SM",
         "company": "Prolife Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE994V01012",
@@ -26966,7 +26966,7 @@
         "bseCode": null
     },
     {
-        "symbol": "DIRL",
+        "symbol": "DIRL-SM",
         "company": "Dhanuka Infra Realty Limited",
         "exchange": "NSE-SME",
         "isin": "INE704V01015",
@@ -26975,7 +26975,7 @@
         "bseCode": null
     },
     {
-        "symbol": "ALCODIS",
+        "symbol": "ALCODIS-SM",
         "company": "Alcokraft Distilleries Limited",
         "exchange": "NSE-SME",
         "isin": "INE448V01019",
@@ -26984,7 +26984,7 @@
         "bseCode": null
     },
     {
-        "symbol": "GRETEX",
+        "symbol": "GRETEX-ST",
         "company": "Gretex Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE985P01012",
@@ -26993,7 +26993,7 @@
         "bseCode": null
     },
     {
-        "symbol": "JETKNIT",
+        "symbol": "JETKNIT-ST",
         "company": "Jet Knitwears Limited",
         "exchange": "NSE-SME",
         "isin": "INE564T01017",
@@ -27002,7 +27002,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AVSL",
+        "symbol": "AVSL-ST",
         "company": "AVSL Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE522V01011",
@@ -27011,7 +27011,7 @@
         "bseCode": null
     },
     {
-        "symbol": "KKVAPOW",
+        "symbol": "KKVAPOW-SM",
         "company": "KKV Agro Powers Limited",
         "exchange": "NSE-SME",
         "isin": "INE239T01016",
@@ -27020,7 +27020,7 @@
         "bseCode": null
     },
     {
-        "symbol": "PERFECT",
+        "symbol": "PERFECT-SZ",
         "company": "Perfect Infraengineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE925S01012",
@@ -27029,7 +27029,7 @@
         "bseCode": null
     },
     {
-        "symbol": "AHIMSA",
+        "symbol": "AHIMSA-ST",
         "company": "Ahimsa Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE136T01014",
@@ -27038,7 +27038,7 @@
         "bseCode": null
     },
     {
-        "symbol": "SHAIVAL",
+        "symbol": "SHAIVAL-ST",
         "company": "Shaival Reality Limited",
         "exchange": "NSE-SME",
         "isin": "INE262S01010",
@@ -27047,7 +27047,7 @@
         "bseCode": null
     },
     {
-        "symbol": "EMKAYTOOLS",
+        "symbol": "EMKAYTOOLS-SM",
         "company": "Emkay Taps and Cutting Tools Limited",
         "exchange": "NSE-SME",
         "isin": "INE332S01011",
@@ -29855,9 +29855,9 @@
         "bseCode": "509196"
     },
     {
-        "symbol": "SEL",
+        "symbol": "SEL-SM",
         "company": "Sanathnagar Enterprises Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE367E01033",
         "yahooTicker": "SEL.BO",
         "screenerSymbol": "509423",
@@ -42770,9 +42770,9 @@
         "bseCode": "539041"
     },
     {
-        "symbol": "RAJPUTANA",
+        "symbol": "RAJPUTANA-SM",
         "company": "Rajputana Investment and Finance Ltd.",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE751R01014",
         "yahooTicker": "RAJPUTANA.BO",
         "screenerSymbol": "539090",
@@ -43787,9 +43787,9 @@
         "bseCode": "539598"
     },
     {
-        "symbol": "KEL",
+        "symbol": "KEL-SM",
         "company": "Kotia Enterprises Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE079C01012",
         "yahooTicker": "KEL.BO",
         "screenerSymbol": "539599",
@@ -44255,9 +44255,9 @@
         "bseCode": "539956"
     },
     {
-        "symbol": "ZEAL",
+        "symbol": "ZEAL-SM",
         "company": "Zeal Aqua Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE819S01025",
         "yahooTicker": "ZEAL.BO",
         "screenerSymbol": "539963",
@@ -44993,9 +44993,9 @@
         "bseCode": "540652"
     },
     {
-        "symbol": "GSTL",
+        "symbol": "GSTL-ST",
         "company": "GlobalSpace Technologies Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE632W01016",
         "yahooTicker": "GSTL.BO",
         "screenerSymbol": "540654",
