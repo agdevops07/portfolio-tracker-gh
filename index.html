@@ -425,11 +425,25 @@ function maximizeChart(cardId, bodyId, canvasId) {
     if (srcChart && srcChart.config) {
       try {
         const cfg = srcChart.config;
+        // Strip non-serializable canvas gradients from datasets
+        const cleanDatasets = (cfg.data.datasets || []).map(ds => {
+          const d = Object.assign({}, ds);
+          if (d.backgroundColor && typeof d.backgroundColor === 'object') d.backgroundColor = 'rgba(0,0,0,0)';
+          return d;
+        });
+        const cleanData = Object.assign({}, cfg.data, { datasets: cleanDatasets });
+        // Deep-clone options and explicitly preserve scales so x-axis is not lost
+        const clonedOpts = JSON.parse(JSON.stringify(cfg.options || {}));
+        clonedOpts.animation = false;
+        clonedOpts.responsive = true;
+        clonedOpts.maintainAspectRatio = false;
+        if (cfg.options && cfg.options.scales) {
+          clonedOpts.scales = JSON.parse(JSON.stringify(cfg.options.scales));
+        }
         new Chart(bigCanvas, {
           type: cfg.type,
-          data: JSON.parse(JSON.stringify(cfg.data)),
-          options: Object.assign({}, JSON.parse(JSON.stringify(cfg.options || {})),
-            { animation: false, responsive: true, maintainAspectRatio: false }),
+          data: JSON.parse(JSON.stringify(cleanData)),
+          options: clonedOpts,
         });
         return;
       } catch(e) { console.warn('Chart re-render failed, falling back', e); }
