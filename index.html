@@ -54,7 +54,7 @@
           <div class="drop-title">Drop your CSV here</div>
           <div class="drop-sub">or click to browse from your device</div>
         </div>
-        <input type="file" id="file-input" accept=".csv" aria-label="Choose CSV file">
+        <input type="file" id="file-input" name="file-input" accept=".csv" aria-label="Choose CSV file">
         <div class="upload-btn-row">
           <button class="btn btn-primary upload-btn" id="browse-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -92,6 +92,7 @@
     </div>
     <div class="btn-group">
       <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button class="btn btn-secondary" onclick="exportHoldingsCSV()">📥 Export CSV</button>
       <button class="btn btn-primary" onclick="loadDashboard()">Load Dashboard →</button>
     </div>
   </div>
@@ -119,7 +120,7 @@
     <div class="header-actions">
       <div class="refresh-controls">
         <span id="last-refresh-time" class="refresh-timestamp"></span>
-        <select id="refresh-interval-sel" class="interval-sel" onchange="setRefreshInterval(+this.value)">
+        <select id="refresh-interval-sel" name="refresh-interval" class="interval-sel" onchange="setRefreshInterval(+this.value)">
           <option value="30000">30s</option>
           <option value="60000">1m</option>
           <option value="120000">2m</option>
@@ -134,7 +135,7 @@
         <button class="export-btn" onclick="toggleExportMenu()">⬇ Export ▾</button>
         <div class="export-menu" id="export-menu">
           <div class="export-menu-item" onclick="exportPDF()">📄 Download as PDF</div>
-          <div class="export-menu-item" onclick="exportChart()">🖼 Export Chart PNG</div>
+          <div class="export-menu-item" onclick="exportHoldingsCSV()">📥 Export Holdings CSV</div>
         </div>
       </div>
       <button class="btn btn-secondary" onclick="goBack()">← Upload New</button>
@@ -179,9 +180,9 @@
       </div>
       <div id="portfolio-chart-body" class="collapsible-body">
         <div id="port-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
-          <input type="date" id="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
           <span style="color:var(--text3)">to</span>
-          <input type="date" id="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
           <button class="tf-btn active" onclick="applyPortCustom()">Apply</button>
         </div>
         <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
@@ -290,9 +291,9 @@
       </div>
       <div id="dd-history-body" class="collapsible-body">
         <div id="dd-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.4rem 0 0.6rem;flex-wrap:wrap;">
-          <input type="date" id="dd-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <input type="date" id="dd-from" name="dd-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
           <span style="color:var(--text3)">to</span>
-          <input type="date" id="dd-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+          <input type="date" id="dd-to" name="dd-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
           <button class="tf-btn active" onclick="applyDDCustom()">Apply</button>
         </div>
         <div class="chart-wrap" style="height:260px;"><canvas id="ddChart"></canvas></div>
