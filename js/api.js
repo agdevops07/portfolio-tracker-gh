@@ -282,7 +282,7 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
 
       // About & sector
       const about  = doc.querySelector('.company-profile p, #company-info p, .about p');
-      if (about) fund.about = about.textContent.trim().slice(0, 10000);
+      if (about) fund.about = about.textContent.trim();
       const sector = doc.querySelector('.company-profile .tag, .company-sector a, a[href*="/screen/"]');
       if (sector) fund.sector = sector.textContent.trim();
 
