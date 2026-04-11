@@ -98,7 +98,7 @@
     <div class="btn-group">
       <button class="btn btn-secondary" onclick="goBack()">← Back</button>
       <button class="btn btn-secondary" onclick="exportHoldingsCSV()">📥 Export CSV</button>
-      <button class="btn btn-primary" onclick="loadDashboard()">Load Dashboard →</button>
+      <button class="btn btn-primary" onclick="window._clearNoPortMsgs&&window._clearNoPortMsgs();loadDashboard()">Load Dashboard →</button>
     </div>
   </div>
   <div id="preview-error"></div>
@@ -115,7 +115,7 @@
       <tbody></tbody>
     </table>
   </div>
-  <button class="btn btn-primary" style="width:100%" onclick="loadDashboard()">Load Dashboard →</button>
+  <button class="btn btn-primary" style="width:100%" onclick="window._clearNoPortMsgs&&window._clearNoPortMsgs();loadDashboard()">Load Dashboard →</button>
 </div>
 
 <!-- DASHBOARD SCREEN -->
@@ -291,7 +291,7 @@
           <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='TCS';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">TCS</button>
           <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='HDFC Bank';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">HDFC Bank</button>
           <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='Infosys';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">Infosys</button>
-          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='Eternal';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">Eternal</button>
+          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='Zomato';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">Zomato</button>
         </div>
       </div>
 
@@ -449,20 +449,22 @@ window.openStockScreener = function() {
   if (loadingDiv) loadingDiv.style.display = 'none';
   if (contentDiv) contentDiv.style.display = 'block';
 
-  // Inject "no portfolio" message into overview and holdings tabs if not already done
-  const noPortfolioMsg = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
-      padding:3rem 1rem;text-align:center;color:var(--text3);">
-    <div style="font-size:2rem;margin-bottom:0.75rem;">📂</div>
-    <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:0.4rem;">No portfolio loaded</div>
-    <div style="font-size:13px;margin-bottom:1.25rem;">Load your portfolio CSV to see your holdings, P&amp;L and charts here.</div>
-    <button class="btn btn-primary" style="font-size:13px;padding:8px 20px;"
-      onclick="document.getElementById('upload-screen').style.display='flex';document.getElementById('dashboard-screen').style.display='none';">
-      ← Load Portfolio
-    </button>
-  </div>`;
+  // Show "no portfolio" overlay on overview+holdings — as a sibling div, never touching their innerHTML
   ['dash-tab-overview','dash-tab-holdings'].forEach(id => {
     const el = document.getElementById(id);
-    if (el && !el.dataset.noPortMsg) { el.innerHTML = noPortfolioMsg; el.dataset.noPortMsg = '1'; }
+    if (!el || el.querySelector('.no-port-msg')) return;
+    const msg = document.createElement('div');
+    msg.className = 'no-port-msg';
+    msg.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;text-align:center;color:var(--text3);background:var(--bg1);z-index:10;';
+    msg.innerHTML = `<div style="font-size:2rem;margin-bottom:0.75rem;">📂</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:0.4rem;">No portfolio loaded</div>
+      <div style="font-size:13px;margin-bottom:1.25rem;">Load your portfolio CSV to see your holdings, P&amp;L and charts here.</div>
+      <button class="btn btn-primary" style="font-size:13px;padding:8px 20px;"
+        onclick="document.getElementById('upload-screen').style.display='flex';document.getElementById('dashboard-screen').style.display='none';">
+        ← Load Portfolio
+      </button>`;
+    el.style.position = 'relative';
+    el.appendChild(msg);
   });
 
   // Activate stocksearch tab via existing switchDashTab (handles initStockSearch)
@@ -480,6 +482,11 @@ function toggleSection(bodyId, btnId) {
 
 // Chart registry — charts.js writes here after each render
 window._chartInstances = window._chartInstances || {};
+
+// Remove screener-mode overlays when real dashboard loads
+window._clearNoPortMsgs = function() {
+  document.querySelectorAll('.no-port-msg').forEach(el => el.remove());
+};
 
 function downloadSampleCSV() {
   var csv = "ticker,quantity,average_buy_price,buy_date,upstox_ticker\nRELIANCE.NS,10,2400.50,2023-06-01,INE002A01018\nTCS.NS,5,3800.00,2023-04-15,\nINFY.NS,20,1500.00,2023-01-10,";
