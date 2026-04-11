@@ -7,16 +7,36 @@
 import { state } from './state.js';
 import { showToast } from './utils.js';
 
-// ── Export chart as PNG ──────────────────────────
-export function exportChart() {
-  const chart = state.portfolioChartInstance;
-  if (!chart) return;
-  const url = chart.canvas.toDataURL('image/png');
+// ── Export holdings as CSV ───────────────────────
+export function exportHoldingsCSV() {
+  const rows = state.rawRows;
+  if (!rows || !rows.length) {
+    showToast('No holdings data to export.');
+    closeExportMenu();
+    return;
+  }
+
+  const header = 'ticker,quantity,average_buy_price,buy_date,upstox_ticker';
+  const lines = rows.map(r =>
+    [
+      r.ticker,
+      r.qty,
+      r.avg,
+      r.date || '',
+      r.upstoxTicker || '',
+    ].join(',')
+  );
+
+  const csv = [header, ...lines].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'portfolio-chart.png';
+  const ts = new Date().toISOString().slice(0, 10);
+  a.download = `portfolio-holdings-${ts}.csv`;
   a.click();
-  showToast('Chart exported!');
+  URL.revokeObjectURL(url);
+  showToast('Holdings exported as CSV!');
   closeExportMenu();
 }
 

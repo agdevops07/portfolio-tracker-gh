@@ -72,7 +72,7 @@ function addPickerRow() {
 }
 
 function removePickerRow(id) {
-  pickerRows = pickerRows.filter(r => r.id !== id);
+  pickerRows = pickerRows.filter(r => String(r.id) !== String(id));
   if (pickerRows.length === 0) addPickerRow();
   else renderPickerRows();
 }
@@ -124,21 +124,21 @@ function renderPickerRows() {
       <div class="sp-fields-row">
         <div class="sp-field">
           <label class="sp-label">Shares / Qty</label>
-          <input type="number" class="sp-input" min="0.001" step="any"
+          <input type="number" class="sp-input" id="sp-qty-${row.id}" name="sp-qty-${row.id}" min="0.001" step="any"
             placeholder="e.g. 100"
             value="${row.qty}"
             oninput="window._spUpdateField('${row.id}','qty',this.value)" />
         </div>
         <div class="sp-field">
           <label class="sp-label">Avg Buy Price (₹)</label>
-          <input type="number" class="sp-input" min="0" step="any"
+          <input type="number" class="sp-input" id="sp-avg-${row.id}" name="sp-avg-${row.id}" min="0" step="any"
             placeholder="e.g. 1500.00"
             value="${row.avg}"
             oninput="window._spUpdateField('${row.id}','avg',this.value)" />
         </div>
         <div class="sp-field">
           <label class="sp-label">Buy Date</label>
-          <input type="date" class="sp-input"
+          <input type="date" class="sp-input" id="sp-date-${row.id}" name="sp-date-${row.id}"
             value="${row.date}"
             oninput="window._spUpdateField('${row.id}','date',this.value)" />
         </div>
