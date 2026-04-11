@@ -70,6 +70,11 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Try with sample portfolio
         </button>
+        <div class="or-divider"><span>just browsing?</span></div>
+        <button class="sample-btn" id="screener-btn" onclick="window.openStockScreener()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Open Stock Screener
+        </button>
         <p class="drop-trust">🔒 Your data stays in memory — never uploaded to any server</p>
       </div>
       <div class="format-hint">
@@ -431,6 +436,41 @@
 </footer> -->
 
 <script>
+window.openStockScreener = function() {
+  // Show dashboard screen — skip loadDashboard entirely (no holdings needed)
+  const screens = ['upload-screen','preview-screen','dashboard-screen','drilldown-screen'];
+  screens.forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = s === 'dashboard-screen' ? 'block' : 'none';
+  });
+  // Hide the loading spinner, show content directly
+  const loadingDiv = document.getElementById('dash-loading');
+  const contentDiv = document.getElementById('dash-content');
+  if (loadingDiv) loadingDiv.style.display = 'none';
+  if (contentDiv) contentDiv.style.display = 'block';
+
+  // Inject "no portfolio" message into overview and holdings tabs if not already done
+  const noPortfolioMsg = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:3rem 1rem;text-align:center;color:var(--text3);">
+    <div style="font-size:2rem;margin-bottom:0.75rem;">📂</div>
+    <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:0.4rem;">No portfolio loaded</div>
+    <div style="font-size:13px;margin-bottom:1.25rem;">Load your portfolio CSV to see your holdings, P&amp;L and charts here.</div>
+    <button class="btn btn-primary" style="font-size:13px;padding:8px 20px;"
+      onclick="document.getElementById('upload-screen').style.display='flex';document.getElementById('dashboard-screen').style.display='none';">
+      ← Load Portfolio
+    </button>
+  </div>`;
+  ['dash-tab-overview','dash-tab-holdings'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.noPortMsg) { el.innerHTML = noPortfolioMsg; el.dataset.noPortMsg = '1'; }
+  });
+
+  // Activate stocksearch tab via existing switchDashTab (handles initStockSearch)
+  if (typeof window.switchDashTab === 'function') {
+    window.switchDashTab('stocksearch', document.querySelector('[data-tab="stocksearch"]'));
+  }
+};
+
 function toggleSection(bodyId, btnId) {
   const body = document.getElementById(bodyId);
   const btn  = document.getElementById(btnId);
