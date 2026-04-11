@@ -18,31 +18,7 @@
   <p class="hero-sub">Upload your holdings CSV and get an instant visual breakdown.</p>
 
   <div class="upload-layout">
-    <!-- Left: feature highlights -->
-    <div class="upload-right">
-      <div class="upload-right-title">What you get</div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">📊</div>
-        <div class="upload-feature-text"><strong>Live Portfolio Value</strong>Real-time prices with historical chart and custom date ranges</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">📈</div>
-        <div class="upload-feature-text"><strong>Intraday Tracking</strong>5-min charts for today's portfolio and individual stocks</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">🧮</div>
-        <div class="upload-feature-text"><strong>P&L Analysis</strong>Overall returns, daily change, CAGR per holding</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">📋</div>
-        <div class="upload-feature-text"><strong>Fundamentals</strong>P/E, ROCE, ROE, Balance Sheet & Cash Flows via Screener.in</div>
-      </div>
-      <div class="upload-feature">
-        <div class="upload-feature-icon">💾</div>
-        <div class="upload-feature-text"><strong>Export</strong>Download PDF reports or chart images anytime</div>
-      </div>
-    </div>
-    <!-- Right: drop zone -->
+    <!-- Left: drop zone -->
     <div class="upload-left">
       <div class="drop-zone" id="drop-zone">
         <div class="drop-icon">📂</div>
@@ -74,6 +50,30 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       <p class="api-note">Prices via Yahoo Finance · Fundamentals via Screener.in</p>
     </div>
 
+    <!-- Right: feature highlights (desktop only) -->
+    <div class="upload-right">
+      <div class="upload-right-title">What you get</div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">📊</div>
+        <div class="upload-feature-text"><strong>Live Portfolio Value</strong>Real-time prices with historical chart and custom date ranges</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">📈</div>
+        <div class="upload-feature-text"><strong>Intraday Tracking</strong>5-min charts for today's portfolio and individual stocks</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">🧮</div>
+        <div class="upload-feature-text"><strong>P&L Analysis</strong>Overall returns, daily change, CAGR per holding</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">📋</div>
+        <div class="upload-feature-text"><strong>Fundamentals</strong>P/E, ROCE, ROE, Balance Sheet & Cash Flows via Screener.in</div>
+      </div>
+      <div class="upload-feature">
+        <div class="upload-feature-icon">💾</div>
+        <div class="upload-feature-text"><strong>Export</strong>Download PDF reports or chart images anytime</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -239,9 +239,29 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   <div class="dd-subtitle" id="dd-subtitle"></div>
   <div class="cards-grid" id="dd-cards" style="margin-bottom:1.5rem"></div>
 
-
-  <!-- Price History + Today's Price (side by side) -->
-  <div class="two-col dd-charts-row" style="margin-bottom:1rem">
+  <!-- Fundamentals Panel -->
+  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
+    <div class="chart-header collapsible-header" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">
+      <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
+      <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+        <div class="fund-mode-toggle">
+          <button class="fund-mode-btn active" id="fund-mode-cons" onclick="switchFundMode('consolidated',this)">Consolidated</button>
+          <button class="fund-mode-btn" id="fund-mode-stand" onclick="switchFundMode('standalone',this)">Standalone</button>
+        </div>
+        <button class="collapse-btn" id="dd-fund-toggle">▲ Collapse</button>
+      </div>
+    </div>
+    <div id="dd-fund-body" class="collapsible-body">
+      <!-- Tab nav -->
+      <div class="fund-tabs" onclick="event.stopPropagation()">
+        <button class="fund-tab active" data-tab="ratios" onclick="switchFundTab('ratios',this)">Key Ratios</button>
+        <button class="fund-tab" data-tab="pnl" onclick="switchFundTab('pnl',this)">P&amp;L</button>
+        <button class="fund-tab" data-tab="balance" onclick="switchFundTab('balance',this)">Balance Sheet</button>
+        <button class="fund-tab" data-tab="cashflow" onclick="switchFundTab('cashflow',this)">Cash Flow</button>
+      </div>
+      <div id="dd-fundamentals" style="padding:0.5rem 0 0.25rem;"></div>
+    </div>
+  </div>
 
   <!-- Stock History Chart -->
   <div class="chart-card collapsible-card" style="margin-bottom:1rem">
@@ -250,7 +270,6 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
         <div class="chart-title">Price History</div>
         <span id="dd-period-chg" style="font-size:13px;font-weight:600;"></span>
       </div>
-      <button class="collapse-btn" id="dd-history-toggle">▲ Collapse</button>
       <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
         <div class="time-filters">
           <button class="tf-btn dd-tf-btn" data-f="1M" onclick="setDDFilter('1M',this)">1M</button>
@@ -259,6 +278,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
           <button class="tf-btn dd-tf-btn" data-f="ALL" onclick="setDDFilter('ALL',this)">ALL</button>
           <button class="tf-btn dd-tf-btn" data-f="CUSTOM" onclick="setDDFilter('CUSTOM',this)">Custom</button>
         </div>
+        <button class="collapse-btn" id="dd-history-toggle">▲ Collapse</button>
       </div>
     </div>
     <div id="dd-history-body" class="collapsible-body">
@@ -273,11 +293,10 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
   </div>
 
   <!-- Stock Day Chart -->
-  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
+  <div class="chart-card collapsible-card">
     <div class="chart-header collapsible-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
       <div class="chart-title">Today's Price <span class="chart-subtitle">(Intraday 5-min)</span></div>
       <button class="collapse-btn" id="dd-day-toggle">▲ Collapse</button>
-      <div style="display:flex;align-items:center;gap:8px;font-size:12px">Intraday Prices are delayed...</div>
     </div>
     <div id="dd-day-body" class="collapsible-body">
       <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
@@ -285,33 +304,7 @@ INFY.NS,20,1500.00,2023-01-10,</pre>
       </div>
     </div>
   </div>
-
 </div>
-
-  <!-- Fundamentals Panel -->
-
-  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
-    <div class="chart-header collapsible-header" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">
-      <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
-      <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
-        <button class="collapse-btn" id="dd-fund-toggle">▲ Collapse</button>
-      </div>
-    </div>
-    <div id="dd-fund-body" class="collapsible-body">
-      <!-- Tab nav -->
-      <div class="fund-tabs" onclick="event.stopPropagation()">
-        <button class="fund-tab active" data-tab="ratios" onclick="switchFundTab('ratios',this)">Key Ratios</button>
-        <button class="fund-tab" data-tab="pnl" onclick="switchFundTab('pnl',this)">P&amp;L</button>
-        <button class="fund-tab" data-tab="balance" onclick="switchFundTab('balance',this)">Balance Sheet</button>
-        <button class="fund-tab" data-tab="cashflow" onclick="switchFundTab('cashflow',this)">Cash Flow</button>
-        <div class="fund-mode-toggle">
-          <button class="fund-mode-btn" id="fund-mode-cons" onclick="switchFundMode('consolidated',this)">Consolidated</button>
-          <button class="fund-mode-btn active" id="fund-mode-stand" onclick="switchFundMode('standalone',this)">Standalone</button>
-        </div>
-      </div>
-      <div id="dd-fundamentals" style="padding:0.5rem 0 0.25rem;"></div>
-    </div>
-  </div>
 
 <!-- HOLDINGS MODAL -->
 <div id="holdings-modal" class="modal-overlay" onclick="if(event.target===this)closeHoldingsModal()">
