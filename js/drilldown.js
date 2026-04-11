@@ -81,6 +81,8 @@ function renderFundTab() {
     el.innerHTML = renderFinTable(_fundData.balance, 'Balance Sheet in ₹ Cr');
   } else if (_fundTab === 'cashflow') {
     el.innerHTML = renderFinTable(_fundData.cashflow, 'Cash Flow in ₹ Cr');
+  } else if (_fundTab === 'quarterly') {
+    el.innerHTML = renderFinTable(_fundData.quarterly, 'Quarterly Results in ₹ Cr');
   }
 }
 

@@ -329,6 +329,7 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
       fund.pnl       = parseScreenerTable(doc, 'profit-loss');
       fund.balance   = parseScreenerTable(doc, 'balance-sheet');
       fund.cashflow  = parseScreenerTable(doc, 'cash-flow');
+      fund.quarterly = parseScreenerTable(doc, 'quarters');
 
       if (Object.keys(fund).length > 2) {
         fund._source = 'screener';

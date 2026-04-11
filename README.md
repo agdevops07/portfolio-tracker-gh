@@ -77,7 +77,15 @@ This version calls **Yahoo Finance directly from the browser** via a public CORS
 - Allocation doughnut chart
 - Overall P&L by stock
 - Today's P&L by stock
-- Per-stock drilldown with price history + intraday
+- Per-stock drilldown with price history (default: 31 Mar – today, fully customisable) + intraday
+- Fundamentals from Screener.in: Key Ratios, P&L, Balance Sheet, Cash Flow, Quarterly Results
+- Standalone / Consolidated toggle for all fundamental views
+- Maximize button on all charts (opens a full-screen overlay)
 - Full holdings modal with sortable table
 - Export chart as PNG
 - Load your CSV from the repo or drag-drop any CSV
+
+### 🔍 Stock Search tab
+- Search any NSE/BSE stock by name or ticker (5,000+ stock database, no portfolio needed)
+- Identical view to the per-stock drilldown — price history, intraday, full fundamentals
+- Clear (✕) button on the search bar for quick reset on mobile
