@@ -26,7 +26,7 @@ In your repo on GitHub:
 
 GitHub will give you a URL like:
 ```
-https://YOUR_USERNAME.github.io/portfolio-tracker/
+https://YOUR_USERNAME.github.io/portfolio-tracker-gh/
 ```
 
 Every time you `git push` to `main`, the site redeploys automatically.
