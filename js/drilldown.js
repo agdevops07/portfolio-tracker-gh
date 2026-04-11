@@ -12,7 +12,7 @@ const ddFilter = { value: 'CUSTOM', customFrom: DEFAULT_FROM, customTo: new Date
 
 // Fundamentals state
 let _fundData = null;
-let _fundMode = 'consolidated';
+let _fundMode = 'standalone';
 let _fundTab  = 'ratios';
 let _currentTicker = '';
 
@@ -31,6 +31,25 @@ function renderFinTable(tableData, note = 'Figures in ₹ Cr') {
   }).join('');
   return `<div style="overflow-x:auto;"><table class="fund-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>
           <div class="fund-table-note">${note} · Source: <a href="${_fundData?._url||''}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a></div>`;
+}
+
+// ── Inject sector / industry / about near company name ──
+function _injectCompanyMeta(fund) {
+  const old = document.getElementById('dd-company-meta');
+  if (old) old.remove();
+  if (!fund.sector && !fund.industry && !fund.about) return;
+  const el = document.createElement('div');
+  el.id = 'dd-company-meta';
+  el.className = 'dd-company-meta';
+  const tags = [];
+  if (fund.sector)   tags.push(`<span class="dd-meta-tag dd-meta-sector">&#127981; ${fund.sector}</span>`);
+  if (fund.industry) tags.push(`<span class="dd-meta-tag dd-meta-industry">&#128295; ${fund.industry}</span>`);
+  el.innerHTML = `
+    ${tags.length ? `<div class="dd-meta-tags">${tags.join('')}</div>` : ''}
+    ${fund.about ? `<div class="dd-meta-about">${fund.about}</div>` : ''}
+  `;
+  const subtitle = document.getElementById('dd-subtitle');
+  if (subtitle && subtitle.parentNode) subtitle.insertAdjacentElement('afterend', el);
 }
 
 // ── Render current tab content ────────────────────
@@ -53,10 +72,10 @@ function renderFundTab() {
         ${row('Debt/Equity', _fundData.debtEquity)}
         ${row('EPS', _fundData.eps)}
         ${row('Face Value', _fundData.faceValue)}
-        ${_fundData.sector ? `<div class="fund-item fund-wide"><span class="fund-label">Sector</span><span class="fund-val">${_fundData.sector}</span></div>` : ''}
       </div>
-      ${_fundData.about ? `<div style="margin-top:0.6rem;font-size:11px;color:var(--text2);line-height:1.5;border-top:1px solid var(--border);padding-top:0.5rem;">${_fundData.about}…</div>` : ''}
       <div class="fund-table-note" style="margin-top:0.5rem;">Source: <a href="${_fundData._url}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a> · ${_fundData._mode}</div>`;
+    // Inject sector/industry/about near company name
+    _injectCompanyMeta(_fundData);
   } else if (_fundTab === 'pnl') {
     el.innerHTML = renderFinTable(_fundData.pnl, 'P&L figures in ₹ Cr');
   } else if (_fundTab === 'balance') {
@@ -162,14 +181,14 @@ export async function openDrilldown(ticker) {
   if (cw) cw.style.display = 'flex';
   document.querySelectorAll('.dd-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === 'CUSTOM'));
   document.querySelectorAll('.fund-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'ratios'));
-  document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.toggle('active', b.id === 'fund-mode-cons'));
+  document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.toggle('active', b.id === 'fund-mode-stand'));
 
   renderDDHistorySection(ticker);
 
   // Fundamentals — Screener only
   const fundEl = document.getElementById('dd-fundamentals');
   if (fundEl) fundEl.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading from Screener.in…</div>';
-  _fundData = await fetchScreenerFundamentals(ticker, 'consolidated');
+  _fundData = await fetchScreenerFundamentals(ticker, 'standalone');
   if (_fundData) renderFundTab(); else renderFundFallback(ticker);
 
   // Intraday
