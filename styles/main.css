@@ -52,7 +52,7 @@ body { background: var(--bg); color: var(--text); font-family: 'SF Pro Display',
 .sample-btn { background: transparent; border: 1px solid var(--border2); color: var(--text2); padding: 8px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 7px; font-weight: 500; }
 .sample-btn:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(99,102,241,0.06); }
 .drop-trust { font-size: 11px; color: var(--text3); }
-.format-hint { margin-top: 1.25rem; max-width: 480px; width: 100%; text-align: center; }
+.format-hint { margin-top: 1.25rem; max-width: 480px; width: 100%; text-align: center; margin-left: auto; margin-right: auto; }
 .format-hint details summary { font-size: 13px; color: var(--text3); cursor: pointer; list-style: none; }
 .format-hint details summary::-webkit-details-marker { display: none; }
 .format-hint pre { margin-top: 0.75rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-size: 12px; color: var(--text2); font-family: 'SF Mono', monospace; overflow-x: auto; }
