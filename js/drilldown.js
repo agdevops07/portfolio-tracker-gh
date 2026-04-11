@@ -12,7 +12,7 @@ const ddFilter = { value: 'CUSTOM', customFrom: DEFAULT_FROM, customTo: new Date
 
 // Fundamentals state
 let _fundData = null;
-let _fundMode = 'standalone';
+let _fundMode = 'consolidated';
 let _fundTab  = 'ratios';
 let _currentTicker = '';
 
