@@ -22164,7 +22164,7 @@
         "company": "Vivid Electromech Limited",
         "exchange": "NSE-SME",
         "isin": "INE24H301028",
-        "yahooTicker": "VIVIDEL.NS",
+        "yahooTicker": "VIVIDEL-ST.NS",
         "screenerSymbol": "VIVIDEL",
         "bseCode": null
     },
@@ -22173,7 +22173,7 @@
         "company": "Falcon Technoprojects India Limited-RE",
         "exchange": "NSE-SME",
         "isin": "INE0PQK20013",
-        "yahooTicker": "FALTECH-RE.NS",
+        "yahooTicker": "FALTECH-RE-ST.NS",
         "screenerSymbol": "FALTECH-RE",
         "bseCode": null
     },
@@ -22182,7 +22182,7 @@
         "company": "Sunrest Lifescience Ltd-RE",
         "exchange": "NSE-SME",
         "isin": "INE0PLZ20012",
-        "yahooTicker": "SUNREST-RE.NS",
+        "yahooTicker": "SUNREST-RE-ST.NS",
         "screenerSymbol": "SUNREST-RE",
         "bseCode": null
     },
@@ -22191,7 +22191,7 @@
         "company": "Apsis Aerocom Limited",
         "exchange": "NSE-SME",
         "isin": "INE1OOJ01011",
-        "yahooTicker": "APSISAERO.NS",
+        "yahooTicker": "APSISAERO-SM.NS",
         "screenerSymbol": "APSISAERO",
         "bseCode": null
     },
@@ -22200,7 +22200,7 @@
         "company": "Srinibas Pradhan Constructions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TPJ01019",
-        "yahooTicker": "SPCON.NS",
+        "yahooTicker": "SPCON-SM.NS",
         "screenerSymbol": "SPCON",
         "bseCode": null
     },
@@ -22209,7 +22209,7 @@
         "company": "Acetech E-Commerce Limited",
         "exchange": "NSE-SME",
         "isin": "INE1J6M01010",
-        "yahooTicker": "ACETEC.NS",
+        "yahooTicker": "ACETEC-SM.NS",
         "screenerSymbol": "ACETEC",
         "bseCode": null
     },
@@ -22218,7 +22218,7 @@
         "company": "Striders Impex Limited",
         "exchange": "NSE-SME",
         "isin": "INE1XWN01017",
-        "yahooTicker": "STRIDERS.NS",
+        "yahooTicker": "STRIDERS-SM.NS",
         "screenerSymbol": "STRIDERS",
         "bseCode": null
     },
@@ -22227,7 +22227,7 @@
         "company": "Yaap Digital Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U0J01015",
-        "yahooTicker": "YAAP.NS",
+        "yahooTicker": "YAAP-SM.NS",
         "screenerSymbol": "YAAP",
         "bseCode": null
     },
@@ -22236,7 +22236,7 @@
         "company": "Mobilise App Lab Limited",
         "exchange": "NSE-SME",
         "isin": "INE1YNB01019",
-        "yahooTicker": "MOBILISE.NS",
+        "yahooTicker": "MOBILISE-SM.NS",
         "screenerSymbol": "MOBILISE",
         "bseCode": null
     },
@@ -22245,7 +22245,7 @@
         "company": "Manilam Industries India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1ERK01013",
-        "yahooTicker": "MANILAM.NS",
+        "yahooTicker": "MANILAM-SM.NS",
         "screenerSymbol": "MANILAM",
         "bseCode": null
     },
@@ -22254,7 +22254,7 @@
         "company": "Marushika Technology Limited",
         "exchange": "NSE-SME",
         "isin": "INE0X7G01013",
-        "yahooTicker": "MARUSHIKA.NS",
+        "yahooTicker": "MARUSHIKA-SM.NS",
         "screenerSymbol": "MARUSHIKA",
         "bseCode": null
     },
@@ -22263,7 +22263,7 @@
         "company": "Biopol Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XW001014",
-        "yahooTicker": "BIOPOL.NS",
+        "yahooTicker": "BIOPOL-SM.NS",
         "screenerSymbol": "BIOPOL",
         "bseCode": null
     },
@@ -22272,7 +22272,7 @@
         "company": "Grover Jewells Limited",
         "exchange": "NSE-SME",
         "isin": "INE1TY801010",
-        "yahooTicker": "GJL.NS",
+        "yahooTicker": "GJL-ST.NS",
         "screenerSymbol": "GJL",
         "bseCode": null
     },
@@ -22281,7 +22281,7 @@
         "company": "Brandman Retail Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XUD01014",
-        "yahooTicker": "BRANDMAN.NS",
+        "yahooTicker": "BRANDMAN-SM.NS",
         "screenerSymbol": "BRANDMAN",
         "bseCode": null
     },
@@ -22290,7 +22290,7 @@
         "company": "C K K Retail Mart Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMX01019",
-        "yahooTicker": "CKKRETAIL.NS",
+        "yahooTicker": "CKKRETAIL-ST.NS",
         "screenerSymbol": "CKKRETAIL",
         "bseCode": null
     },
@@ -22299,7 +22299,7 @@
         "company": "KRM Ayurveda Limited",
         "exchange": "NSE-SME",
         "isin": "INE1MTV01019",
-        "yahooTicker": "KRMAYURVED.NS",
+        "yahooTicker": "KRMAYURVED-SM.NS",
         "screenerSymbol": "KRMAYURVED",
         "bseCode": null
     },
@@ -22308,7 +22308,7 @@
         "company": "Armour Security (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TZX01019",
-        "yahooTicker": "ARMOUR.NS",
+        "yahooTicker": "ARMOUR-SM.NS",
         "screenerSymbol": "ARMOUR",
         "bseCode": null
     },
@@ -22317,7 +22317,7 @@
         "company": "Avana Electrosystems Limited",
         "exchange": "NSE-SME",
         "isin": "INE1KU201016",
-        "yahooTicker": "AVANA.NS",
+        "yahooTicker": "AVANA-SM.NS",
         "screenerSymbol": "AVANA",
         "bseCode": null
     },
@@ -22326,7 +22326,7 @@
         "company": "Victory Electric Vehicles International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0F8901022",
-        "yahooTicker": "VICTORYEV.NS",
+        "yahooTicker": "VICTORYEV-SM.NS",
         "screenerSymbol": "VICTORYEV",
         "bseCode": null
     },
@@ -22335,7 +22335,7 @@
         "company": "E To E Transportation Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CEJ01017",
-        "yahooTicker": "E2ERAIL.NS",
+        "yahooTicker": "E2ERAIL-SM.NS",
         "screenerSymbol": "E2ERAIL",
         "bseCode": null
     },
@@ -22344,7 +22344,7 @@
         "company": "Dhara Rail Projects Limited",
         "exchange": "NSE-SME",
         "isin": "INE2HJL01019",
-        "yahooTicker": "DHARARAIL.NS",
+        "yahooTicker": "DHARARAIL-SM.NS",
         "screenerSymbol": "DHARARAIL",
         "bseCode": null
     },
@@ -22353,7 +22353,7 @@
         "company": "EPW India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1KEC01023",
-        "yahooTicker": "EPWINDIA.NS",
+        "yahooTicker": "EPWINDIA-SM.NS",
         "screenerSymbol": "EPWINDIA",
         "bseCode": null
     },
@@ -22362,7 +22362,7 @@
         "company": "Shyam Dhani Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CRP01016",
-        "yahooTicker": "SHYAMDHANI.NS",
+        "yahooTicker": "SHYAMDHANI-SM.NS",
         "screenerSymbol": "SHYAMDHANI",
         "bseCode": null
     },
@@ -22371,7 +22371,7 @@
         "company": "Sundrex Oil Company Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CTB01014",
-        "yahooTicker": "SOCL.NS",
+        "yahooTicker": "SOCL-SM.NS",
         "screenerSymbol": "SOCL",
         "bseCode": null
     },
@@ -22380,7 +22380,7 @@
         "company": "Marc Technocrats Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TD401015",
-        "yahooTicker": "MARC.NS",
+        "yahooTicker": "MARC-SM.NS",
         "screenerSymbol": "MARC",
         "bseCode": null
     },
@@ -22389,7 +22389,7 @@
         "company": "Ashwini Container Movers Limited",
         "exchange": "NSE-SME",
         "isin": "INE1A6Q01010",
-        "yahooTicker": "ASHWINI.NS",
+        "yahooTicker": "ASHWINI-SM.NS",
         "screenerSymbol": "ASHWINI",
         "bseCode": null
     },
@@ -22398,7 +22398,7 @@
         "company": "Exim Routes Limited",
         "exchange": "NSE-SME",
         "isin": "INE19I001020",
-        "yahooTicker": "EXIMROUTES.NS",
+        "yahooTicker": "EXIMROUTES-ST.NS",
         "screenerSymbol": "EXIMROUTES",
         "bseCode": null
     },
@@ -22407,7 +22407,7 @@
         "company": "Encompass Design India Limited",
         "exchange": "NSE-SME",
         "isin": "INE433T01015",
-        "yahooTicker": "ENCOMPAS.NS",
+        "yahooTicker": "ENCOMPAS-SM.NS",
         "screenerSymbol": "ENCOMPAS",
         "bseCode": null
     },
@@ -22416,7 +22416,7 @@
         "company": "Flywings Simulator Training Centre Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SQZ01015",
-        "yahooTicker": "FWSTC.NS",
+        "yahooTicker": "FWSTC-SM.NS",
         "screenerSymbol": "FWSTC",
         "bseCode": null
     },
@@ -22425,7 +22425,7 @@
         "company": "Shri Kanha Stainless Limited",
         "exchange": "NSE-SME",
         "isin": "INE1V4601019",
-        "yahooTicker": "SHRIKANHA.NS",
+        "yahooTicker": "SHRIKANHA-SM.NS",
         "screenerSymbol": "SHRIKANHA",
         "bseCode": null
     },
@@ -22434,7 +22434,7 @@
         "company": "Neochem Bio Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE21UM01018",
-        "yahooTicker": "NEOCHEM.NS",
+        "yahooTicker": "NEOCHEM-SM.NS",
         "screenerSymbol": "NEOCHEM",
         "bseCode": null
     },
@@ -22443,7 +22443,7 @@
         "company": "Invicta Diagnostic Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XJ501010",
-        "yahooTicker": "INVICTA.NS",
+        "yahooTicker": "INVICTA-SM.NS",
         "screenerSymbol": "INVICTA",
         "bseCode": null
     },
@@ -22452,7 +22452,7 @@
         "company": "Clear Secured Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE1EF801010",
-        "yahooTicker": "CSSL.NS",
+        "yahooTicker": "CSSL-SM.NS",
         "screenerSymbol": "CSSL",
         "bseCode": null
     },
@@ -22461,7 +22461,7 @@
         "company": "Speb Adhesives Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CW901027",
-        "yahooTicker": "SPEB.NS",
+        "yahooTicker": "SPEB-SM.NS",
         "screenerSymbol": "SPEB",
         "bseCode": null
     },
@@ -22470,7 +22470,7 @@
         "company": "Curis Lifesciences Limited",
         "exchange": "NSE-SME",
         "isin": "INE1BZN01016",
-        "yahooTicker": "CURIS.NS",
+        "yahooTicker": "CURIS-SM.NS",
         "screenerSymbol": "CURIS",
         "bseCode": null
     },
@@ -22479,7 +22479,7 @@
         "company": "Finbud Financial Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0EDU01014",
-        "yahooTicker": "FINBUD.NS",
+        "yahooTicker": "FINBUD-SM.NS",
         "screenerSymbol": "FINBUD",
         "bseCode": null
     },
@@ -22488,7 +22488,7 @@
         "company": "Shreeji Global FMCG Limited",
         "exchange": "NSE-SME",
         "isin": "INE1FL101016",
-        "yahooTicker": "SHETHJI.NS",
+        "yahooTicker": "SHETHJI-SM.NS",
         "screenerSymbol": "SHETHJI",
         "bseCode": null
     },
@@ -22497,7 +22497,7 @@
         "company": "Jayesh Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE1AE401014",
-        "yahooTicker": "JAYESH.NS",
+        "yahooTicker": "JAYESH-SM.NS",
         "screenerSymbol": "JAYESH",
         "bseCode": null
     },
@@ -22506,7 +22506,7 @@
         "company": "Greenleaf Envirotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PLX01017",
-        "yahooTicker": "GREENLEAF.NS",
+        "yahooTicker": "GREENLEAF-SM.NS",
         "screenerSymbol": "GREENLEAF",
         "bseCode": null
     },
@@ -22515,7 +22515,7 @@
         "company": "Sheel Biotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YJV01017",
-        "yahooTicker": "SHEEL.NS",
+        "yahooTicker": "SHEEL-SM.NS",
         "screenerSymbol": "SHEEL",
         "bseCode": null
     },
@@ -22524,7 +22524,7 @@
         "company": "B.A.G. Convergence Limited",
         "exchange": "NSE-SME",
         "isin": "INE17CQ01015",
-        "yahooTicker": "BAGDIGITAL.NS",
+        "yahooTicker": "BAGDIGITAL-SM.NS",
         "screenerSymbol": "BAGDIGITAL",
         "bseCode": null
     },
@@ -22533,7 +22533,7 @@
         "company": "Munish Forge Limited",
         "exchange": "NSE-SME",
         "isin": "INE1K8Y01018",
-        "yahooTicker": "MUNISH.NS",
+        "yahooTicker": "MUNISH-SM.NS",
         "screenerSymbol": "MUNISH",
         "bseCode": null
     },
@@ -22542,7 +22542,7 @@
         "company": "Suba Hotels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RYR01018",
-        "yahooTicker": "SUBAHOTELS.NS",
+        "yahooTicker": "SUBAHOTELS-SM.NS",
         "screenerSymbol": "SUBAHOTELS",
         "bseCode": null
     },
@@ -22551,7 +22551,7 @@
         "company": "Vijaypd Ceutical Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WL901019",
-        "yahooTicker": "VIJAYPD.NS",
+        "yahooTicker": "VIJAYPD-ST.NS",
         "screenerSymbol": "VIJAYPD",
         "bseCode": null
     },
@@ -22560,7 +22560,7 @@
         "company": "Manas Polymers and Energies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U4H01011",
-        "yahooTicker": "MPEL.NS",
+        "yahooTicker": "MPEL-SM.NS",
         "screenerSymbol": "MPEL",
         "bseCode": null
     },
@@ -22569,7 +22569,7 @@
         "company": "Gurunanak Agriculture India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CCX01012",
-        "yahooTicker": "GURUNANAK.NS",
+        "yahooTicker": "GURUNANAK-SM.NS",
         "screenerSymbol": "GURUNANAK",
         "bseCode": null
     },
@@ -22578,7 +22578,7 @@
         "company": "Ecoline Exim Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VBS01016",
-        "yahooTicker": "ECOLINE.NS",
+        "yahooTicker": "ECOLINE-SM.NS",
         "screenerSymbol": "ECOLINE",
         "bseCode": null
     },
@@ -22587,7 +22587,7 @@
         "company": "Matrix Geo Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE132901013",
-        "yahooTicker": "MGSL.NS",
+        "yahooTicker": "MGSL-SM.NS",
         "screenerSymbol": "MGSL",
         "bseCode": null
     },
@@ -22596,7 +22596,7 @@
         "company": "Prime Cable Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CQA01020",
-        "yahooTicker": "PRIMECAB.NS",
+        "yahooTicker": "PRIMECAB-SM.NS",
         "screenerSymbol": "PRIMECAB",
         "bseCode": null
     },
@@ -22605,7 +22605,7 @@
         "company": "Siddhi Cotspin Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SVO01019",
-        "yahooTicker": "SIDDHICOTS.NS",
+        "yahooTicker": "SIDDHICOTS-ST.NS",
         "screenerSymbol": "SIDDHICOTS",
         "bseCode": null
     },
@@ -22614,7 +22614,7 @@
         "company": "TechD Cybersecurity Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Y5H01014",
-        "yahooTicker": "TECHD.NS",
+        "yahooTicker": "TECHD-SM.NS",
         "screenerSymbol": "TECHD",
         "bseCode": null
     },
@@ -22623,7 +22623,7 @@
         "company": "Galaxy Medicare Limited",
         "exchange": "NSE-SME",
         "isin": "INE09A801015",
-        "yahooTicker": "GML.NS",
+        "yahooTicker": "GML-ST.NS",
         "screenerSymbol": "GML",
         "bseCode": null
     },
@@ -22632,7 +22632,7 @@
         "company": "Taurian MPS Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XWS01018",
-        "yahooTicker": "TAURIAN.NS",
+        "yahooTicker": "TAURIAN-SM.NS",
         "screenerSymbol": "TAURIAN",
         "bseCode": null
     },
@@ -22641,7 +22641,7 @@
         "company": "Vigor Plast India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1DM601016",
-        "yahooTicker": "VIGOR.NS",
+        "yahooTicker": "VIGOR-SM.NS",
         "screenerSymbol": "VIGOR",
         "bseCode": null
     },
@@ -22650,7 +22650,7 @@
         "company": "Optivalue Tek Consulting Limited",
         "exchange": "NSE-SME",
         "isin": "INE15B101011",
-        "yahooTicker": "OPTIVALUE.NS",
+        "yahooTicker": "OPTIVALUE-SM.NS",
         "screenerSymbol": "OPTIVALUE",
         "bseCode": null
     },
@@ -22659,7 +22659,7 @@
         "company": "Snehaa Organics Limited",
         "exchange": "NSE-SME",
         "isin": "INE1OIC01018",
-        "yahooTicker": "SNEHAA.NS",
+        "yahooTicker": "SNEHAA-SM.NS",
         "screenerSymbol": "SNEHAA",
         "bseCode": null
     },
@@ -22668,7 +22668,7 @@
         "company": "Sattva Engineering Construction Limited",
         "exchange": "NSE-SME",
         "isin": "INE14DW01018",
-        "yahooTicker": "SATTVAENGG.NS",
+        "yahooTicker": "SATTVAENGG-SM.NS",
         "screenerSymbol": "SATTVAENGG",
         "bseCode": null
     },
@@ -22677,7 +22677,7 @@
         "company": "Current Infraprojects Limited",
         "exchange": "NSE-SME",
         "isin": "INE1CRQ01014",
-        "yahooTicker": "CURRENT.NS",
+        "yahooTicker": "CURRENT-SM.NS",
         "screenerSymbol": "CURRENT",
         "bseCode": null
     },
@@ -22686,7 +22686,7 @@
         "company": "Classic Electrodes (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UQ601012",
-        "yahooTicker": "CLASSICEIL.NS",
+        "yahooTicker": "CLASSICEIL-SM.NS",
         "screenerSymbol": "CLASSICEIL",
         "bseCode": null
     },
@@ -22695,7 +22695,7 @@
         "company": "Shivashrit Foods Limited",
         "exchange": "NSE-SME",
         "isin": "INE1DLF01018",
-        "yahooTicker": "SHIVASHRIT.NS",
+        "yahooTicker": "SHIVASHRIT-SM.NS",
         "screenerSymbol": "SHIVASHRIT",
         "bseCode": null
     },
@@ -22704,7 +22704,7 @@
         "company": "Anondita Medicare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VTV01012",
-        "yahooTicker": "ANONDITA.NS",
+        "yahooTicker": "ANONDITA-SM.NS",
         "screenerSymbol": "ANONDITA",
         "bseCode": null
     },
@@ -22713,7 +22713,7 @@
         "company": "ARC Insulation & Insulators Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YDV01010",
-        "yahooTicker": "ARCIIL.NS",
+        "yahooTicker": "ARCIIL-SM.NS",
         "screenerSymbol": "ARCIIL",
         "bseCode": null
     },
@@ -22722,7 +22722,7 @@
         "company": "Studio LSD Limited",
         "exchange": "NSE-SME",
         "isin": "INE17VO01028",
-        "yahooTicker": "STUDIOLSD.NS",
+        "yahooTicker": "STUDIOLSD-SM.NS",
         "screenerSymbol": "STUDIOLSD",
         "bseCode": null
     },
@@ -22731,7 +22731,7 @@
         "company": "Mahendra Realtors & Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE632Q01018",
-        "yahooTicker": "MRIL.NS",
+        "yahooTicker": "MRIL-SM.NS",
         "screenerSymbol": "MRIL",
         "bseCode": null
     },
@@ -22740,7 +22740,7 @@
         "company": "Medistep Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UOY01019",
-        "yahooTicker": "MEDISTEP.NS",
+        "yahooTicker": "MEDISTEP-ST.NS",
         "screenerSymbol": "MEDISTEP",
         "bseCode": null
     },
@@ -22749,7 +22749,7 @@
         "company": "ANB Metal Cast Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VG001016",
-        "yahooTicker": "AMCL.NS",
+        "yahooTicker": "AMCL-SM.NS",
         "screenerSymbol": "AMCL",
         "bseCode": null
     },
@@ -22758,7 +22758,7 @@
         "company": "Sawaliya Food Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE10VS01016",
-        "yahooTicker": "SAWALIYA.NS",
+        "yahooTicker": "SAWALIYA-SM.NS",
         "screenerSymbol": "SAWALIYA",
         "bseCode": null
     },
@@ -22767,7 +22767,7 @@
         "company": "Connplex Cinemas Limited",
         "exchange": "NSE-SME",
         "isin": "INE0EAS01014",
-        "yahooTicker": "CONNPLEX.NS",
+        "yahooTicker": "CONNPLEX-SM.NS",
         "screenerSymbol": "CONNPLEX",
         "bseCode": null
     },
@@ -22776,7 +22776,7 @@
         "company": "Bhadora Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZRC01017",
-        "yahooTicker": "BHADORA.NS",
+        "yahooTicker": "BHADORA-SM.NS",
         "screenerSymbol": "BHADORA",
         "bseCode": null
     },
@@ -22785,7 +22785,7 @@
         "company": "Parth Electricals & Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE1H7V01011",
-        "yahooTicker": "PARTH.NS",
+        "yahooTicker": "PARTH-ST.NS",
         "screenerSymbol": "PARTH",
         "bseCode": null
     },
@@ -22794,7 +22794,7 @@
         "company": "Aaradhya Disposal Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE124401014",
-        "yahooTicker": "AARADHYA.NS",
+        "yahooTicker": "AARADHYA-SM.NS",
         "screenerSymbol": "AARADHYA",
         "bseCode": null
     },
@@ -22803,7 +22803,7 @@
         "company": "Jyoti Global Plast Limited",
         "exchange": "NSE-SME",
         "isin": "INE1M3T01017",
-        "yahooTicker": "JYOTIGLOBL.NS",
+        "yahooTicker": "JYOTIGLOBL-ST.NS",
         "screenerSymbol": "JYOTIGLOBL",
         "bseCode": null
     },
@@ -22812,7 +22812,7 @@
         "company": "FlySBS Aviation Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VCK01011",
-        "yahooTicker": "FLYSBS.NS",
+        "yahooTicker": "FLYSBS-SM.NS",
         "screenerSymbol": "FLYSBS",
         "bseCode": null
     },
@@ -22821,7 +22821,7 @@
         "company": "Renol Polychem Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VZX01015",
-        "yahooTicker": "RNPL.NS",
+        "yahooTicker": "RNPL-SM.NS",
         "screenerSymbol": "RNPL",
         "bseCode": null
     },
@@ -22830,7 +22830,7 @@
         "company": "Cash Ur Drive Marketing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WL201014",
-        "yahooTicker": "CUDML.NS",
+        "yahooTicker": "CUDML-SM.NS",
         "screenerSymbol": "CUDML",
         "bseCode": null
     },
@@ -22839,7 +22839,7 @@
         "company": "Kaytex Fabrics Limited",
         "exchange": "NSE-SME",
         "isin": "INE13ZD01013",
-        "yahooTicker": "KAYTEX.NS",
+        "yahooTicker": "KAYTEX-SM.NS",
         "screenerSymbol": "KAYTEX",
         "bseCode": null
     },
@@ -22848,7 +22848,7 @@
         "company": "Sellowrap Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IJF01013",
-        "yahooTicker": "SELLOWRAP.NS",
+        "yahooTicker": "SELLOWRAP-SM.NS",
         "screenerSymbol": "SELLOWRAP",
         "bseCode": null
     },
@@ -22857,7 +22857,7 @@
         "company": "TSC India Limited",
         "exchange": "NSE-SME",
         "isin": "INE16VK01010",
-        "yahooTicker": "TSC.NS",
+        "yahooTicker": "TSC-SM.NS",
         "screenerSymbol": "TSC",
         "bseCode": null
     },
@@ -22866,7 +22866,7 @@
         "company": "Savy Infra and Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UCN01017",
-        "yahooTicker": "SAVY.NS",
+        "yahooTicker": "SAVY-SM.NS",
         "screenerSymbol": "SAVY",
         "bseCode": null
     },
@@ -22875,7 +22875,7 @@
         "company": "Spunweb Nonwoven Limited",
         "exchange": "NSE-SME",
         "isin": "INE19QH01010",
-        "yahooTicker": "SPUNWEB.NS",
+        "yahooTicker": "SPUNWEB-SM.NS",
         "screenerSymbol": "SPUNWEB",
         "bseCode": null
     },
@@ -22884,7 +22884,7 @@
         "company": "Smarten Power Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE14GK01016",
-        "yahooTicker": "SMARTEN.NS",
+        "yahooTicker": "SMARTEN-SM.NS",
         "screenerSymbol": "SMARTEN",
         "bseCode": null
     },
@@ -22893,7 +22893,7 @@
         "company": "Happy Square Outsourcing Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TLP01015",
-        "yahooTicker": "WHITEFORCE.NS",
+        "yahooTicker": "WHITEFORCE-SM.NS",
         "screenerSymbol": "WHITEFORCE",
         "bseCode": null
     },
@@ -22902,7 +22902,7 @@
         "company": "Emkay Tools Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PXC01024",
-        "yahooTicker": "ETL.NS",
+        "yahooTicker": "ETL-SM.NS",
         "screenerSymbol": "ETL",
         "bseCode": null
     },
@@ -22911,7 +22911,7 @@
         "company": "Cedaar Textile Limited",
         "exchange": "NSE-SME",
         "isin": "INE11J101017",
-        "yahooTicker": "CEDAAR.NS",
+        "yahooTicker": "CEDAAR-SM.NS",
         "screenerSymbol": "CEDAAR",
         "bseCode": null
     },
@@ -22920,7 +22920,7 @@
         "company": "Pushpa Jewellers Limited",
         "exchange": "NSE-SME",
         "isin": "INE154801018",
-        "yahooTicker": "PUSHPA.NS",
+        "yahooTicker": "PUSHPA-SM.NS",
         "screenerSymbol": "PUSHPA",
         "bseCode": null
     },
@@ -22929,7 +22929,7 @@
         "company": "Silky Overseas Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SN801015",
-        "yahooTicker": "SILKY.NS",
+        "yahooTicker": "SILKY-SM.NS",
         "screenerSymbol": "SILKY",
         "bseCode": null
     },
@@ -22938,7 +22938,7 @@
         "company": "Moving Media Entertainment Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XM301010",
-        "yahooTicker": "MMEL.NS",
+        "yahooTicker": "MMEL-SM.NS",
         "screenerSymbol": "MMEL",
         "bseCode": null
     },
@@ -22947,7 +22947,7 @@
         "company": "Pro FX Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VJT01017",
-        "yahooTicker": "PROFX.NS",
+        "yahooTicker": "PROFX-SM.NS",
         "screenerSymbol": "PROFX",
         "bseCode": null
     },
@@ -22956,7 +22956,7 @@
         "company": "Rama Telecom Limited",
         "exchange": "NSE-SME",
         "isin": "INE14W901010",
-        "yahooTicker": "RTL.NS",
+        "yahooTicker": "RTL-ST.NS",
         "screenerSymbol": "RTL",
         "bseCode": null
     },
@@ -22965,7 +22965,7 @@
         "company": "Suntech Infra Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SGZ01016",
-        "yahooTicker": "SUNTECH.NS",
+        "yahooTicker": "SUNTECH-SM.NS",
         "screenerSymbol": "SUNTECH",
         "bseCode": null
     },
@@ -22974,7 +22974,7 @@
         "company": "Shri Hare-Krishna Sponge Iron Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NON01025",
-        "yahooTicker": "SHKSIL.NS",
+        "yahooTicker": "SHKSIL-SM.NS",
         "screenerSymbol": "SHKSIL",
         "bseCode": null
     },
@@ -22983,7 +22983,7 @@
         "company": "Mayasheel Ventures Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZTO01018",
-        "yahooTicker": "MAYASHEEL.NS",
+        "yahooTicker": "MAYASHEEL-SM.NS",
         "screenerSymbol": "MAYASHEEL",
         "bseCode": null
     },
@@ -22992,7 +22992,7 @@
         "company": "Aakaar Medical Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE1GYP01013",
-        "yahooTicker": "AAKAAR.NS",
+        "yahooTicker": "AAKAAR-ST.NS",
         "screenerSymbol": "AAKAAR",
         "bseCode": null
     },
@@ -23001,7 +23001,7 @@
         "company": "Safe Enterprises Retail Fixtures Limited",
         "exchange": "NSE-SME",
         "isin": "INE17D601016",
-        "yahooTicker": "SAFEENTP.NS",
+        "yahooTicker": "SAFEENTP-SM.NS",
         "screenerSymbol": "SAFEENTP",
         "bseCode": null
     },
@@ -23010,7 +23010,7 @@
         "company": "Influx Healthtech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MYZ01012",
-        "yahooTicker": "INFLUX.NS",
+        "yahooTicker": "INFLUX-SM.NS",
         "screenerSymbol": "INFLUX",
         "bseCode": null
     },
@@ -23019,7 +23019,7 @@
         "company": "Eppeltone Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE11HF01010",
-        "yahooTicker": "EEPL.NS",
+        "yahooTicker": "EEPL-SM.NS",
         "screenerSymbol": "EEPL",
         "bseCode": null
     },
@@ -23028,7 +23028,7 @@
         "company": "Patil Automation Limited",
         "exchange": "NSE-SME",
         "isin": "INE17GV01016",
-        "yahooTicker": "PATILAUTOM.NS",
+        "yahooTicker": "PATILAUTOM-SM.NS",
         "screenerSymbol": "PATILAUTOM",
         "bseCode": null
     },
@@ -23037,7 +23037,7 @@
         "company": "Samay Project Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE124101010",
-        "yahooTicker": "SAMAY.NS",
+        "yahooTicker": "SAMAY-SM.NS",
         "screenerSymbol": "SAMAY",
         "bseCode": null
     },
@@ -23046,7 +23046,7 @@
         "company": "Monolithisch India Limited",
         "exchange": "NSE-SME",
         "isin": "INE1DV401010",
-        "yahooTicker": "MONOLITH.NS",
+        "yahooTicker": "MONOLITH-SM.NS",
         "screenerSymbol": "MONOLITH",
         "bseCode": null
     },
@@ -23055,7 +23055,7 @@
         "company": "Jainik Power Cables Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XIL01012",
-        "yahooTicker": "JAINIK.NS",
+        "yahooTicker": "JAINIK-SM.NS",
         "screenerSymbol": "JAINIK",
         "bseCode": null
     },
@@ -23064,7 +23064,7 @@
         "company": "Sacheerome Limited",
         "exchange": "NSE-SME",
         "isin": "INE1ARD01016",
-        "yahooTicker": "SACHEEROME.NS",
+        "yahooTicker": "SACHEEROME-SM.NS",
         "screenerSymbol": "SACHEEROME",
         "bseCode": null
     },
@@ -23073,7 +23073,7 @@
         "company": "Ganga Bath Fittings Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZI101018",
-        "yahooTicker": "GANGABATH.NS",
+        "yahooTicker": "GANGABATH-SM.NS",
         "screenerSymbol": "GANGABATH",
         "bseCode": null
     },
@@ -23082,7 +23082,7 @@
         "company": "Neptune Petrochemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE156901014",
-        "yahooTicker": "NEPTUNE.NS",
+        "yahooTicker": "NEPTUNE-ST.NS",
         "screenerSymbol": "NEPTUNE",
         "bseCode": null
     },
@@ -23091,7 +23091,7 @@
         "company": "N R Vandana Tex Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE104101014",
-        "yahooTicker": "NRVANDANA.NS",
+        "yahooTicker": "NRVANDANA-SM.NS",
         "screenerSymbol": "NRVANDANA",
         "bseCode": null
     },
@@ -23100,7 +23100,7 @@
         "company": "Blue Water Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0X3M01010",
-        "yahooTicker": "BLUEWATER.NS",
+        "yahooTicker": "BLUEWATER-SM.NS",
         "screenerSymbol": "BLUEWATER",
         "bseCode": null
     },
@@ -23109,7 +23109,7 @@
         "company": "NIKITA GREENTECH RECYCLING LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0FLF01015",
-        "yahooTicker": "NIKITA.NS",
+        "yahooTicker": "NIKITA-SM.NS",
         "screenerSymbol": "NIKITA",
         "bseCode": null
     },
@@ -23118,7 +23118,7 @@
         "company": "Dar Credit & Capital Limited",
         "exchange": "NSE-SME",
         "isin": "INE04Q901010",
-        "yahooTicker": "DCCL.NS",
+        "yahooTicker": "DCCL-SM.NS",
         "screenerSymbol": "DCCL",
         "bseCode": null
     },
@@ -23127,7 +23127,7 @@
         "company": "Accretion Pharmaceuticals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T8T01010",
-        "yahooTicker": "ACCPL.NS",
+        "yahooTicker": "ACCPL-SM.NS",
         "screenerSymbol": "ACCPL",
         "bseCode": null
     },
@@ -23136,7 +23136,7 @@
         "company": "Integrity Infrabuild Developers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YSH01017",
-        "yahooTicker": "INTEGRITY.NS",
+        "yahooTicker": "INTEGRITY-SM.NS",
         "screenerSymbol": "INTEGRITY",
         "bseCode": null
     },
@@ -23145,7 +23145,7 @@
         "company": "Virtual Galaxy Infotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VRH01015",
-        "yahooTicker": "VGINFOTECH.NS",
+        "yahooTicker": "VGINFOTECH-SM.NS",
         "screenerSymbol": "VGINFOTECH",
         "bseCode": null
     },
@@ -23154,7 +23154,7 @@
         "company": "Arunaya Organics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TTG01017",
-        "yahooTicker": "ARUNAYA.NS",
+        "yahooTicker": "ARUNAYA-SM.NS",
         "screenerSymbol": "ARUNAYA",
         "bseCode": null
     },
@@ -23163,7 +23163,7 @@
         "company": "Iware Supplychain Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE1AII01014",
-        "yahooTicker": "IWARE.NS",
+        "yahooTicker": "IWARE-ST.NS",
         "screenerSymbol": "IWARE",
         "bseCode": null
     },
@@ -23172,7 +23172,7 @@
         "company": "Tankup Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Z7N01017",
-        "yahooTicker": "TANKUP.NS",
+        "yahooTicker": "TANKUP-SM.NS",
         "screenerSymbol": "TANKUP",
         "bseCode": null
     },
@@ -23181,7 +23181,7 @@
         "company": "ATC Energies System Limited",
         "exchange": "NSE-SME",
         "isin": "INE0V0Q01019",
-        "yahooTicker": "ATCENERGY.NS",
+        "yahooTicker": "ATCENERGY-SM.NS",
         "screenerSymbol": "ATCENERGY",
         "bseCode": null
     },
@@ -23190,7 +23190,7 @@
         "company": "Shri Ahimsa Naturals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DM401012",
-        "yahooTicker": "SHRIAHIMSA.NS",
+        "yahooTicker": "SHRIAHIMSA-SM.NS",
         "screenerSymbol": "SHRIAHIMSA",
         "bseCode": null
     },
@@ -23199,7 +23199,7 @@
         "company": "Rapid Fleet Management Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QX901013",
-        "yahooTicker": "RAPIDFLEET.NS",
+        "yahooTicker": "RAPIDFLEET-SM.NS",
         "screenerSymbol": "RAPIDFLEET",
         "bseCode": null
     },
@@ -23208,7 +23208,7 @@
         "company": "Active Infrastructures Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KLO01025",
-        "yahooTicker": "ACTIVEINFR.NS",
+        "yahooTicker": "ACTIVEINFR-SM.NS",
         "screenerSymbol": "ACTIVEINFR",
         "bseCode": null
     },
@@ -23217,7 +23217,7 @@
         "company": "Grand Continent Hotels Limited",
         "exchange": "NSE-SME",
         "isin": "INE12E301017",
-        "yahooTicker": "GCHOTELS.NS",
+        "yahooTicker": "GCHOTELS-SM.NS",
         "screenerSymbol": "GCHOTELS",
         "bseCode": null
     },
@@ -23226,7 +23226,7 @@
         "company": "Divine Hira Jewellers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NA501011",
-        "yahooTicker": "DIVINEHIRA.NS",
+        "yahooTicker": "DIVINEHIRA-ST.NS",
         "screenerSymbol": "DIVINEHIRA",
         "bseCode": null
     },
@@ -23235,7 +23235,7 @@
         "company": "Balaji Phosphates Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PQ601019",
-        "yahooTicker": "BALAJIPHOS.NS",
+        "yahooTicker": "BALAJIPHOS-SM.NS",
         "screenerSymbol": "BALAJIPHOS",
         "bseCode": null
     },
@@ -23244,7 +23244,7 @@
         "company": "HP Telecom India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VA601019",
-        "yahooTicker": "HPTL.NS",
+        "yahooTicker": "HPTL-SM.NS",
         "screenerSymbol": "HPTL",
         "bseCode": null
     },
@@ -23253,7 +23253,7 @@
         "company": "Tejas Cargo India Limited",
         "exchange": "NSE-SME",
         "isin": "INE17WC01013",
-        "yahooTicker": "TEJASCARGO.NS",
+        "yahooTicker": "TEJASCARGO-SM.NS",
         "screenerSymbol": "TEJASCARGO",
         "bseCode": null
     },
@@ -23262,7 +23262,7 @@
         "company": "Royal Arc Electrodes Limited",
         "exchange": "NSE-SME",
         "isin": "INE0EO401019",
-        "yahooTicker": "ROYALARC.NS",
+        "yahooTicker": "ROYALARC-SM.NS",
         "screenerSymbol": "ROYALARC",
         "bseCode": null
     },
@@ -23271,7 +23271,7 @@
         "company": "P S Raj Steels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XUS01012",
-        "yahooTicker": "PSRAJ.NS",
+        "yahooTicker": "PSRAJ-SM.NS",
         "screenerSymbol": "PSRAJ",
         "bseCode": null
     },
@@ -23280,7 +23280,7 @@
         "company": "Voler Car Limited",
         "exchange": "NSE-SME",
         "isin": "INE241X01014",
-        "yahooTicker": "VOLERCAR.NS",
+        "yahooTicker": "VOLERCAR-SM.NS",
         "screenerSymbol": "VOLERCAR",
         "bseCode": null
     },
@@ -23289,7 +23289,7 @@
         "company": "Maxvolt Energy Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE10A501018",
-        "yahooTicker": "MAXVOLT.NS",
+        "yahooTicker": "MAXVOLT-SM.NS",
         "screenerSymbol": "MAXVOLT",
         "bseCode": null
     },
@@ -23298,7 +23298,7 @@
         "company": "Chandan Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0B2N01016",
-        "yahooTicker": "CHANDAN.NS",
+        "yahooTicker": "CHANDAN-SM.NS",
         "screenerSymbol": "CHANDAN",
         "bseCode": null
     },
@@ -23307,7 +23307,7 @@
         "company": "Eleganz Interiors Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R9101015",
-        "yahooTicker": "ELGNZ.NS",
+        "yahooTicker": "ELGNZ-SM.NS",
         "screenerSymbol": "ELGNZ",
         "bseCode": null
     },
@@ -23316,7 +23316,7 @@
         "company": "Readymix Construction Machinery Limited",
         "exchange": "NSE-SME",
         "isin": "INE10QL01011",
-        "yahooTicker": "READYMIX.NS",
+        "yahooTicker": "READYMIX-SM.NS",
         "screenerSymbol": "READYMIX",
         "bseCode": null
     },
@@ -23325,7 +23325,7 @@
         "company": "Ken Enterprises Limited",
         "exchange": "NSE-SME",
         "isin": "INE15DO01012",
-        "yahooTicker": "KEN.NS",
+        "yahooTicker": "KEN-SM.NS",
         "screenerSymbol": "KEN",
         "bseCode": null
     },
@@ -23334,7 +23334,7 @@
         "company": "Chamunda Electrical Limited",
         "exchange": "NSE-SME",
         "isin": "INE11HG01018",
-        "yahooTicker": "CHAMUNDA.NS",
+        "yahooTicker": "CHAMUNDA-SM.NS",
         "screenerSymbol": "CHAMUNDA",
         "bseCode": null
     },
@@ -23343,7 +23343,7 @@
         "company": "Rexpro Enterprises Limited",
         "exchange": "NSE-SME",
         "isin": "INE113601012",
-        "yahooTicker": "REXPRO.NS",
+        "yahooTicker": "REXPRO-SM.NS",
         "screenerSymbol": "REXPRO",
         "bseCode": null
     },
@@ -23352,7 +23352,7 @@
         "company": "EMA Partners India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ZOL01023",
-        "yahooTicker": "EMAPARTNER.NS",
+        "yahooTicker": "EMAPARTNER-SM.NS",
         "screenerSymbol": "EMAPARTNER",
         "bseCode": null
     },
@@ -23361,7 +23361,7 @@
         "company": "Kabra Jewels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XOW01017",
-        "yahooTicker": "KKJEWELS.NS",
+        "yahooTicker": "KKJEWELS-SM.NS",
         "screenerSymbol": "KKJEWELS",
         "bseCode": null
     },
@@ -23370,7 +23370,7 @@
         "company": "Barflex Polyfilms Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QX401014",
-        "yahooTicker": "BARFLEX.NS",
+        "yahooTicker": "BARFLEX-SM.NS",
         "screenerSymbol": "BARFLEX",
         "bseCode": null
     },
@@ -23379,7 +23379,7 @@
         "company": "Sat Kartar Shopping Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NB801022",
-        "yahooTicker": "SATKARTAR.NS",
+        "yahooTicker": "SATKARTAR-SM.NS",
         "screenerSymbol": "SATKARTAR",
         "bseCode": null
     },
@@ -23388,7 +23388,7 @@
         "company": "Delta Autocorp Limited",
         "exchange": "NSE-SME",
         "isin": "INE0XRN01019",
-        "yahooTicker": "DELTIC.NS",
+        "yahooTicker": "DELTIC-SM.NS",
         "screenerSymbol": "DELTIC",
         "bseCode": null
     },
@@ -23397,7 +23397,7 @@
         "company": "Anya Polytech & Fertilizers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SI601032",
-        "yahooTicker": "ANYA.NS",
+        "yahooTicker": "ANYA-SM.NS",
         "screenerSymbol": "ANYA",
         "bseCode": null
     },
@@ -23406,7 +23406,7 @@
         "company": "Newmalayalam Steel Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TP801012",
-        "yahooTicker": "NMSTEEL.NS",
+        "yahooTicker": "NMSTEEL-SM.NS",
         "screenerSymbol": "NMSTEEL",
         "bseCode": null
     },
@@ -23415,7 +23415,7 @@
         "company": "Identical Brains Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TD101011",
-        "yahooTicker": "IDENTICAL.NS",
+        "yahooTicker": "IDENTICAL-SM.NS",
         "screenerSymbol": "IDENTICAL",
         "bseCode": null
     },
@@ -23424,7 +23424,7 @@
         "company": "Purple United Sales Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P5R01014",
-        "yahooTicker": "PURPLEUTED.NS",
+        "yahooTicker": "PURPLEUTED-SM.NS",
         "screenerSymbol": "PURPLEUTED",
         "bseCode": null
     },
@@ -23433,7 +23433,7 @@
         "company": "Supreme Facility Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U6N01014",
-        "yahooTicker": "SFML.NS",
+        "yahooTicker": "SFML-SM.NS",
         "screenerSymbol": "SFML",
         "bseCode": null
     },
@@ -23442,7 +23442,7 @@
         "company": "Dhanlaxmi Crop Science Limited",
         "exchange": "NSE-SME",
         "isin": "INE0V9V01010",
-        "yahooTicker": "DHANLAXMI.NS",
+        "yahooTicker": "DHANLAXMI-SM.NS",
         "screenerSymbol": "DHANLAXMI",
         "bseCode": null
     },
@@ -23451,7 +23451,7 @@
         "company": "Emerald Tyre Manufacturers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RHD01013",
-        "yahooTicker": "ETML.NS",
+        "yahooTicker": "ETML-SM.NS",
         "screenerSymbol": "ETML",
         "bseCode": null
     },
@@ -23460,7 +23460,7 @@
         "company": "Ganesh Infraworld Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TVT01024",
-        "yahooTicker": "GANESHIN.NS",
+        "yahooTicker": "GANESHIN-SM.NS",
         "screenerSymbol": "GANESHIN",
         "bseCode": null
     },
@@ -23469,7 +23469,7 @@
         "company": "Agarwal Toughened Glass India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P8X01016",
-        "yahooTicker": "AGARWALTUF.NS",
+        "yahooTicker": "AGARWALTUF-SM.NS",
         "screenerSymbol": "AGARWALTUF",
         "bseCode": null
     },
@@ -23478,7 +23478,7 @@
         "company": "Apex Ecotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T4V01015",
-        "yahooTicker": "APEXECO.NS",
+        "yahooTicker": "APEXECO-SM.NS",
         "screenerSymbol": "APEXECO",
         "bseCode": null
     },
@@ -23487,7 +23487,7 @@
         "company": "Abha Power and Steel Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UYG01015",
-        "yahooTicker": "ABHAPOWER.NS",
+        "yahooTicker": "ABHAPOWER-SM.NS",
         "screenerSymbol": "ABHAPOWER",
         "bseCode": null
     },
@@ -23496,7 +23496,7 @@
         "company": "Rajputana Biodiesel Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VHU01019",
-        "yahooTicker": "RAJPUTANA.NS",
+        "yahooTicker": "RAJPUTANA-SM.NS",
         "screenerSymbol": "RAJPUTANA",
         "bseCode": null
     },
@@ -23505,7 +23505,7 @@
         "company": "C2C Advanced Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U7V01015",
-        "yahooTicker": "C2C.NS",
+        "yahooTicker": "C2C-SM.NS",
         "screenerSymbol": "C2C",
         "bseCode": null
     },
@@ -23514,7 +23514,7 @@
         "company": "Innovative Tyres & Tubes Limited",
         "exchange": "NSE-SME",
         "isin": "INE070Y01023",
-        "yahooTicker": "ITTL.NS",
+        "yahooTicker": "ITTL-ST.NS",
         "screenerSymbol": "ITTL",
         "bseCode": null
     },
@@ -23523,7 +23523,7 @@
         "company": "Lamosaic India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R0201012",
-        "yahooTicker": "LAMOSAIC.NS",
+        "yahooTicker": "LAMOSAIC-SM.NS",
         "screenerSymbol": "LAMOSAIC",
         "bseCode": null
     },
@@ -23532,7 +23532,7 @@
         "company": "Onyx Biotec Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WVU01018",
-        "yahooTicker": "ONYX.NS",
+        "yahooTicker": "ONYX-SM.NS",
         "screenerSymbol": "ONYX",
         "bseCode": null
     },
@@ -23541,7 +23541,7 @@
         "company": "Neelam Linens and Garments (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N1401016",
-        "yahooTicker": "NEELAM.NS",
+        "yahooTicker": "NEELAM-SM.NS",
         "screenerSymbol": "NEELAM",
         "bseCode": null
     },
@@ -23550,7 +23550,7 @@
         "company": "Usha Financial Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LS001014",
-        "yahooTicker": "USHAFIN.NS",
+        "yahooTicker": "USHAFIN-SM.NS",
         "screenerSymbol": "USHAFIN",
         "bseCode": null
     },
@@ -23559,7 +23559,7 @@
         "company": "OBSC Perfection Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YHV01011",
-        "yahooTicker": "OBSCP.NS",
+        "yahooTicker": "OBSCP-SM.NS",
         "screenerSymbol": "OBSCP",
         "bseCode": null
     },
@@ -23568,7 +23568,7 @@
         "company": "United Heat Transfer Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMR01011",
-        "yahooTicker": "UHTL.NS",
+        "yahooTicker": "UHTL-SM.NS",
         "screenerSymbol": "UHTL",
         "bseCode": null
     },
@@ -23577,7 +23577,7 @@
         "company": "Danish Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YU901016",
-        "yahooTicker": "DANISH.NS",
+        "yahooTicker": "DANISH-SM.NS",
         "screenerSymbol": "DANISH",
         "bseCode": null
     },
@@ -23586,7 +23586,7 @@
         "company": "Premium Plast Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M1F01011",
-        "yahooTicker": "PREMIUM.NS",
+        "yahooTicker": "PREMIUM-SM.NS",
         "screenerSymbol": "PREMIUM",
         "bseCode": null
     },
@@ -23595,7 +23595,7 @@
         "company": "Freshara Agro Exports Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SFW01015",
-        "yahooTicker": "FRESHARA.NS",
+        "yahooTicker": "FRESHARA-ST.NS",
         "screenerSymbol": "FRESHARA",
         "bseCode": null
     },
@@ -23604,7 +23604,7 @@
         "company": "Lakshya Powertech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VZS01015",
-        "yahooTicker": "LAKSHYA.NS",
+        "yahooTicker": "LAKSHYA-SM.NS",
         "screenerSymbol": "LAKSHYA",
         "bseCode": null
     },
@@ -23613,7 +23613,7 @@
         "company": "Pranik Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VJG01014",
-        "yahooTicker": "PRANIK.NS",
+        "yahooTicker": "PRANIK-SM.NS",
         "screenerSymbol": "PRANIK",
         "bseCode": null
     },
@@ -23622,7 +23622,7 @@
         "company": "Paramount Dye Tec Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TG801013",
-        "yahooTicker": "PARAMOUNT.NS",
+        "yahooTicker": "PARAMOUNT-SM.NS",
         "screenerSymbol": "PARAMOUNT",
         "bseCode": null
     },
@@ -23631,7 +23631,7 @@
         "company": "HVAX Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TO501019",
-        "yahooTicker": "HVAX.NS",
+        "yahooTicker": "HVAX-SM.NS",
         "screenerSymbol": "HVAX",
         "bseCode": null
     },
@@ -23640,7 +23640,7 @@
         "company": "Saj Hotels Limited",
         "exchange": "NSE-SME",
         "isin": "INE00MT01022",
-        "yahooTicker": "SAJHOTELS.NS",
+        "yahooTicker": "SAJHOTELS-SM.NS",
         "screenerSymbol": "SAJHOTELS",
         "bseCode": null
     },
@@ -23649,7 +23649,7 @@
         "company": "Sahasra Electronic Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RBQ01018",
-        "yahooTicker": "SAHASRA.NS",
+        "yahooTicker": "SAHASRA-SM.NS",
         "screenerSymbol": "SAHASRA",
         "bseCode": null
     },
@@ -23658,7 +23658,7 @@
         "company": "Divyadhan Recycling Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QYI01019",
-        "yahooTicker": "DIVYADHAN.NS",
+        "yahooTicker": "DIVYADHAN-SM.NS",
         "screenerSymbol": "DIVYADHAN",
         "bseCode": null
     },
@@ -23667,7 +23667,7 @@
         "company": "Forge Auto International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YKW01013",
-        "yahooTicker": "FORGEAUTO.NS",
+        "yahooTicker": "FORGEAUTO-SM.NS",
         "screenerSymbol": "FORGEAUTO",
         "bseCode": null
     },
@@ -23676,7 +23676,7 @@
         "company": "Thinking Hats Entertainment Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SHE01019",
-        "yahooTicker": "THESL.NS",
+        "yahooTicker": "THESL-SM.NS",
         "screenerSymbol": "THESL",
         "bseCode": null
     },
@@ -23685,7 +23685,7 @@
         "company": "Unilex Colours and Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0B2801011",
-        "yahooTicker": "UNILEX.NS",
+        "yahooTicker": "UNILEX-SM.NS",
         "screenerSymbol": "UNILEX",
         "bseCode": null
     },
@@ -23694,7 +23694,7 @@
         "company": "TechEra Engineering (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JQS01019",
-        "yahooTicker": "TECHERA.NS",
+        "yahooTicker": "TECHERA-SM.NS",
         "screenerSymbol": "TECHERA",
         "bseCode": null
     },
@@ -23703,7 +23703,7 @@
         "company": "Wol 3D India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OO201011",
-        "yahooTicker": "WOL3D.NS",
+        "yahooTicker": "WOL3D-SM.NS",
         "screenerSymbol": "WOL3D",
         "bseCode": null
     },
@@ -23712,7 +23712,7 @@
         "company": "Rappid Valves (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MVO01012",
-        "yahooTicker": "RAPPID.NS",
+        "yahooTicker": "RAPPID-SM.NS",
         "screenerSymbol": "RAPPID",
         "bseCode": null
     },
@@ -23721,7 +23721,7 @@
         "company": "Bikewo Green Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SQH01013",
-        "yahooTicker": "BIKEWO.NS",
+        "yahooTicker": "BIKEWO-ST.NS",
         "screenerSymbol": "BIKEWO",
         "bseCode": null
     },
@@ -23730,7 +23730,7 @@
         "company": "Avi Ansh Textile Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TFB01017",
-        "yahooTicker": "AVIANSH.NS",
+        "yahooTicker": "AVIANSH-SM.NS",
         "screenerSymbol": "AVIANSH",
         "bseCode": null
     },
@@ -23739,7 +23739,7 @@
         "company": "Phoenix Overseas Limited",
         "exchange": "NSE-SME",
         "isin": "INE0FPO01018",
-        "yahooTicker": "PHOGLOBAL.NS",
+        "yahooTicker": "PHOGLOBAL-SM.NS",
         "screenerSymbol": "PHOGLOBAL",
         "bseCode": null
     },
@@ -23748,7 +23748,7 @@
         "company": "S D Retail Limited",
         "exchange": "NSE-SME",
         "isin": "INE0X6F01017",
-        "yahooTicker": "SDREAMS.NS",
+        "yahooTicker": "SDREAMS-SM.NS",
         "screenerSymbol": "SDREAMS",
         "bseCode": null
     },
@@ -23757,7 +23757,7 @@
         "company": "Kalana Ispat Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T0L01014",
-        "yahooTicker": "KALANA.NS",
+        "yahooTicker": "KALANA-ST.NS",
         "screenerSymbol": "KALANA",
         "bseCode": null
     },
@@ -23766,7 +23766,7 @@
         "company": "Paramount Speciality Forgings Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q6001012",
-        "yahooTicker": "PSFL.NS",
+        "yahooTicker": "PSFL-SM.NS",
         "screenerSymbol": "PSFL",
         "bseCode": null
     },
@@ -23775,7 +23775,7 @@
         "company": "Osel Devices Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RMF01018",
-        "yahooTicker": "OSELDEVICE.NS",
+        "yahooTicker": "OSELDEVICE-SM.NS",
         "screenerSymbol": "OSELDEVICE",
         "bseCode": null
     },
@@ -23784,7 +23784,7 @@
         "company": "Deccan Transcon Leasing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S7C01019",
-        "yahooTicker": "DECCANTRAN.NS",
+        "yahooTicker": "DECCANTRAN-SM.NS",
         "screenerSymbol": "DECCANTRAN",
         "bseCode": null
     },
@@ -23793,7 +23793,7 @@
         "company": "Envirotech Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SUH01015",
-        "yahooTicker": "ENVIRO.NS",
+        "yahooTicker": "ENVIRO-SM.NS",
         "screenerSymbol": "ENVIRO",
         "bseCode": null
     },
@@ -23802,7 +23802,7 @@
         "company": "Pelatro Limited",
         "exchange": "NSE-SME",
         "isin": "INE0VG601013",
-        "yahooTicker": "PELATRO.NS",
+        "yahooTicker": "PELATRO-SM.NS",
         "screenerSymbol": "PELATRO",
         "bseCode": null
     },
@@ -23811,7 +23811,7 @@
         "company": "Excellent Wires and Packaging Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Y4801011",
-        "yahooTicker": "EXCELLENT.NS",
+        "yahooTicker": "EXCELLENT-ST.NS",
         "screenerSymbol": "EXCELLENT",
         "bseCode": null
     },
@@ -23820,7 +23820,7 @@
         "company": "Innomet Advanced Materials Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S1D01010",
-        "yahooTicker": "INNOMET.NS",
+        "yahooTicker": "INNOMET-SM.NS",
         "screenerSymbol": "INNOMET",
         "bseCode": null
     },
@@ -23829,7 +23829,7 @@
         "company": "SPP Polymer Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QR801013",
-        "yahooTicker": "SPPPOLY.NS",
+        "yahooTicker": "SPPPOLY-SM.NS",
         "screenerSymbol": "SPPPOLY",
         "bseCode": null
     },
@@ -23838,7 +23838,7 @@
         "company": "Aditya Ultra Steel Limited",
         "exchange": "NSE-SME",
         "isin": "INE01YQ01013",
-        "yahooTicker": "AUSL.NS",
+        "yahooTicker": "AUSL-SM.NS",
         "screenerSymbol": "AUSL",
         "bseCode": null
     },
@@ -23847,7 +23847,7 @@
         "company": "Gajanand International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QTE01018",
-        "yahooTicker": "GAJANAND.NS",
+        "yahooTicker": "GAJANAND-SM.NS",
         "screenerSymbol": "GAJANAND",
         "bseCode": null
     },
@@ -23856,7 +23856,7 @@
         "company": "Shubhshree Biofuels Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0UL701015",
-        "yahooTicker": "SHUBHSHREE.NS",
+        "yahooTicker": "SHUBHSHREE-SM.NS",
         "screenerSymbol": "SHUBHSHREE",
         "bseCode": null
     },
@@ -23865,7 +23865,7 @@
         "company": "Vision Infra Equipment Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TR001017",
-        "yahooTicker": "VIESL.NS",
+        "yahooTicker": "VIESL-SM.NS",
         "screenerSymbol": "VIESL",
         "bseCode": null
     },
@@ -23874,7 +23874,7 @@
         "company": "My Mudra Fincorp Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RVQ01016",
-        "yahooTicker": "MYMUDRA.NS",
+        "yahooTicker": "MYMUDRA-SM.NS",
         "screenerSymbol": "MYMUDRA",
         "bseCode": null
     },
@@ -23883,7 +23883,7 @@
         "company": "Namo eWaste Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE08NZ01012",
-        "yahooTicker": "NAMOEWASTE.NS",
+        "yahooTicker": "NAMOEWASTE-SM.NS",
         "screenerSymbol": "NAMOEWASTE",
         "bseCode": null
     },
@@ -23892,7 +23892,7 @@
         "company": "Jeyyam Global Foods Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RXB01022",
-        "yahooTicker": "JEYYAM.NS",
+        "yahooTicker": "JEYYAM-SM.NS",
         "screenerSymbol": "JEYYAM",
         "bseCode": null
     },
@@ -23901,7 +23901,7 @@
         "company": "Boss Packaging Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QNI01012",
-        "yahooTicker": "BOSS.NS",
+        "yahooTicker": "BOSS-SM.NS",
         "screenerSymbol": "BOSS",
         "bseCode": null
     },
@@ -23910,7 +23910,7 @@
         "company": "Aeron Composite Limited",
         "exchange": "NSE-SME",
         "isin": "INE0WL801011",
-        "yahooTicker": "AERON.NS",
+        "yahooTicker": "AERON-SM.NS",
         "screenerSymbol": "AERON",
         "bseCode": null
     },
@@ -23919,7 +23919,7 @@
         "company": "Paramatrix Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S2W01018",
-        "yahooTicker": "PARAMATRIX.NS",
+        "yahooTicker": "PARAMATRIX-SM.NS",
         "screenerSymbol": "PARAMATRIX",
         "bseCode": null
     },
@@ -23928,7 +23928,7 @@
         "company": "Indian Phosphate Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DHF01018",
-        "yahooTicker": "IPHL.NS",
+        "yahooTicker": "IPHL-SM.NS",
         "screenerSymbol": "IPHL",
         "bseCode": null
     },
@@ -23937,7 +23937,7 @@
         "company": "Jay Bee Laminations Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMY01017",
-        "yahooTicker": "JAYBEE.NS",
+        "yahooTicker": "JAYBEE-SM.NS",
         "screenerSymbol": "JAYBEE",
         "bseCode": null
     },
@@ -23946,7 +23946,7 @@
         "company": "Vdeal System Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U2M01015",
-        "yahooTicker": "VDEAL.NS",
+        "yahooTicker": "VDEAL-SM.NS",
         "screenerSymbol": "VDEAL",
         "bseCode": null
     },
@@ -23955,7 +23955,7 @@
         "company": "Ideal Technoplast Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T9I01011",
-        "yahooTicker": "IDEALTECHO.NS",
+        "yahooTicker": "IDEALTECHO-SM.NS",
         "screenerSymbol": "IDEALTECHO",
         "bseCode": null
     },
@@ -23964,7 +23964,7 @@
         "company": "QVC Exports Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KZF01015",
-        "yahooTicker": "QVCEL.NS",
+        "yahooTicker": "QVCEL-SM.NS",
         "screenerSymbol": "QVCEL",
         "bseCode": null
     },
@@ -23973,7 +23973,7 @@
         "company": "Forcas Studio Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U2501017",
-        "yahooTicker": "FORCAS.NS",
+        "yahooTicker": "FORCAS-SM.NS",
         "screenerSymbol": "FORCAS",
         "bseCode": null
     },
@@ -23982,7 +23982,7 @@
         "company": "Brace Port Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R4Z01018",
-        "yahooTicker": "BRACEPORT.NS",
+        "yahooTicker": "BRACEPORT-SM.NS",
         "screenerSymbol": "BRACEPORT",
         "bseCode": null
     },
@@ -23991,7 +23991,7 @@
         "company": "Solve Plastic Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U0201016",
-        "yahooTicker": "BALCO.NS",
+        "yahooTicker": "BALCO-SM.NS",
         "screenerSymbol": "BALCO",
         "bseCode": null
     },
@@ -24000,7 +24000,7 @@
         "company": "Positron Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S3H01017",
-        "yahooTicker": "POSITRON.NS",
+        "yahooTicker": "POSITRON-SM.NS",
         "screenerSymbol": "POSITRON",
         "bseCode": null
     },
@@ -24009,7 +24009,7 @@
         "company": "Sunlite Recycling Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U2N01013",
-        "yahooTicker": "SUNLITE.NS",
+        "yahooTicker": "SUNLITE-SM.NS",
         "screenerSymbol": "SUNLITE",
         "bseCode": null
     },
@@ -24018,7 +24018,7 @@
         "company": "Aesthetik Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TSF01011",
-        "yahooTicker": "AESTHETIK.NS",
+        "yahooTicker": "AESTHETIK-SM.NS",
         "screenerSymbol": "AESTHETIK",
         "bseCode": null
     },
@@ -24027,7 +24027,7 @@
         "company": "Picturepost Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YAL01017",
-        "yahooTicker": "PPSL.NS",
+        "yahooTicker": "PPSL-SM.NS",
         "screenerSymbol": "PPSL",
         "bseCode": null
     },
@@ -24036,7 +24036,7 @@
         "company": "Dhariwalcorp Limited",
         "exchange": "NSE-SME",
         "isin": "INE0YRN01025",
-        "yahooTicker": "DHARIWAL.NS",
+        "yahooTicker": "DHARIWAL-ST.NS",
         "screenerSymbol": "DHARIWAL",
         "bseCode": null
     },
@@ -24045,7 +24045,7 @@
         "company": "Utssav CZ Gold Jewels Limited",
         "exchange": "NSE-SME",
         "isin": "INE06IJ01010",
-        "yahooTicker": "UTSSAV.NS",
+        "yahooTicker": "UTSSAV-SM.NS",
         "screenerSymbol": "UTSSAV",
         "bseCode": null
     },
@@ -24054,7 +24054,7 @@
         "company": "Ashapura Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LAA01017",
-        "yahooTicker": "ASHALOG.NS",
+        "yahooTicker": "ASHALOG-SM.NS",
         "screenerSymbol": "ASHALOG",
         "bseCode": null
     },
@@ -24063,7 +24063,7 @@
         "company": "Rajputana Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PCU01012",
-        "yahooTicker": "RAJINDLTD.NS",
+        "yahooTicker": "RAJINDLTD-SM.NS",
         "screenerSymbol": "RAJINDLTD",
         "bseCode": null
     },
@@ -24072,7 +24072,7 @@
         "company": "Sathlokhar Synergys E&C Global Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RFP01011",
-        "yahooTicker": "SSEGL.NS",
+        "yahooTicker": "SSEGL-SM.NS",
         "screenerSymbol": "SSEGL",
         "bseCode": null
     },
@@ -24081,7 +24081,7 @@
         "company": "Bulkcorp International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SZ301012",
-        "yahooTicker": "BULKCORP.NS",
+        "yahooTicker": "BULKCORP-SM.NS",
         "screenerSymbol": "BULKCORP",
         "bseCode": null
     },
@@ -24090,7 +24090,7 @@
         "company": "S A Tech Software India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BSN01013",
-        "yahooTicker": "SATECH.NS",
+        "yahooTicker": "SATECH-SM.NS",
         "screenerSymbol": "SATECH",
         "bseCode": null
     },
@@ -24099,7 +24099,7 @@
         "company": "Esprit Stones Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SBP01018",
-        "yahooTicker": "ESPRIT.NS",
+        "yahooTicker": "ESPRIT-SM.NS",
         "screenerSymbol": "ESPRIT",
         "bseCode": null
     },
@@ -24108,7 +24108,7 @@
         "company": "Aprameya Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LQG01010",
-        "yahooTicker": "APRAMEYA.NS",
+        "yahooTicker": "APRAMEYA-SM.NS",
         "screenerSymbol": "APRAMEYA",
         "bseCode": null
     },
@@ -24117,7 +24117,7 @@
         "company": "Trom Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SYV01018",
-        "yahooTicker": "TROM.NS",
+        "yahooTicker": "TROM-SM.NS",
         "screenerSymbol": "TROM",
         "bseCode": null
     },
@@ -24126,7 +24126,7 @@
         "company": "Manglam Infra & Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R3101011",
-        "yahooTicker": "MIEL.NS",
+        "yahooTicker": "MIEL-SM.NS",
         "screenerSymbol": "MIEL",
         "bseCode": null
     },
@@ -24135,7 +24135,7 @@
         "company": "Chetana Education Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U1T01012",
-        "yahooTicker": "CHETANA.NS",
+        "yahooTicker": "CHETANA-SM.NS",
         "screenerSymbol": "CHETANA",
         "bseCode": null
     },
@@ -24144,7 +24144,7 @@
         "company": "V.L.Infraprojects Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QXL01015",
-        "yahooTicker": "VLINFRA.NS",
+        "yahooTicker": "VLINFRA-SM.NS",
         "screenerSymbol": "VLINFRA",
         "bseCode": null
     },
@@ -24153,7 +24153,7 @@
         "company": "RNFI Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SA001017",
-        "yahooTicker": "RNFI.NS",
+        "yahooTicker": "RNFI-SM.NS",
         "screenerSymbol": "RNFI",
         "bseCode": null
     },
@@ -24162,7 +24162,7 @@
         "company": "Macobs Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R0J01010",
-        "yahooTicker": "MACOBSTECH.NS",
+        "yahooTicker": "MACOBSTECH-SM.NS",
         "screenerSymbol": "MACOBSTECH",
         "bseCode": null
     },
@@ -24171,7 +24171,7 @@
         "company": "Kataria Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SVY01018",
-        "yahooTicker": "KATARIA.NS",
+        "yahooTicker": "KATARIA-SM.NS",
         "screenerSymbol": "KATARIA",
         "bseCode": null
     },
@@ -24180,7 +24180,7 @@
         "company": "Tunwal E-Motors Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OXV01027",
-        "yahooTicker": "TUNWAL.NS",
+        "yahooTicker": "TUNWAL-SM.NS",
         "screenerSymbol": "TUNWAL",
         "bseCode": null
     },
@@ -24189,7 +24189,7 @@
         "company": "Sati Poly Plast Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RPM01017",
-        "yahooTicker": "SATIPOLY.NS",
+        "yahooTicker": "SATIPOLY-SM.NS",
         "screenerSymbol": "SATIPOLY",
         "bseCode": null
     },
@@ -24198,7 +24198,7 @@
         "company": "Prizor Viztech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0V9N01017",
-        "yahooTicker": "PRIZOR.NS",
+        "yahooTicker": "PRIZOR-ST.NS",
         "screenerSymbol": "PRIZOR",
         "bseCode": null
     },
@@ -24207,7 +24207,7 @@
         "company": "Sahaj Solar Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P4701011",
-        "yahooTicker": "SAHAJSOLAR.NS",
+        "yahooTicker": "SAHAJSOLAR-SM.NS",
         "screenerSymbol": "SAHAJSOLAR",
         "bseCode": null
     },
@@ -24216,7 +24216,7 @@
         "company": "Ganesh Green Bharat Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R8C01018",
-        "yahooTicker": "GGBL.NS",
+        "yahooTicker": "GGBL-SM.NS",
         "screenerSymbol": "GGBL",
         "bseCode": null
     },
@@ -24225,7 +24225,7 @@
         "company": "Effwa Infra & Research Limited",
         "exchange": "NSE-SME",
         "isin": "INE0U9101019",
-        "yahooTicker": "EFFWA.NS",
+        "yahooTicker": "EFFWA-SM.NS",
         "screenerSymbol": "EFFWA",
         "bseCode": null
     },
@@ -24234,7 +24234,7 @@
         "company": "Ambey Laboratories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M3I01029",
-        "yahooTicker": "AMBEY.NS",
+        "yahooTicker": "AMBEY-SM.NS",
         "screenerSymbol": "AMBEY",
         "bseCode": null
     },
@@ -24243,7 +24243,7 @@
         "company": "Nephro Care India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SUN01013",
-        "yahooTicker": "NEPHROCARE.NS",
+        "yahooTicker": "NEPHROCARE-SM.NS",
         "screenerSymbol": "NEPHROCARE",
         "bseCode": null
     },
@@ -24252,7 +24252,7 @@
         "company": "Diensten Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JRD01019",
-        "yahooTicker": "DTL.NS",
+        "yahooTicker": "DTL-SM.NS",
         "screenerSymbol": "DTL",
         "bseCode": null
     },
@@ -24261,7 +24261,7 @@
         "company": "Divine Power Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SCO01019",
-        "yahooTicker": "DPEL.NS",
+        "yahooTicker": "DPEL-SM.NS",
         "screenerSymbol": "DPEL",
         "bseCode": null
     },
@@ -24270,7 +24270,7 @@
         "company": "Akiko Global Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PMR01017",
-        "yahooTicker": "AKIKO.NS",
+        "yahooTicker": "AKIKO-ST.NS",
         "screenerSymbol": "AKIKO",
         "bseCode": null
     },
@@ -24279,7 +24279,7 @@
         "company": "Petro Carbon and Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE998U01015",
-        "yahooTicker": "PCCL.NS",
+        "yahooTicker": "PCCL-SM.NS",
         "screenerSymbol": "PCCL",
         "bseCode": null
     },
@@ -24288,7 +24288,7 @@
         "company": "Mason Infratech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SH001010",
-        "yahooTicker": "MASON.NS",
+        "yahooTicker": "MASON-SM.NS",
         "screenerSymbol": "MASON",
         "bseCode": null
     },
@@ -24297,7 +24297,7 @@
         "company": "Shivalic Power Control Limited",
         "exchange": "NSE-SME",
         "isin": "INE0T7B01010",
-        "yahooTicker": "SPCL.NS",
+        "yahooTicker": "SPCL-SM.NS",
         "screenerSymbol": "SPCL",
         "bseCode": null
     },
@@ -24306,7 +24306,7 @@
         "company": "Visaman Global Sales Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BHK01012",
-        "yahooTicker": "VISAMAN.NS",
+        "yahooTicker": "VISAMAN-ST.NS",
         "screenerSymbol": "VISAMAN",
         "bseCode": null
     },
@@ -24315,7 +24315,7 @@
         "company": "Sylvan Plyboard (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE01IH01015",
-        "yahooTicker": "SYLVANPLY.NS",
+        "yahooTicker": "SYLVANPLY-SM.NS",
         "screenerSymbol": "SYLVANPLY",
         "bseCode": null
     },
@@ -24324,7 +24324,7 @@
         "company": "Medicamen Organics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PE401018",
-        "yahooTicker": "MEDIORG.NS",
+        "yahooTicker": "MEDIORG-SM.NS",
         "screenerSymbol": "MEDIORG",
         "bseCode": null
     },
@@ -24333,7 +24333,7 @@
         "company": "Winny Immigration & Education Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S9101013",
-        "yahooTicker": "WINNY.NS",
+        "yahooTicker": "WINNY-SM.NS",
         "screenerSymbol": "WINNY",
         "bseCode": null
     },
@@ -24342,7 +24342,7 @@
         "company": "Falcon Technoprojects India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PQK01013",
-        "yahooTicker": "FALCONTECH.NS",
+        "yahooTicker": "FALCONTECH-SM.NS",
         "screenerSymbol": "FALCONTECH",
         "bseCode": null
     },
@@ -24351,7 +24351,7 @@
         "company": "Durlax Top Surface Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OUW01013",
-        "yahooTicker": "DURLAX.NS",
+        "yahooTicker": "DURLAX-SM.NS",
         "screenerSymbol": "DURLAX",
         "bseCode": null
     },
@@ -24360,7 +24360,7 @@
         "company": "GP Eco Solutions India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S7E01015",
-        "yahooTicker": "GPECO.NS",
+        "yahooTicker": "GPECO-SM.NS",
         "screenerSymbol": "GPECO",
         "bseCode": null
     },
@@ -24369,7 +24369,7 @@
         "company": "TBI Corn Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N2D01013",
-        "yahooTicker": "TBI.NS",
+        "yahooTicker": "TBI-SM.NS",
         "screenerSymbol": "TBI",
         "bseCode": null
     },
@@ -24378,7 +24378,7 @@
         "company": "Aimtron Electronics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RUV01018",
-        "yahooTicker": "AIMTRON.NS",
+        "yahooTicker": "AIMTRON-SM.NS",
         "screenerSymbol": "AIMTRON",
         "bseCode": null
     },
@@ -24387,7 +24387,7 @@
         "company": "Z-Tech (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ISZ01012",
-        "yahooTicker": "ZTECH.NS",
+        "yahooTicker": "ZTECH-SM.NS",
         "screenerSymbol": "ZTECH",
         "bseCode": null
     },
@@ -24396,7 +24396,7 @@
         "company": "Beacon Trusteeship Limited",
         "exchange": "NSE-SME",
         "isin": "INE639X01027",
-        "yahooTicker": "BEACON.NS",
+        "yahooTicker": "BEACON-SM.NS",
         "screenerSymbol": "BEACON",
         "bseCode": null
     },
@@ -24405,7 +24405,7 @@
         "company": "Vilas Transcore Limited",
         "exchange": "NSE-SME",
         "isin": "INE0AZY01017",
-        "yahooTicker": "VILAS.NS",
+        "yahooTicker": "VILAS-SM.NS",
         "screenerSymbol": "VILAS",
         "bseCode": null
     },
@@ -24414,7 +24414,7 @@
         "company": "GSM Foils Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SQY01018",
-        "yahooTicker": "GSMFOILS.NS",
+        "yahooTicker": "GSMFOILS-SM.NS",
         "screenerSymbol": "GSMFOILS",
         "bseCode": null
     },
@@ -24423,7 +24423,7 @@
         "company": "Rulka Electricals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R7301013",
-        "yahooTicker": "RULKA.NS",
+        "yahooTicker": "RULKA-SM.NS",
         "screenerSymbol": "RULKA",
         "bseCode": null
     },
@@ -24432,7 +24432,7 @@
         "company": "Hoac Foods India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S6S01017",
-        "yahooTicker": "HOACFOODS.NS",
+        "yahooTicker": "HOACFOODS-ST.NS",
         "screenerSymbol": "HOACFOODS",
         "bseCode": null
     },
@@ -24441,7 +24441,7 @@
         "company": "Quest Laboratories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TNW01017",
-        "yahooTicker": "QUESTLAB.NS",
+        "yahooTicker": "QUESTLAB-ST.NS",
         "screenerSymbol": "QUESTLAB",
         "bseCode": null
     },
@@ -24450,7 +24450,7 @@
         "company": "Indian Emulsifiers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RRU01016",
-        "yahooTicker": "IEML.NS",
+        "yahooTicker": "IEML-SM.NS",
         "screenerSymbol": "IEML",
         "bseCode": null
     },
@@ -24459,7 +24459,7 @@
         "company": "ABS Marine Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QRV01016",
-        "yahooTicker": "ABSMARINE.NS",
+        "yahooTicker": "ABSMARINE-SM.NS",
         "screenerSymbol": "ABSMARINE",
         "bseCode": null
     },
@@ -24468,7 +24468,7 @@
         "company": "Mandeep Auto Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R3T01013",
-        "yahooTicker": "MANDEEP.NS",
+        "yahooTicker": "MANDEEP-SM.NS",
         "screenerSymbol": "MANDEEP",
         "bseCode": null
     },
@@ -24477,7 +24477,7 @@
         "company": "Veritaas Advertising Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SRI01019",
-        "yahooTicker": "VERITAAS.NS",
+        "yahooTicker": "VERITAAS-SM.NS",
         "screenerSymbol": "VERITAAS",
         "bseCode": null
     },
@@ -24486,7 +24486,7 @@
         "company": "Premier Roadlines Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CFG01012",
-        "yahooTicker": "PRLIND.NS",
+        "yahooTicker": "PRLIND-SM.NS",
         "screenerSymbol": "PRLIND",
         "bseCode": null
     },
@@ -24495,7 +24495,7 @@
         "company": "Energy Mission Machineries (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S1L01013",
-        "yahooTicker": "EMMIL.NS",
+        "yahooTicker": "EMMIL-SM.NS",
         "screenerSymbol": "EMMIL",
         "bseCode": null
     },
@@ -24504,7 +24504,7 @@
         "company": "Silkflex Polymers (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0STN01015",
-        "yahooTicker": "SILKFLEX.NS",
+        "yahooTicker": "SILKFLEX-ST.NS",
         "screenerSymbol": "SILKFLEX",
         "bseCode": null
     },
@@ -24513,7 +24513,7 @@
         "company": "Refractory Shapes Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TNX01015",
-        "yahooTicker": "REFRACTORY.NS",
+        "yahooTicker": "REFRACTORY-SM.NS",
         "screenerSymbol": "REFRACTORY",
         "bseCode": null
     },
@@ -24522,7 +24522,7 @@
         "company": "Winsol Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S3D01016",
-        "yahooTicker": "WINSOL.NS",
+        "yahooTicker": "WINSOL-SM.NS",
         "screenerSymbol": "WINSOL",
         "bseCode": null
     },
@@ -24531,7 +24531,7 @@
         "company": "Slone Infosystems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SMA01017",
-        "yahooTicker": "SLONE.NS",
+        "yahooTicker": "SLONE-SM.NS",
         "screenerSymbol": "SLONE",
         "bseCode": null
     },
@@ -24540,7 +24540,7 @@
         "company": "Ramdevbaba Solvent Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RJH01010",
-        "yahooTicker": "RBS.NS",
+        "yahooTicker": "RBS-SM.NS",
         "screenerSymbol": "RBS",
         "bseCode": null
     },
@@ -24549,7 +24549,7 @@
         "company": "Grill Splendour Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PC901019",
-        "yahooTicker": "BIRDYS.NS",
+        "yahooTicker": "BIRDYS-SM.NS",
         "screenerSymbol": "BIRDYS",
         "bseCode": null
     },
@@ -24558,7 +24558,7 @@
         "company": "Teerth Gopicon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0K6601012",
-        "yahooTicker": "TGL.NS",
+        "yahooTicker": "TGL-ST.NS",
         "screenerSymbol": "TGL",
         "bseCode": null
     },
@@ -24567,7 +24567,7 @@
         "company": "DCG Cables & Wires Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S8401018",
-        "yahooTicker": "DCG.NS",
+        "yahooTicker": "DCG-SM.NS",
         "screenerSymbol": "DCG",
         "bseCode": null
     },
@@ -24576,7 +24576,7 @@
         "company": "DRS Cargo Movers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QZM01018",
-        "yahooTicker": "DRSCARGO.NS",
+        "yahooTicker": "DRSCARGO-SM.NS",
         "screenerSymbol": "DRSCARGO",
         "bseCode": null
     },
@@ -24585,7 +24585,7 @@
         "company": "ALUWIND INFRA-TECH LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0STM01017",
-        "yahooTicker": "ALUWIND.NS",
+        "yahooTicker": "ALUWIND-SM.NS",
         "screenerSymbol": "ALUWIND",
         "bseCode": null
     },
@@ -24594,7 +24594,7 @@
         "company": "Creative Graphics Solutions India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R7401011",
-        "yahooTicker": "CGRAPHICS.NS",
+        "yahooTicker": "CGRAPHICS-SM.NS",
         "screenerSymbol": "CGRAPHICS",
         "bseCode": null
     },
@@ -24603,7 +24603,7 @@
         "company": "K2 Infragen Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DEZ01013",
-        "yahooTicker": "K2INFRA.NS",
+        "yahooTicker": "K2INFRA-SM.NS",
         "screenerSymbol": "K2INFRA",
         "bseCode": null
     },
@@ -24612,7 +24612,7 @@
         "company": "Yash Optics & Lens Limited",
         "exchange": "NSE-SME",
         "isin": "INE0TO601017",
-        "yahooTicker": "YASHOPTICS.NS",
+        "yahooTicker": "YASHOPTICS-SM.NS",
         "screenerSymbol": "YASHOPTICS",
         "bseCode": null
     },
@@ -24621,7 +24621,7 @@
         "company": "Radiowalla Network Limited",
         "exchange": "NSE-SME",
         "isin": "INE430U01019",
-        "yahooTicker": "RADIOWALLA.NS",
+        "yahooTicker": "RADIOWALLA-SM.NS",
         "screenerSymbol": "RADIOWALLA",
         "bseCode": null
     },
@@ -24630,7 +24630,7 @@
         "company": "TAC Infosec Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SOY01013",
-        "yahooTicker": "TAC.NS",
+        "yahooTicker": "TAC-SM.NS",
         "screenerSymbol": "TAC",
         "bseCode": null
     },
@@ -24639,7 +24639,7 @@
         "company": "Trust Fintech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SWN01019",
-        "yahooTicker": "TRUST.NS",
+        "yahooTicker": "TRUST-SM.NS",
         "screenerSymbol": "TRUST",
         "bseCode": null
     },
@@ -24648,7 +24648,7 @@
         "company": "Blue Pebble Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SAK01011",
-        "yahooTicker": "BLUEPEBBLE.NS",
+        "yahooTicker": "BLUEPEBBLE-ST.NS",
         "screenerSymbol": "BLUEPEBBLE",
         "bseCode": null
     },
@@ -24657,7 +24657,7 @@
         "company": "Aspire & Innovative Advertising Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S7801010",
-        "yahooTicker": "ASPIRE.NS",
+        "yahooTicker": "ASPIRE-SM.NS",
         "screenerSymbol": "ASPIRE",
         "bseCode": null
     },
@@ -24666,7 +24666,7 @@
         "company": "Naman Industries Proxima Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RJM01010",
-        "yahooTicker": "NAMAN.NS",
+        "yahooTicker": "NAMAN-SM.NS",
         "screenerSymbol": "NAMAN",
         "bseCode": null
     },
@@ -24675,7 +24675,7 @@
         "company": "Vishwas Agri Seeds Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S2E01016",
-        "yahooTicker": "VISHWAS.NS",
+        "yahooTicker": "VISHWAS-SM.NS",
         "screenerSymbol": "VISHWAS",
         "bseCode": null
     },
@@ -24684,7 +24684,7 @@
         "company": "Enfuse Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S3X01014",
-        "yahooTicker": "ENFUSE.NS",
+        "yahooTicker": "ENFUSE-SM.NS",
         "screenerSymbol": "ENFUSE",
         "bseCode": null
     },
@@ -24693,7 +24693,7 @@
         "company": "Enser Communications Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R9I01021",
-        "yahooTicker": "ENSER.NS",
+        "yahooTicker": "ENSER-SM.NS",
         "screenerSymbol": "ENSER",
         "bseCode": null
     },
@@ -24702,7 +24702,7 @@
         "company": "AVP Infracon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R9401019",
-        "yahooTicker": "AVPINFRA.NS",
+        "yahooTicker": "AVPINFRA-SM.NS",
         "screenerSymbol": "AVPINFRA",
         "bseCode": null
     },
@@ -24711,7 +24711,7 @@
         "company": "Signoria Creation Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RDE01010",
-        "yahooTicker": "SIGNORIA.NS",
+        "yahooTicker": "SIGNORIA-SM.NS",
         "screenerSymbol": "SIGNORIA",
         "bseCode": null
     },
@@ -24720,7 +24720,7 @@
         "company": "Pratham EPC Projects Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QA601016",
-        "yahooTicker": "PRATHAM.NS",
+        "yahooTicker": "PRATHAM-SM.NS",
         "screenerSymbol": "PRATHAM",
         "bseCode": null
     },
@@ -24729,7 +24729,7 @@
         "company": "Shree Karni Fabcom Limited",
         "exchange": "NSE-SME",
         "isin": "INE0S4Y01010",
-        "yahooTicker": "SHREEKARNI.NS",
+        "yahooTicker": "SHREEKARNI-SM.NS",
         "screenerSymbol": "SHREEKARNI",
         "bseCode": null
     },
@@ -24738,7 +24738,7 @@
         "company": "Sona Machinery Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q6H01012",
-        "yahooTicker": "SONAMAC.NS",
+        "yahooTicker": "SONAMAC-SM.NS",
         "screenerSymbol": "SONAMAC",
         "bseCode": null
     },
@@ -24747,7 +24747,7 @@
         "company": "V R Infraspace Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QQM01017",
-        "yahooTicker": "VR.NS",
+        "yahooTicker": "VR-SM.NS",
         "screenerSymbol": "VR",
         "bseCode": null
     },
@@ -24756,7 +24756,7 @@
         "company": "M.V.K. Agro Food Product Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SGC01015",
-        "yahooTicker": "MVKAGRO.NS",
+        "yahooTicker": "MVKAGRO-SM.NS",
         "screenerSymbol": "MVKAGRO",
         "bseCode": null
     },
@@ -24765,7 +24765,7 @@
         "company": "Purv Flexipack Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R6C01012",
-        "yahooTicker": "PURVFLEXI.NS",
+        "yahooTicker": "PURVFLEXI-SM.NS",
         "screenerSymbol": "PURVFLEXI",
         "bseCode": null
     },
@@ -24774,7 +24774,7 @@
         "company": "Owais Metal And Mineral Processing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R8M01017",
-        "yahooTicker": "OWAIS.NS",
+        "yahooTicker": "OWAIS-SM.NS",
         "screenerSymbol": "OWAIS",
         "bseCode": null
     },
@@ -24783,7 +24783,7 @@
         "company": "Sadhav Shipping Limited",
         "exchange": "NSE-SME",
         "isin": "INE0K5H01010",
-        "yahooTicker": "SADHAV.NS",
+        "yahooTicker": "SADHAV-SM.NS",
         "screenerSymbol": "SADHAV",
         "bseCode": null
     },
@@ -24792,7 +24792,7 @@
         "company": "Deem Roll Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE586O01011",
-        "yahooTicker": "DEEM.NS",
+        "yahooTicker": "DEEM-SM.NS",
         "screenerSymbol": "DEEM",
         "bseCode": null
     },
@@ -24801,7 +24801,7 @@
         "company": "Zenith Drugs Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QWN01013",
-        "yahooTicker": "ZENITHDRUG.NS",
+        "yahooTicker": "ZENITHDRUG-SM.NS",
         "screenerSymbol": "ZENITHDRUG",
         "bseCode": null
     },
@@ -24810,7 +24810,7 @@
         "company": "Atmastco Limited",
         "exchange": "NSE-SME",
         "isin": "INE05DH01017",
-        "yahooTicker": "ATMASTCO.NS",
+        "yahooTicker": "ATMASTCO-SM.NS",
         "screenerSymbol": "ATMASTCO",
         "bseCode": null
     },
@@ -24819,7 +24819,7 @@
         "company": "Thaai Casting Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QJL01014",
-        "yahooTicker": "TCL.NS",
+        "yahooTicker": "TCL-SM.NS",
         "screenerSymbol": "TCL",
         "bseCode": null
     },
@@ -24828,7 +24828,7 @@
         "company": "Esconet Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RQZ01017",
-        "yahooTicker": "ESCONET.NS",
+        "yahooTicker": "ESCONET-SM.NS",
         "screenerSymbol": "ESCONET",
         "bseCode": null
     },
@@ -24837,7 +24837,7 @@
         "company": "Interiors & More Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OPC01015",
-        "yahooTicker": "INM.NS",
+        "yahooTicker": "INM-SM.NS",
         "screenerSymbol": "INM",
         "bseCode": null
     },
@@ -24846,7 +24846,7 @@
         "company": "Wise Travel India Limited",
         "exchange": "NSE-SME",
         "isin": "INE623Y01011",
-        "yahooTicker": "WTICAB.NS",
+        "yahooTicker": "WTICAB-SM.NS",
         "screenerSymbol": "WTICAB",
         "bseCode": null
     },
@@ -24855,7 +24855,7 @@
         "company": "Polysil Irrigation Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE517M01028",
-        "yahooTicker": "POLYSIL.NS",
+        "yahooTicker": "POLYSIL-ST.NS",
         "screenerSymbol": "POLYSIL",
         "bseCode": null
     },
@@ -24864,7 +24864,7 @@
         "company": "Alpex Solar Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R4701017",
-        "yahooTicker": "ALPEXSOLAR.NS",
+        "yahooTicker": "ALPEXSOLAR-SM.NS",
         "screenerSymbol": "ALPEXSOLAR",
         "bseCode": null
     },
@@ -24873,7 +24873,7 @@
         "company": "Italian Edibles Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R7R01018",
-        "yahooTicker": "ITALIANE.NS",
+        "yahooTicker": "ITALIANE-ST.NS",
         "screenerSymbol": "ITALIANE",
         "bseCode": null
     },
@@ -24882,7 +24882,7 @@
         "company": "Baweja Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JFJ01011",
-        "yahooTicker": "BAWEJA.NS",
+        "yahooTicker": "BAWEJA-SM.NS",
         "screenerSymbol": "BAWEJA",
         "bseCode": null
     },
@@ -24891,7 +24891,7 @@
         "company": "Megatherm Induction Limited",
         "exchange": "NSE-SME",
         "isin": "INE531R01010",
-        "yahooTicker": "MEGATHERM.NS",
+        "yahooTicker": "MEGATHERM-SM.NS",
         "screenerSymbol": "MEGATHERM",
         "bseCode": null
     },
@@ -24900,7 +24900,7 @@
         "company": "Fonebox Retail Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q4701019",
-        "yahooTicker": "FONEBOX.NS",
+        "yahooTicker": "FONEBOX-SM.NS",
         "screenerSymbol": "FONEBOX",
         "bseCode": null
     },
@@ -24909,7 +24909,7 @@
         "company": "Docmode Health Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OGG01015",
-        "yahooTicker": "DHTL.NS",
+        "yahooTicker": "DHTL-SM.NS",
         "screenerSymbol": "DHTL",
         "bseCode": null
     },
@@ -24918,7 +24918,7 @@
         "company": "Delaplex Limited",
         "exchange": "NSE-SME",
         "isin": "INE0SK801018",
-        "yahooTicker": "DELAPLEX.NS",
+        "yahooTicker": "DELAPLEX-SM.NS",
         "screenerSymbol": "DELAPLEX",
         "bseCode": null
     },
@@ -24927,7 +24927,7 @@
         "company": "Konstelec Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QEI01011",
-        "yahooTicker": "KONSTELEC.NS",
+        "yahooTicker": "KONSTELEC-SM.NS",
         "screenerSymbol": "KONSTELEC",
         "bseCode": null
     },
@@ -24936,7 +24936,7 @@
         "company": "Addictive Learning Technology Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RDH01021",
-        "yahooTicker": "ADDICTIVE.NS",
+        "yahooTicker": "ADDICTIVE-SM.NS",
         "screenerSymbol": "ADDICTIVE",
         "bseCode": null
     },
@@ -24945,7 +24945,7 @@
         "company": "Maxposure Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ECC01022",
-        "yahooTicker": "MAXPOSURE.NS",
+        "yahooTicker": "MAXPOSURE-SM.NS",
         "screenerSymbol": "MAXPOSURE",
         "bseCode": null
     },
@@ -24954,7 +24954,7 @@
         "company": "Australian Premium Solar (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P0001010",
-        "yahooTicker": "APS.NS",
+        "yahooTicker": "APS-SM.NS",
         "screenerSymbol": "APS",
         "bseCode": null
     },
@@ -24963,7 +24963,7 @@
         "company": "IBL Finance Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7401018",
-        "yahooTicker": "IBLFL.NS",
+        "yahooTicker": "IBLFL-SM.NS",
         "screenerSymbol": "IBLFL",
         "bseCode": null
     },
@@ -24972,7 +24972,7 @@
         "company": "Kaushalya Logistics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q2V01012",
-        "yahooTicker": "KLL.NS",
+        "yahooTicker": "KLL-SM.NS",
         "screenerSymbol": "KLL",
         "bseCode": null
     },
@@ -24981,7 +24981,7 @@
         "company": "Kay Cee Energy & Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0RCG01017",
-        "yahooTicker": "KCEIL.NS",
+        "yahooTicker": "KCEIL-SM.NS",
         "screenerSymbol": "KCEIL",
         "bseCode": null
     },
@@ -24990,7 +24990,7 @@
         "company": "HRH Next Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R3501012",
-        "yahooTicker": "HRHNEXT.NS",
+        "yahooTicker": "HRHNEXT-SM.NS",
         "screenerSymbol": "HRHNEXT",
         "bseCode": null
     },
@@ -24999,7 +24999,7 @@
         "company": "Akanksha Power and Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PCY01014",
-        "yahooTicker": "AKANKSHA.NS",
+        "yahooTicker": "AKANKSHA-SM.NS",
         "screenerSymbol": "AKANKSHA",
         "bseCode": null
     },
@@ -25008,7 +25008,7 @@
         "company": "Sameera Agro And Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PZA01015",
-        "yahooTicker": "SAIFL.NS",
+        "yahooTicker": "SAIFL-SM.NS",
         "screenerSymbol": "SAIFL",
         "bseCode": null
     },
@@ -25017,7 +25017,7 @@
         "company": "Trident Techlabs Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QD201012",
-        "yahooTicker": "TECHLABS.NS",
+        "yahooTicker": "TECHLABS-SM.NS",
         "screenerSymbol": "TECHLABS",
         "bseCode": null
     },
@@ -25026,7 +25026,7 @@
         "company": "Indifra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PS301014",
-        "yahooTicker": "INDIFRA.NS",
+        "yahooTicker": "INDIFRA-SM.NS",
         "screenerSymbol": "INDIFRA",
         "bseCode": null
     },
@@ -25035,7 +25035,7 @@
         "company": "Supreme Power Equipment Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QHG01026",
-        "yahooTicker": "SUPREMEPWR.NS",
+        "yahooTicker": "SUPREMEPWR-SM.NS",
         "screenerSymbol": "SUPREMEPWR",
         "bseCode": null
     },
@@ -25044,7 +25044,7 @@
         "company": "Electro Force (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q1W01012",
-        "yahooTicker": "EFORCE.NS",
+        "yahooTicker": "EFORCE-SM.NS",
         "screenerSymbol": "EFORCE",
         "bseCode": null
     },
@@ -25053,7 +25053,7 @@
         "company": "Shree OSFM E-Mobility Limited",
         "exchange": "NSE-SME",
         "isin": "INE02S501018",
-        "yahooTicker": "SHREEOSFM.NS",
+        "yahooTicker": "SHREEOSFM-SM.NS",
         "screenerSymbol": "SHREEOSFM",
         "bseCode": null
     },
@@ -25062,7 +25062,7 @@
         "company": "S J Logistics (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0F3301020",
-        "yahooTicker": "SJLOGISTIC.NS",
+        "yahooTicker": "SJLOGISTIC-SM.NS",
         "screenerSymbol": "SJLOGISTIC",
         "bseCode": null
     },
@@ -25071,7 +25071,7 @@
         "company": "Presstonic Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0R1601012",
-        "yahooTicker": "PRESSTONIC.NS",
+        "yahooTicker": "PRESSTONIC-ST.NS",
         "screenerSymbol": "PRESSTONIC",
         "bseCode": null
     },
@@ -25080,7 +25080,7 @@
         "company": "Accent Microcell Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q5D01013",
-        "yahooTicker": "ACCENTMIC.NS",
+        "yahooTicker": "ACCENTMIC-SM.NS",
         "screenerSymbol": "ACCENTMIC",
         "bseCode": null
     },
@@ -25089,7 +25089,7 @@
         "company": "Graphisads Limited",
         "exchange": "NSE-SME",
         "isin": "INE0POU01017",
-        "yahooTicker": "GRAPHISAD.NS",
+        "yahooTicker": "GRAPHISAD-ST.NS",
         "screenerSymbol": "GRAPHISAD",
         "bseCode": null
     },
@@ -25098,7 +25098,7 @@
         "company": "Sheetal Universal Limited",
         "exchange": "NSE-SME",
         "isin": "INE04VX01019",
-        "yahooTicker": "SHEETAL.NS",
+        "yahooTicker": "SHEETAL-ST.NS",
         "screenerSymbol": "SHEETAL",
         "bseCode": null
     },
@@ -25107,7 +25107,7 @@
         "company": "Marinetrans India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P1P01017",
-        "yahooTicker": "MARINETRAN.NS",
+        "yahooTicker": "MARINETRAN-SM.NS",
         "screenerSymbol": "MARINETRAN",
         "bseCode": null
     },
@@ -25116,7 +25116,7 @@
         "company": "Net Avenue Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE518X01015",
-        "yahooTicker": "CBAZAAR.NS",
+        "yahooTicker": "CBAZAAR-SM.NS",
         "screenerSymbol": "CBAZAAR",
         "bseCode": null
     },
@@ -25125,7 +25125,7 @@
         "company": "Rockingdeals Circular Economy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PTR01012",
-        "yahooTicker": "ROCKINGDCE.NS",
+        "yahooTicker": "ROCKINGDCE-SM.NS",
         "screenerSymbol": "ROCKINGDCE",
         "bseCode": null
     },
@@ -25134,7 +25134,7 @@
         "company": "Sunrest Lifescience Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PLZ01012",
-        "yahooTicker": "SUNREST.NS",
+        "yahooTicker": "SUNREST-SM.NS",
         "screenerSymbol": "SUNREST",
         "bseCode": null
     },
@@ -25143,7 +25143,7 @@
         "company": "Rox Hi Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PDJ01013",
-        "yahooTicker": "ROXHITECH.NS",
+        "yahooTicker": "ROXHITECH-SM.NS",
         "screenerSymbol": "ROXHITECH",
         "bseCode": null
     },
@@ -25152,7 +25152,7 @@
         "company": "Baba Food Processing (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QW501012",
-        "yahooTicker": "BABAFP.NS",
+        "yahooTicker": "BABAFP-SM.NS",
         "screenerSymbol": "BABAFP",
         "bseCode": null
     },
@@ -25161,7 +25161,7 @@
         "company": "Micropro Software Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PZK01014",
-        "yahooTicker": "MICROPRO.NS",
+        "yahooTicker": "MICROPRO-SM.NS",
         "screenerSymbol": "MICROPRO",
         "bseCode": null
     },
@@ -25170,7 +25170,7 @@
         "company": "Sar Televenture Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PUC01020",
-        "yahooTicker": "SARTELE.NS",
+        "yahooTicker": "SARTELE-SM.NS",
         "screenerSymbol": "SARTELE",
         "bseCode": null
     },
@@ -25179,7 +25179,7 @@
         "company": "Maitreya Medicare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PLQ01011",
-        "yahooTicker": "MAITREYA.NS",
+        "yahooTicker": "MAITREYA-SM.NS",
         "screenerSymbol": "MAITREYA",
         "bseCode": null
     },
@@ -25188,7 +25188,7 @@
         "company": "Transteel Seating Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NVI01020",
-        "yahooTicker": "TRANSTEEL.NS",
+        "yahooTicker": "TRANSTEEL-SM.NS",
         "screenerSymbol": "TRANSTEEL",
         "bseCode": null
     },
@@ -25197,7 +25197,7 @@
         "company": "Shanthala FMCG Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q9Q01017",
-        "yahooTicker": "SHANTHALA.NS",
+        "yahooTicker": "SHANTHALA-SM.NS",
         "screenerSymbol": "SHANTHALA",
         "bseCode": null
     },
@@ -25206,7 +25206,7 @@
         "company": "Paragon Fine and Speciality Chemical Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N4G01012",
-        "yahooTicker": "PARAGON.NS",
+        "yahooTicker": "PARAGON-SM.NS",
         "screenerSymbol": "PARAGON",
         "bseCode": null
     },
@@ -25215,7 +25215,7 @@
         "company": "On Door Concepts Limited",
         "exchange": "NSE-SME",
         "isin": "INE00ER01015",
-        "yahooTicker": "ONDOOR.NS",
+        "yahooTicker": "ONDOOR-SM.NS",
         "screenerSymbol": "ONDOOR",
         "bseCode": null
     },
@@ -25224,7 +25224,7 @@
         "company": "Rajgor Castor Derivatives Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BZQ01011",
-        "yahooTicker": "RCDL.NS",
+        "yahooTicker": "RCDL-SM.NS",
         "screenerSymbol": "RCDL",
         "bseCode": null
     },
@@ -25233,7 +25233,7 @@
         "company": "Womancart Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q9601016",
-        "yahooTicker": "WOMANCART.NS",
+        "yahooTicker": "WOMANCART-SM.NS",
         "screenerSymbol": "WOMANCART",
         "bseCode": null
     },
@@ -25242,7 +25242,7 @@
         "company": "ARVIND PORT AND INFRA LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0P4T01013",
-        "yahooTicker": "ARVINDPORT.NS",
+        "yahooTicker": "ARVINDPORT-SM.NS",
         "screenerSymbol": "ARVINDPORT",
         "bseCode": null
     },
@@ -25251,7 +25251,7 @@
         "company": "Committed Cargo Care Limited",
         "exchange": "NSE-SME",
         "isin": "INE597Z01014",
-        "yahooTicker": "COMMITTED.NS",
+        "yahooTicker": "COMMITTED-SM.NS",
         "screenerSymbol": "COMMITTED",
         "bseCode": null
     },
@@ -25260,7 +25260,7 @@
         "company": "Plada Infotech Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PXD01014",
-        "yahooTicker": "PLADAINFO.NS",
+        "yahooTicker": "PLADAINFO-SM.NS",
         "screenerSymbol": "PLADAINFO",
         "bseCode": null
     },
@@ -25269,7 +25269,7 @@
         "company": "Karnika Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MGA01012",
-        "yahooTicker": "KARNIKA.NS",
+        "yahooTicker": "KARNIKA-SM.NS",
         "screenerSymbol": "KARNIKA",
         "bseCode": null
     },
@@ -25278,7 +25278,7 @@
         "company": "Sharp Chucks and Machines Limited",
         "exchange": "NSE-SME",
         "isin": "INE460Q01014",
-        "yahooTicker": "SCML.NS",
+        "yahooTicker": "SCML-SM.NS",
         "screenerSymbol": "SCML",
         "bseCode": null
     },
@@ -25287,7 +25287,7 @@
         "company": "Canarys Automations Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QG301017",
-        "yahooTicker": "CANARYS.NS",
+        "yahooTicker": "CANARYS-SM.NS",
         "screenerSymbol": "CANARYS",
         "bseCode": null
     },
@@ -25296,7 +25296,7 @@
         "company": "Oneclick Logistics India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OPS01011",
-        "yahooTicker": "OLIL.NS",
+        "yahooTicker": "OLIL-SM.NS",
         "screenerSymbol": "OLIL",
         "bseCode": null
     },
@@ -25305,7 +25305,7 @@
         "company": "Goyal Salt Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QFE01017",
-        "yahooTicker": "GOYALSALT.NS",
+        "yahooTicker": "GOYALSALT-SM.NS",
         "screenerSymbol": "GOYALSALT",
         "bseCode": null
     },
@@ -25314,7 +25314,7 @@
         "company": "Vishnusurya Projects and Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PQ001012",
-        "yahooTicker": "VISHNUINFR.NS",
+        "yahooTicker": "VISHNUINFR-SM.NS",
         "screenerSymbol": "VISHNUINFR",
         "bseCode": null
     },
@@ -25323,7 +25323,7 @@
         "company": "Kontor Space Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KZ301010",
-        "yahooTicker": "KONTOR.NS",
+        "yahooTicker": "KONTOR-SM.NS",
         "screenerSymbol": "KONTOR",
         "bseCode": null
     },
@@ -25332,7 +25332,7 @@
         "company": "E Factor Experiences Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KFF01017",
-        "yahooTicker": "EFACTOR.NS",
+        "yahooTicker": "EFACTOR-SM.NS",
         "screenerSymbol": "EFACTOR",
         "bseCode": null
     },
@@ -25341,7 +25341,7 @@
         "company": "Arabian Petroleum Limited",
         "exchange": "NSE-SME",
         "isin": "INE08NJ01024",
-        "yahooTicker": "ARABIAN.NS",
+        "yahooTicker": "ARABIAN-SM.NS",
         "screenerSymbol": "ARABIAN",
         "bseCode": null
     },
@@ -25350,7 +25350,7 @@
         "company": "Vinyas Innovative Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OLS01010",
-        "yahooTicker": "VINYAS.NS",
+        "yahooTicker": "VINYAS-SM.NS",
         "screenerSymbol": "VINYAS",
         "bseCode": null
     },
@@ -25359,7 +25359,7 @@
         "company": "Newjaisa Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PW501021",
-        "yahooTicker": "NEWJAISA.NS",
+        "yahooTicker": "NEWJAISA-SM.NS",
         "screenerSymbol": "NEWJAISA",
         "bseCode": null
     },
@@ -25368,7 +25368,7 @@
         "company": "Inspire Films Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NDX01019",
-        "yahooTicker": "INSPIRE.NS",
+        "yahooTicker": "INSPIRE-SM.NS",
         "screenerSymbol": "INSPIRE",
         "bseCode": null
     },
@@ -25377,7 +25377,7 @@
         "company": "Digikore Studios Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QJ901011",
-        "yahooTicker": "DIGIKORE.NS",
+        "yahooTicker": "DIGIKORE-SM.NS",
         "screenerSymbol": "DIGIKORE",
         "bseCode": null
     },
@@ -25386,7 +25386,7 @@
         "company": "Mangalam Alloys Limited",
         "exchange": "NSE-SME",
         "isin": "INE00C401011",
-        "yahooTicker": "MAL.NS",
+        "yahooTicker": "MAL-SM.NS",
         "screenerSymbol": "MAL",
         "bseCode": null
     },
@@ -25395,7 +25395,7 @@
         "company": "Saakshi Medtech and Panels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PSK01027",
-        "yahooTicker": "SAAKSHI.NS",
+        "yahooTicker": "SAAKSHI-SM.NS",
         "screenerSymbol": "SAAKSHI",
         "bseCode": null
     },
@@ -25404,7 +25404,7 @@
         "company": "Master Components Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OJM01017",
-        "yahooTicker": "MASTER.NS",
+        "yahooTicker": "MASTER-SM.NS",
         "screenerSymbol": "MASTER",
         "bseCode": null
     },
@@ -25413,7 +25413,7 @@
         "company": "Hi-Green Carbon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PIC01017",
-        "yahooTicker": "HIGREEN.NS",
+        "yahooTicker": "HIGREEN-SM.NS",
         "screenerSymbol": "HIGREEN",
         "bseCode": null
     },
@@ -25422,7 +25422,7 @@
         "company": "Cellecor Gadgets Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OMO01025",
-        "yahooTicker": "CELLECOR.NS",
+        "yahooTicker": "CELLECOR-SM.NS",
         "screenerSymbol": "CELLECOR",
         "bseCode": null
     },
@@ -25431,7 +25431,7 @@
         "company": "Marco Cables & Conductors Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QP001012",
-        "yahooTicker": "MARCO.NS",
+        "yahooTicker": "MARCO-SM.NS",
         "screenerSymbol": "MARCO",
         "bseCode": null
     },
@@ -25440,7 +25440,7 @@
         "company": "Kody Technolab Limited",
         "exchange": "NSE-SME",
         "isin": "INE0Q7P01013",
-        "yahooTicker": "KODYTECH.NS",
+        "yahooTicker": "KODYTECH-ST.NS",
         "screenerSymbol": "KODYTECH",
         "bseCode": null
     },
@@ -25449,7 +25449,7 @@
         "company": "Kundan Edifice Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OWX01025",
-        "yahooTicker": "KEL.NS",
+        "yahooTicker": "KEL-SM.NS",
         "screenerSymbol": "KEL",
         "bseCode": null
     },
@@ -25458,7 +25458,7 @@
         "company": "Madhusudan Masala Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P6701019",
-        "yahooTicker": "MADHUSUDAN.NS",
+        "yahooTicker": "MADHUSUDAN-SM.NS",
         "screenerSymbol": "MADHUSUDAN",
         "bseCode": null
     },
@@ -25467,7 +25467,7 @@
         "company": "Chavda Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PT101017",
-        "yahooTicker": "CHAVDA.NS",
+        "yahooTicker": "CHAVDA-SM.NS",
         "screenerSymbol": "CHAVDA",
         "bseCode": null
     },
@@ -25476,7 +25476,7 @@
         "company": "Holmarc Opto-Mechatronics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LXA01019",
-        "yahooTicker": "HOLMARC.NS",
+        "yahooTicker": "HOLMARC-SM.NS",
         "screenerSymbol": "HOLMARC",
         "bseCode": null
     },
@@ -25485,7 +25485,7 @@
         "company": "Unihealth Hospitals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PRF01011",
-        "yahooTicker": "UNIHEALTH.NS",
+        "yahooTicker": "UNIHEALTH-ST.NS",
         "screenerSymbol": "UNIHEALTH",
         "bseCode": null
     },
@@ -25494,7 +25494,7 @@
         "company": "Jiwanram Sheoduttrai Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N5H01017",
-        "yahooTicker": "JIWANRAM.NS",
+        "yahooTicker": "JIWANRAM-SM.NS",
         "screenerSymbol": "JIWANRAM",
         "bseCode": null
     },
@@ -25503,7 +25503,7 @@
         "company": "Saroja Pharma Industries India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PCL01011",
-        "yahooTicker": "SAROJA.NS",
+        "yahooTicker": "SAROJA-SM.NS",
         "screenerSymbol": "SAROJA",
         "bseCode": null
     },
@@ -25512,7 +25512,7 @@
         "company": "Pramara Promotions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7A01017",
-        "yahooTicker": "PRAMARA.NS",
+        "yahooTicker": "PRAMARA-SM.NS",
         "screenerSymbol": "PRAMARA",
         "bseCode": null
     },
@@ -25521,7 +25521,7 @@
         "company": "Basilic Fly Studio Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OCC01013",
-        "yahooTicker": "BASILIC.NS",
+        "yahooTicker": "BASILIC-SM.NS",
         "screenerSymbol": "BASILIC",
         "bseCode": null
     },
@@ -25530,7 +25530,7 @@
         "company": "Mono Pharmacare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OIP01012",
-        "yahooTicker": "MONOPHARMA.NS",
+        "yahooTicker": "MONOPHARMA-SM.NS",
         "screenerSymbol": "MONOPHARMA",
         "bseCode": null
     },
@@ -25539,7 +25539,7 @@
         "company": "C P S Shapers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0QBU01012",
-        "yahooTicker": "CPS.NS",
+        "yahooTicker": "CPS-SM.NS",
         "screenerSymbol": "CPS",
         "bseCode": null
     },
@@ -25548,7 +25548,7 @@
         "company": "Sungarner Energies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O3O01017",
-        "yahooTicker": "SEL.NS",
+        "yahooTicker": "SEL-SM.NS",
         "screenerSymbol": "SEL",
         "bseCode": null
     },
@@ -25557,7 +25557,7 @@
         "company": "Crop Life Science Limited",
         "exchange": "NSE-SME",
         "isin": "INE00NH01017",
-        "yahooTicker": "CLSL.NS",
+        "yahooTicker": "CLSL-SM.NS",
         "screenerSymbol": "CLSL",
         "bseCode": null
     },
@@ -25566,7 +25566,7 @@
         "company": "Srivari Spices And Foods Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ON201012",
-        "yahooTicker": "SSFL.NS",
+        "yahooTicker": "SSFL-SM.NS",
         "screenerSymbol": "SSFL",
         "bseCode": null
     },
@@ -25575,7 +25575,7 @@
         "company": "Yudiz Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE09FA01019",
-        "yahooTicker": "YUDIZ.NS",
+        "yahooTicker": "YUDIZ-ST.NS",
         "screenerSymbol": "YUDIZ",
         "bseCode": null
     },
@@ -25584,7 +25584,7 @@
         "company": "Sangani Hospitals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OVI01010",
-        "yahooTicker": "SANGANI.NS",
+        "yahooTicker": "SANGANI-SM.NS",
         "screenerSymbol": "SANGANI",
         "bseCode": null
     },
@@ -25593,7 +25593,7 @@
         "company": "Oriana Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OUT01019",
-        "yahooTicker": "ORIANA.NS",
+        "yahooTicker": "ORIANA-SM.NS",
         "screenerSymbol": "ORIANA",
         "bseCode": null
     },
@@ -25602,7 +25602,7 @@
         "company": "Vinsys IT Services India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OSJ01014",
-        "yahooTicker": "VINSYS.NS",
+        "yahooTicker": "VINSYS-SM.NS",
         "screenerSymbol": "VINSYS",
         "bseCode": null
     },
@@ -25611,7 +25611,7 @@
         "company": "Zeal Global Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PPS01018",
-        "yahooTicker": "ZEAL.NS",
+        "yahooTicker": "ZEAL-SM.NS",
         "screenerSymbol": "ZEAL",
         "bseCode": null
     },
@@ -25620,7 +25620,7 @@
         "company": "Shri Techtex Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OMF01015",
-        "yahooTicker": "SHRITECH.NS",
+        "yahooTicker": "SHRITECH-SM.NS",
         "screenerSymbol": "SHRITECH",
         "bseCode": null
     },
@@ -25629,7 +25629,7 @@
         "company": "Yasons Chemex Care Limited",
         "exchange": "NSE-SME",
         "isin": "INE08S201019",
-        "yahooTicker": "YCCL.NS",
+        "yahooTicker": "YCCL-SM.NS",
         "screenerSymbol": "YCCL",
         "bseCode": null
     },
@@ -25638,7 +25638,7 @@
         "company": "Service Care Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P1Q01015",
-        "yahooTicker": "SERVICE.NS",
+        "yahooTicker": "SERVICE-ST.NS",
         "screenerSymbol": "SERVICE",
         "bseCode": null
     },
@@ -25647,7 +25647,7 @@
         "company": "Drone Destination Limited",
         "exchange": "NSE-SME",
         "isin": "INE0P7201019",
-        "yahooTicker": "DRONE.NS",
+        "yahooTicker": "DRONE-SM.NS",
         "screenerSymbol": "DRONE",
         "bseCode": null
     },
@@ -25656,7 +25656,7 @@
         "company": "Synoptics Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0BTR01012",
-        "yahooTicker": "SYNOPTICS.NS",
+        "yahooTicker": "SYNOPTICS-SM.NS",
         "screenerSymbol": "SYNOPTICS",
         "bseCode": null
     },
@@ -25665,7 +25665,7 @@
         "company": "Tridhya Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LWY01029",
-        "yahooTicker": "TRIDHYA.NS",
+        "yahooTicker": "TRIDHYA-SM.NS",
         "screenerSymbol": "TRIDHYA",
         "bseCode": null
     },
@@ -25674,7 +25674,7 @@
         "company": "Global Pet Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0PS501019",
-        "yahooTicker": "GLOBALPET.NS",
+        "yahooTicker": "GLOBALPET-SM.NS",
         "screenerSymbol": "GLOBALPET",
         "bseCode": null
     },
@@ -25683,7 +25683,7 @@
         "company": "Pentagon Rubber Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ORS01017",
-        "yahooTicker": "PENTAGON.NS",
+        "yahooTicker": "PENTAGON-SM.NS",
         "screenerSymbol": "PENTAGON",
         "bseCode": null
     },
@@ -25692,7 +25692,7 @@
         "company": "Magson Retail And Distribution Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O1S01012",
-        "yahooTicker": "MAGSON.NS",
+        "yahooTicker": "MAGSON-SM.NS",
         "screenerSymbol": "MAGSON",
         "bseCode": null
     },
@@ -25701,7 +25701,7 @@
         "company": "Essen Speciality Films Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ITO01014",
-        "yahooTicker": "ESFL.NS",
+        "yahooTicker": "ESFL-SM.NS",
         "screenerSymbol": "ESFL",
         "bseCode": null
     },
@@ -25710,7 +25710,7 @@
         "company": "Greenchef Appliances Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7P01015",
-        "yahooTicker": "GREENCHEF.NS",
+        "yahooTicker": "GREENCHEF-SM.NS",
         "screenerSymbol": "GREENCHEF",
         "bseCode": null
     },
@@ -25719,7 +25719,7 @@
         "company": "Aatmaj Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OB201016",
-        "yahooTicker": "AATMAJ.NS",
+        "yahooTicker": "AATMAJ-SM.NS",
         "screenerSymbol": "AATMAJ",
         "bseCode": null
     },
@@ -25728,7 +25728,7 @@
         "company": "Vilin Bio Med Limited",
         "exchange": "NSE-SME",
         "isin": "INE0L4V01013",
-        "yahooTicker": "VILINBIO.NS",
+        "yahooTicker": "VILINBIO-ST.NS",
         "screenerSymbol": "VILINBIO",
         "bseCode": null
     },
@@ -25737,7 +25737,7 @@
         "company": "Cell Point (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O0001013",
-        "yahooTicker": "CELLPOINT.NS",
+        "yahooTicker": "CELLPOINT-SM.NS",
         "screenerSymbol": "CELLPOINT",
         "bseCode": null
     },
@@ -25746,7 +25746,7 @@
         "company": "Urban Enviro Waste Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O0201019",
-        "yahooTicker": "URBAN.NS",
+        "yahooTicker": "URBAN-SM.NS",
         "screenerSymbol": "URBAN",
         "bseCode": null
     },
@@ -25755,7 +25755,7 @@
         "company": "Spectrum Talent Management Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OL001018",
-        "yahooTicker": "SPECTSTM.NS",
+        "yahooTicker": "SPECTSTM-SM.NS",
         "screenerSymbol": "SPECTSTM",
         "bseCode": null
     },
@@ -25764,7 +25764,7 @@
         "company": "Kore Digital Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O4R01018",
-        "yahooTicker": "KDL.NS",
+        "yahooTicker": "KDL-ST.NS",
         "screenerSymbol": "KDL",
         "bseCode": null
     },
@@ -25773,7 +25773,7 @@
         "company": "Sahana System Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LEX01011",
-        "yahooTicker": "SAHANA.NS",
+        "yahooTicker": "SAHANA-SM.NS",
         "screenerSymbol": "SAHANA",
         "bseCode": null
     },
@@ -25782,7 +25782,7 @@
         "company": "Infollion Research Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NNZ01013",
-        "yahooTicker": "INFOLLION.NS",
+        "yahooTicker": "INFOLLION-SM.NS",
         "screenerSymbol": "INFOLLION",
         "bseCode": null
     },
@@ -25791,7 +25791,7 @@
         "company": "Proventus Agrocom Limited",
         "exchange": "NSE-SME",
         "isin": "INE0ONE01016",
-        "yahooTicker": "PROV.NS",
+        "yahooTicker": "PROV-SM.NS",
         "screenerSymbol": "PROV",
         "bseCode": null
     },
@@ -25800,7 +25800,7 @@
         "company": "Crayons Advertising Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OFK01019",
-        "yahooTicker": "CRAYONS.NS",
+        "yahooTicker": "CRAYONS-SM.NS",
         "screenerSymbol": "CRAYONS",
         "bseCode": null
     },
@@ -25809,7 +25809,7 @@
         "company": "Vasa Denticity Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N5801013",
-        "yahooTicker": "DENTALKART.NS",
+        "yahooTicker": "DENTALKART-SM.NS",
         "screenerSymbol": "DENTALKART",
         "bseCode": null
     },
@@ -25818,7 +25818,7 @@
         "company": "Remus Pharmaceuticals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O5T01011",
-        "yahooTicker": "REMUS.NS",
+        "yahooTicker": "REMUS-SM.NS",
         "screenerSymbol": "REMUS",
         "bseCode": null
     },
@@ -25827,7 +25827,7 @@
         "company": "Krishca Strapping Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NR701018",
-        "yahooTicker": "KRISHCA.NS",
+        "yahooTicker": "KRISHCA-SM.NS",
         "screenerSymbol": "KRISHCA",
         "bseCode": null
     },
@@ -25836,7 +25836,7 @@
         "company": "Auro Impex  & Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NUL01018",
-        "yahooTicker": "AUROIMPEX.NS",
+        "yahooTicker": "AUROIMPEX-SM.NS",
         "screenerSymbol": "AUROIMPEX",
         "bseCode": null
     },
@@ -25845,7 +25845,7 @@
         "company": "De Neers Tools Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JWV01011",
-        "yahooTicker": "DENEERS.NS",
+        "yahooTicker": "DENEERS-ST.NS",
         "screenerSymbol": "DENEERS",
         "bseCode": null
     },
@@ -25854,7 +25854,7 @@
         "company": "Quicktouch Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0K4D01020",
-        "yahooTicker": "QUICKTOUCH.NS",
+        "yahooTicker": "QUICKTOUCH-SM.NS",
         "screenerSymbol": "QUICKTOUCH",
         "bseCode": null
     },
@@ -25863,7 +25863,7 @@
         "company": "A G Universal Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O6N01012",
-        "yahooTicker": "AGUL.NS",
+        "yahooTicker": "AGUL-SM.NS",
         "screenerSymbol": "AGUL",
         "bseCode": null
     },
@@ -25872,7 +25872,7 @@
         "company": "Pattech Fitwell Tube Components Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NZW01014",
-        "yahooTicker": "PATTECH.NS",
+        "yahooTicker": "PATTECH-SM.NS",
         "screenerSymbol": "PATTECH",
         "bseCode": null
     },
@@ -25881,7 +25881,7 @@
         "company": "Mos Utility Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N7S01028",
-        "yahooTicker": "MOS.NS",
+        "yahooTicker": "MOS-SM.NS",
         "screenerSymbol": "MOS",
         "bseCode": null
     },
@@ -25890,7 +25890,7 @@
         "company": "Infinium Pharmachem Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MRE01011",
-        "yahooTicker": "INFINIUM.NS",
+        "yahooTicker": "INFINIUM-SM.NS",
         "screenerSymbol": "INFINIUM",
         "bseCode": null
     },
@@ -25899,7 +25899,7 @@
         "company": "Sotac Pharmaceuticals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O2D01012",
-        "yahooTicker": "SOTAC.NS",
+        "yahooTicker": "SOTAC-SM.NS",
         "screenerSymbol": "SOTAC",
         "bseCode": null
     },
@@ -25908,7 +25908,7 @@
         "company": "Nirman Agri Genetics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0OK701014",
-        "yahooTicker": "NIRMAN.NS",
+        "yahooTicker": "NIRMAN-ST.NS",
         "screenerSymbol": "NIRMAN",
         "bseCode": null
     },
@@ -25917,7 +25917,7 @@
         "company": "Quality Foils (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O1M01015",
-        "yahooTicker": "QFIL.NS",
+        "yahooTicker": "QFIL-SM.NS",
         "screenerSymbol": "QFIL",
         "bseCode": null
     },
@@ -25926,7 +25926,7 @@
         "company": "Vels Film International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0I3H01019",
-        "yahooTicker": "VELS.NS",
+        "yahooTicker": "VELS-SM.NS",
         "screenerSymbol": "VELS",
         "bseCode": null
     },
@@ -25935,7 +25935,7 @@
         "company": "Mcon Rasayan India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O4M01019",
-        "yahooTicker": "MCON.NS",
+        "yahooTicker": "MCON-SM.NS",
         "screenerSymbol": "MCON",
         "bseCode": null
     },
@@ -25944,7 +25944,7 @@
         "company": "Systango Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0O7R01011",
-        "yahooTicker": "SYSTANGO.NS",
+        "yahooTicker": "SYSTANGO-SM.NS",
         "screenerSymbol": "SYSTANGO",
         "bseCode": null
     },
@@ -25953,7 +25953,7 @@
         "company": "Vertexplus Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NLB01018",
-        "yahooTicker": "VERTEXPLUS.NS",
+        "yahooTicker": "VERTEXPLUS-SM.NS",
         "screenerSymbol": "VERTEXPLUS",
         "bseCode": null
     },
@@ -25962,7 +25962,7 @@
         "company": "Srivasavi Adhesive Tapes Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NPI01014",
-        "yahooTicker": "SRIVASAVI.NS",
+        "yahooTicker": "SRIVASAVI-SM.NS",
         "screenerSymbol": "SRIVASAVI",
         "bseCode": null
     },
@@ -25971,7 +25971,7 @@
         "company": "Viaz Tyres Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MO401019",
-        "yahooTicker": "VIAZ.NS",
+        "yahooTicker": "VIAZ-SM.NS",
         "screenerSymbol": "VIAZ",
         "bseCode": null
     },
@@ -25980,7 +25980,7 @@
         "company": "Agarwal Float Glass India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MLA01012",
-        "yahooTicker": "AGARWALFT.NS",
+        "yahooTicker": "AGARWALFT-SM.NS",
         "screenerSymbol": "AGARWALFT",
         "bseCode": null
     },
@@ -25989,7 +25989,7 @@
         "company": "Lead Reclaim And Rubber Products Limited",
         "exchange": "NSE-SME",
         "isin": "INE0H4B01011",
-        "yahooTicker": "LRRPL.NS",
+        "yahooTicker": "LRRPL-SM.NS",
         "screenerSymbol": "LRRPL",
         "bseCode": null
     },
@@ -25998,7 +25998,7 @@
         "company": "Shera Energy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MM001019",
-        "yahooTicker": "SHERA.NS",
+        "yahooTicker": "SHERA-SM.NS",
         "screenerSymbol": "SHERA",
         "bseCode": null
     },
@@ -26007,7 +26007,7 @@
         "company": "Gayatri Rubbers And Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LVM01018",
-        "yahooTicker": "GRCL.NS",
+        "yahooTicker": "GRCL-SM.NS",
         "screenerSymbol": "GRCL",
         "bseCode": null
     },
@@ -26016,7 +26016,7 @@
         "company": "Aristo Bio-Tech And Lifescience Limited",
         "exchange": "NSE-SME",
         "isin": "INE082101010",
-        "yahooTicker": "ARISTO.NS",
+        "yahooTicker": "ARISTO-SM.NS",
         "screenerSymbol": "ARISTO",
         "bseCode": null
     },
@@ -26025,7 +26025,7 @@
         "company": "Ducol Organics And Colours Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LZO01015",
-        "yahooTicker": "DUCOL.NS",
+        "yahooTicker": "DUCOL-SM.NS",
         "screenerSymbol": "DUCOL",
         "bseCode": null
     },
@@ -26034,7 +26034,7 @@
         "company": "Chaman Metallics Limited",
         "exchange": "NSE-SME",
         "isin": "INE06PV01010",
-        "yahooTicker": "CMNL.NS",
+        "yahooTicker": "CMNL-SM.NS",
         "screenerSymbol": "CMNL",
         "bseCode": null
     },
@@ -26043,7 +26043,7 @@
         "company": "Anlon Technology Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LR101013",
-        "yahooTicker": "ANLON.NS",
+        "yahooTicker": "ANLON-SM.NS",
         "screenerSymbol": "ANLON",
         "bseCode": null
     },
@@ -26052,7 +26052,7 @@
         "company": "Rbm Infracon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NA301016",
-        "yahooTicker": "RBMINFRA.NS",
+        "yahooTicker": "RBMINFRA-SM.NS",
         "screenerSymbol": "RBMINFRA",
         "bseCode": null
     },
@@ -26061,7 +26061,7 @@
         "company": "Homesfy Realty Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N7F01017",
-        "yahooTicker": "HOMESFY.NS",
+        "yahooTicker": "HOMESFY-SM.NS",
         "screenerSymbol": "HOMESFY",
         "bseCode": null
     },
@@ -26070,7 +26070,7 @@
         "company": "Moxsh Overseas Educon Limited",
         "exchange": "NSE-SME",
         "isin": "INE0N6D01014",
-        "yahooTicker": "MOXSH.NS",
+        "yahooTicker": "MOXSH-ST.NS",
         "screenerSymbol": "MOXSH",
         "bseCode": null
     },
@@ -26079,7 +26079,7 @@
         "company": "Uma Converter Limited",
         "exchange": "NSE-SME",
         "isin": "INE067901012",
-        "yahooTicker": "UMA.NS",
+        "yahooTicker": "UMA-SM.NS",
         "screenerSymbol": "UMA",
         "bseCode": null
     },
@@ -26088,7 +26088,7 @@
         "company": "Arihant Academy Limited",
         "exchange": "NSE-SME",
         "isin": "INE0NCC01015",
-        "yahooTicker": "ARIHANTACA.NS",
+        "yahooTicker": "ARIHANTACA-SM.NS",
         "screenerSymbol": "ARIHANTACA",
         "bseCode": null
     },
@@ -26097,7 +26097,7 @@
         "company": "Dollex Agrotech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JHH01011",
-        "yahooTicker": "DOLLEX.NS",
+        "yahooTicker": "DOLLEX-SM.NS",
         "screenerSymbol": "DOLLEX",
         "bseCode": null
     },
@@ -26106,7 +26106,7 @@
         "company": "All E Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M2X01012",
-        "yahooTicker": "ALLETEC.NS",
+        "yahooTicker": "ALLETEC-SM.NS",
         "screenerSymbol": "ALLETEC",
         "bseCode": null
     },
@@ -26115,7 +26115,7 @@
         "company": "Arham Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0L2Y01011",
-        "yahooTicker": "ARHAM.NS",
+        "yahooTicker": "ARHAM-SM.NS",
         "screenerSymbol": "ARHAM",
         "bseCode": null
     },
@@ -26124,7 +26124,7 @@
         "company": "Baheti Recycling Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE029Q01017",
-        "yahooTicker": "BAHETI.NS",
+        "yahooTicker": "BAHETI-SM.NS",
         "screenerSymbol": "BAHETI",
         "bseCode": null
     },
@@ -26133,7 +26133,7 @@
         "company": "Pritika Engineering Components Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MJQ01020",
-        "yahooTicker": "PRITIKA.NS",
+        "yahooTicker": "PRITIKA-SM.NS",
         "screenerSymbol": "PRITIKA",
         "bseCode": null
     },
@@ -26142,7 +26142,7 @@
         "company": "Amiable Logistics (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MTP01013",
-        "yahooTicker": "AMIABLE.NS",
+        "yahooTicker": "AMIABLE-ST.NS",
         "screenerSymbol": "AMIABLE",
         "bseCode": null
     },
@@ -26151,7 +26151,7 @@
         "company": "Rite Zone Chemcon India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MRA01019",
-        "yahooTicker": "RITEZONE.NS",
+        "yahooTicker": "RITEZONE-SM.NS",
         "screenerSymbol": "RITEZONE",
         "bseCode": null
     },
@@ -26160,7 +26160,7 @@
         "company": "Integrated Personnel Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE02EE01019",
-        "yahooTicker": "IPSL.NS",
+        "yahooTicker": "IPSL-SM.NS",
         "screenerSymbol": "IPSL",
         "bseCode": null
     },
@@ -26169,7 +26169,7 @@
         "company": "Phantom Digital Effects Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MLZ01019",
-        "yahooTicker": "PHANTOMFX.NS",
+        "yahooTicker": "PHANTOMFX-SM.NS",
         "screenerSymbol": "PHANTOMFX",
         "bseCode": null
     },
@@ -26178,7 +26178,7 @@
         "company": "Frog Innovations Limited",
         "exchange": "NSE-SME",
         "isin": "INE385O01018",
-        "yahooTicker": "FROG.NS",
+        "yahooTicker": "FROG-SM.NS",
         "screenerSymbol": "FROG",
         "bseCode": null
     },
@@ -26187,7 +26187,7 @@
         "company": "Swastik Pipe Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DGC01025",
-        "yahooTicker": "SWASTIK.NS",
+        "yahooTicker": "SWASTIK-SM.NS",
         "screenerSymbol": "SWASTIK",
         "bseCode": null
     },
@@ -26196,7 +26196,7 @@
         "company": "Lloyds Luxuries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DTQ01028",
-        "yahooTicker": "LLOYDS.NS",
+        "yahooTicker": "LLOYDS-SM.NS",
         "screenerSymbol": "LLOYDS",
         "bseCode": null
     },
@@ -26205,7 +26205,7 @@
         "company": "QMS Medical Allied Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE0FMW01018",
-        "yahooTicker": "QMSMEDI.NS",
+        "yahooTicker": "QMSMEDI-SM.NS",
         "screenerSymbol": "QMSMEDI",
         "bseCode": null
     },
@@ -26214,7 +26214,7 @@
         "company": "Cyber Media Research & Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE075Z01011",
-        "yahooTicker": "CMRSL.NS",
+        "yahooTicker": "CMRSL-SM.NS",
         "screenerSymbol": "CMRSL",
         "bseCode": null
     },
@@ -26223,7 +26223,7 @@
         "company": "Kandarp Digi Smart BPO Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MOT01016",
-        "yahooTicker": "KANDARP.NS",
+        "yahooTicker": "KANDARP-SM.NS",
         "screenerSymbol": "KANDARP",
         "bseCode": null
     },
@@ -26232,7 +26232,7 @@
         "company": "Maks Energy Solutions India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CDK01019",
-        "yahooTicker": "MAKS.NS",
+        "yahooTicker": "MAKS-SM.NS",
         "screenerSymbol": "MAKS",
         "bseCode": null
     },
@@ -26241,7 +26241,7 @@
         "company": "Annapurna Swadisht Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MGM01017",
-        "yahooTicker": "ANNAPURNA.NS",
+        "yahooTicker": "ANNAPURNA-SM.NS",
         "screenerSymbol": "ANNAPURNA",
         "bseCode": null
     },
@@ -26250,7 +26250,7 @@
         "company": "Tapi Fruit Processing Limited",
         "exchange": "NSE-SME",
         "isin": "INE0M7001010",
-        "yahooTicker": "TAPIFRUIT.NS",
+        "yahooTicker": "TAPIFRUIT-SM.NS",
         "screenerSymbol": "TAPIFRUIT",
         "bseCode": null
     },
@@ -26259,7 +26259,7 @@
         "company": "Ishan International Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LCW01025",
-        "yahooTicker": "ISHAN.NS",
+        "yahooTicker": "ISHAN-SM.NS",
         "screenerSymbol": "ISHAN",
         "bseCode": null
     },
@@ -26268,7 +26268,7 @@
         "company": "Sabar Flex India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DZ101013",
-        "yahooTicker": "SABAR.NS",
+        "yahooTicker": "SABAR-ST.NS",
         "screenerSymbol": "SABAR",
         "bseCode": null
     },
@@ -26277,7 +26277,7 @@
         "company": "Mega Flex Plastics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0G1D01014",
-        "yahooTicker": "MEGAFLEX.NS",
+        "yahooTicker": "MEGAFLEX-ST.NS",
         "screenerSymbol": "MEGAFLEX",
         "bseCode": null
     },
@@ -26286,7 +26286,7 @@
         "company": "Viviana Power Tech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0MEG01014",
-        "yahooTicker": "VIVIANA.NS",
+        "yahooTicker": "VIVIANA-SM.NS",
         "screenerSymbol": "VIVIANA",
         "bseCode": null
     },
@@ -26295,7 +26295,7 @@
         "company": "Jay Jalaram Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J6801010",
-        "yahooTicker": "KORE.NS",
+        "yahooTicker": "KORE-SM.NS",
         "screenerSymbol": "KORE",
         "bseCode": null
     },
@@ -26304,7 +26304,7 @@
         "company": "Jfl Life Sciences Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LA901015",
-        "yahooTicker": "JFLLIFE.NS",
+        "yahooTicker": "JFLLIFE-SM.NS",
         "screenerSymbol": "JFLLIFE",
         "bseCode": null
     },
@@ -26313,7 +26313,7 @@
         "company": "Ameya Precision Engineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KT901015",
-        "yahooTicker": "AMEYA.NS",
+        "yahooTicker": "AMEYA-SM.NS",
         "screenerSymbol": "AMEYA",
         "bseCode": null
     },
@@ -26322,7 +26322,7 @@
         "company": "Veekayem Fashion and Apparels Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KTW01013",
-        "yahooTicker": "VEEKAYEM.NS",
+        "yahooTicker": "VEEKAYEM-SM.NS",
         "screenerSymbol": "VEEKAYEM",
         "bseCode": null
     },
@@ -26331,7 +26331,7 @@
         "company": "Upsurge Seeds Of Agriculture Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CBM01019",
-        "yahooTicker": "USASEEDS.NS",
+        "yahooTicker": "USASEEDS-SM.NS",
         "screenerSymbol": "USASEEDS",
         "bseCode": null
     },
@@ -26340,7 +26340,7 @@
         "company": "Agni Green Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LF301013",
-        "yahooTicker": "AGNI.NS",
+        "yahooTicker": "AGNI-SM.NS",
         "screenerSymbol": "AGNI",
         "bseCode": null
     },
@@ -26349,7 +26349,7 @@
         "company": "SKP Bearing Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KZA01016",
-        "yahooTicker": "SKP.NS",
+        "yahooTicker": "SKP-SM.NS",
         "screenerSymbol": "SKP",
         "bseCode": null
     },
@@ -26358,7 +26358,7 @@
         "company": "Kck Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J1E01027",
-        "yahooTicker": "KCK.NS",
+        "yahooTicker": "KCK-SM.NS",
         "screenerSymbol": "KCK",
         "bseCode": null
     },
@@ -26367,7 +26367,7 @@
         "company": "Rachana Infrastructure Limited",
         "exchange": "NSE-SME",
         "isin": "INE02OY01016",
-        "yahooTicker": "RILINFRA.NS",
+        "yahooTicker": "RILINFRA-SM.NS",
         "screenerSymbol": "RILINFRA",
         "bseCode": null
     },
@@ -26376,7 +26376,7 @@
         "company": "Fidel Softech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0LQQ01019",
-        "yahooTicker": "FIDEL.NS",
+        "yahooTicker": "FIDEL-SM.NS",
         "screenerSymbol": "FIDEL",
         "bseCode": null
     },
@@ -26385,7 +26385,7 @@
         "company": "Globesecure Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE00WS01056",
-        "yahooTicker": "GSTL.NS",
+        "yahooTicker": "GSTL-ST.NS",
         "screenerSymbol": "GSTL",
         "bseCode": null
     },
@@ -26394,7 +26394,7 @@
         "company": "Sonu Infratech Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JZA01018",
-        "yahooTicker": "SONUINFRA.NS",
+        "yahooTicker": "SONUINFRA-SM.NS",
         "screenerSymbol": "SONUINFRA",
         "bseCode": null
     },
@@ -26403,7 +26403,7 @@
         "company": "P. E. Analytics Limited",
         "exchange": "NSE-SME",
         "isin": "INE0KN801013",
-        "yahooTicker": "PROPEQUITY.NS",
+        "yahooTicker": "PROPEQUITY-SM.NS",
         "screenerSymbol": "PROPEQUITY",
         "bseCode": null
     },
@@ -26412,7 +26412,7 @@
         "company": "Swaraj Suiting Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GMR01016",
-        "yahooTicker": "SWARAJ.NS",
+        "yahooTicker": "SWARAJ-SM.NS",
         "screenerSymbol": "SWARAJ",
         "bseCode": null
     },
@@ -26421,7 +26421,7 @@
         "company": "Cool Caps Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE0HS001028",
-        "yahooTicker": "COOLCAPS.NS",
+        "yahooTicker": "COOLCAPS-SM.NS",
         "screenerSymbol": "COOLCAPS",
         "bseCode": null
     },
@@ -26430,7 +26430,7 @@
         "company": "Sp Refractories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JW501011",
-        "yahooTicker": "SPRL.NS",
+        "yahooTicker": "SPRL-SM.NS",
         "screenerSymbol": "SPRL",
         "bseCode": null
     },
@@ -26439,7 +26439,7 @@
         "company": "Shigan Quantum Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE03KJ01013",
-        "yahooTicker": "SHIGAN.NS",
+        "yahooTicker": "SHIGAN-ST.NS",
         "screenerSymbol": "SHIGAN",
         "bseCode": null
     },
@@ -26448,7 +26448,7 @@
         "company": "Vaidya Sane Ayurved Laboratories Limited",
         "exchange": "NSE-SME",
         "isin": "INE0JR301013",
-        "yahooTicker": "MADHAVBAUG.NS",
+        "yahooTicker": "MADHAVBAUG-SM.NS",
         "screenerSymbol": "MADHAVBAUG",
         "bseCode": null
     },
@@ -26457,7 +26457,7 @@
         "company": "Richa Info Systems Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J1P01015",
-        "yahooTicker": "RICHA.NS",
+        "yahooTicker": "RICHA-SM.NS",
         "screenerSymbol": "RICHA",
         "bseCode": null
     },
@@ -26466,7 +26466,7 @@
         "company": "Precision Metaliks Limited",
         "exchange": "NSE-SME",
         "isin": "INE0HKW01018",
-        "yahooTicker": "PRECISION.NS",
+        "yahooTicker": "PRECISION-SM.NS",
         "screenerSymbol": "PRECISION",
         "bseCode": null
     },
@@ -26475,7 +26475,7 @@
         "company": "Timescan Logistics (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IJY01014",
-        "yahooTicker": "TIMESCAN.NS",
+        "yahooTicker": "TIMESCAN-SM.NS",
         "screenerSymbol": "TIMESCAN",
         "bseCode": null
     },
@@ -26484,7 +26484,7 @@
         "company": "Vivo Collaboration Solutions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IA701014",
-        "yahooTicker": "VIVO.NS",
+        "yahooTicker": "VIVO-SM.NS",
         "screenerSymbol": "VIVO",
         "bseCode": null
     },
@@ -26493,7 +26493,7 @@
         "company": "Foce India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0I7D01019",
-        "yahooTicker": "FOCE.NS",
+        "yahooTicker": "FOCE-SM.NS",
         "screenerSymbol": "FOCE",
         "bseCode": null
     },
@@ -26502,7 +26502,7 @@
         "company": "Nidan Laboratories and Healthcare Limited",
         "exchange": "NSE-SME",
         "isin": "INE0J6L01013",
-        "yahooTicker": "NIDAN.NS",
+        "yahooTicker": "NIDAN-SM.NS",
         "screenerSymbol": "NIDAN",
         "bseCode": null
     },
@@ -26511,7 +26511,7 @@
         "company": "D.K. Enterprises Global Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GN101014",
-        "yahooTicker": "DKEGL.NS",
+        "yahooTicker": "DKEGL-SM.NS",
         "screenerSymbol": "DKEGL",
         "bseCode": null
     },
@@ -26520,7 +26520,7 @@
         "company": "Dynamic Services & Security Limited",
         "exchange": "NSE-SME",
         "isin": "INE0DZ701010",
-        "yahooTicker": "DYNAMIC.NS",
+        "yahooTicker": "DYNAMIC-SM.NS",
         "screenerSymbol": "DYNAMIC",
         "bseCode": null
     },
@@ -26529,7 +26529,7 @@
         "company": "Destiny Logistics & Infra Limited",
         "exchange": "NSE-SME",
         "isin": "INE0IGO01011",
-        "yahooTicker": "DESTINY.NS",
+        "yahooTicker": "DESTINY-SM.NS",
         "screenerSymbol": "DESTINY",
         "bseCode": null
     },
@@ -26538,7 +26538,7 @@
         "company": "Bombay Metrics Supply Chain Limited",
         "exchange": "NSE-SME",
         "isin": "INE0I3Y01014",
-        "yahooTicker": "BMETRICS.NS",
+        "yahooTicker": "BMETRICS-SM.NS",
         "screenerSymbol": "BMETRICS",
         "bseCode": null
     },
@@ -26547,7 +26547,7 @@
         "company": "Jainam Ferro Alloys (I) Limited",
         "exchange": "NSE-SME",
         "isin": "INE02KC01010",
-        "yahooTicker": "JAINAM.NS",
+        "yahooTicker": "JAINAM-SM.NS",
         "screenerSymbol": "JAINAM",
         "bseCode": null
     },
@@ -26556,7 +26556,7 @@
         "company": "Quadpro Ites Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GOJ01027",
-        "yahooTicker": "QUADPRO.NS",
+        "yahooTicker": "QUADPRO-SM.NS",
         "screenerSymbol": "QUADPRO",
         "bseCode": null
     },
@@ -26565,7 +26565,7 @@
         "company": "BEW Engineering Limited",
         "exchange": "NSE-SME",
         "isin": "INE0HQI01014",
-        "yahooTicker": "BEWLTD.NS",
+        "yahooTicker": "BEWLTD-SM.NS",
         "screenerSymbol": "BEWLTD",
         "bseCode": null
     },
@@ -26574,7 +26574,7 @@
         "company": "DUDIGITAL GLOBAL LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE0HPK01020",
-        "yahooTicker": "DUGLOBAL.NS",
+        "yahooTicker": "DUGLOBAL-SM.NS",
         "screenerSymbol": "DUGLOBAL",
         "bseCode": null
     },
@@ -26583,7 +26583,7 @@
         "company": "Rex Pipes And Cables Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE00D001018",
-        "yahooTicker": "REXPIPES.NS",
+        "yahooTicker": "REXPIPES-SM.NS",
         "screenerSymbol": "REXPIPES",
         "bseCode": null
     },
@@ -26592,7 +26592,7 @@
         "company": "Walpar Nutritions Limited",
         "exchange": "NSE-SME",
         "isin": "INE0G2G01015",
-        "yahooTicker": "WALPAR.NS",
+        "yahooTicker": "WALPAR-SM.NS",
         "screenerSymbol": "WALPAR",
         "bseCode": null
     },
@@ -26601,7 +26601,7 @@
         "company": "Abhishek Integrations Limited",
         "exchange": "NSE-SME",
         "isin": "INE0CAJ01017",
-        "yahooTicker": "AILIMITED.NS",
+        "yahooTicker": "AILIMITED-SM.NS",
         "screenerSymbol": "AILIMITED",
         "bseCode": null
     },
@@ -26610,7 +26610,7 @@
         "company": "V Marc India Limited",
         "exchange": "NSE-SME",
         "isin": "INE0GXK01018",
-        "yahooTicker": "VMARCIND.NS",
+        "yahooTicker": "VMARCIND-SM.NS",
         "screenerSymbol": "VMARCIND",
         "bseCode": null
     },
@@ -26619,7 +26619,7 @@
         "company": "Siddhika Coatings Limited",
         "exchange": "NSE-SME",
         "isin": "INE0A1E01018",
-        "yahooTicker": "SIDDHIKA.NS",
+        "yahooTicker": "SIDDHIKA-SM.NS",
         "screenerSymbol": "SIDDHIKA",
         "bseCode": null
     },
@@ -26628,7 +26628,7 @@
         "company": "Party Cruisers Limited",
         "exchange": "NSE-SME",
         "isin": "INE06ZX01015",
-        "yahooTicker": "PARTYCRUS.NS",
+        "yahooTicker": "PARTYCRUS-SM.NS",
         "screenerSymbol": "PARTYCRUS",
         "bseCode": null
     },
@@ -26637,7 +26637,7 @@
         "company": "Ascom Leasing & Investments Limited",
         "exchange": "NSE-SME",
         "isin": "INE08KD01015",
-        "yahooTicker": "ASCOM.NS",
+        "yahooTicker": "ASCOM-ST.NS",
         "screenerSymbol": "ASCOM",
         "bseCode": null
     },
@@ -26646,7 +26646,7 @@
         "company": "Goldkart Jewels Limited",
         "exchange": "NSE-SME",
         "isin": "INE06MH01016",
-        "yahooTicker": "GOLDKART.NS",
+        "yahooTicker": "GOLDKART-SM.NS",
         "screenerSymbol": "GOLDKART",
         "bseCode": null
     },
@@ -26655,7 +26655,7 @@
         "company": "Khfm Hospitality And Facility Management Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE00UG01014",
-        "yahooTicker": "KHFM.NS",
+        "yahooTicker": "KHFM-SM.NS",
         "screenerSymbol": "KHFM",
         "bseCode": null
     },
@@ -26664,7 +26664,7 @@
         "company": "Mindpool Technologies Limited",
         "exchange": "NSE-SME",
         "isin": "INE00RQ01019",
-        "yahooTicker": "MINDPOOL.NS",
+        "yahooTicker": "MINDPOOL-SM.NS",
         "screenerSymbol": "MINDPOOL",
         "bseCode": null
     },
@@ -26673,7 +26673,7 @@
         "company": "Surani Steel Tubes Limited",
         "exchange": "NSE-SME",
         "isin": "INE01ZJ01015",
-        "yahooTicker": "SURANI.NS",
+        "yahooTicker": "SURANI-ST.NS",
         "screenerSymbol": "SURANI",
         "bseCode": null
     },
@@ -26682,7 +26682,7 @@
         "company": "DRS Dilip Roadlines Limited",
         "exchange": "NSE-SME",
         "isin": "INE02CV01017",
-        "yahooTicker": "DRSDILIP.NS",
+        "yahooTicker": "DRSDILIP-ST.NS",
         "screenerSymbol": "DRSDILIP",
         "bseCode": null
     },
@@ -26691,7 +26691,7 @@
         "company": "Shubhlaxmi Jewel Art Limited",
         "exchange": "NSE-SME",
         "isin": "INE01Z401013",
-        "yahooTicker": "SHUBHLAXMI.NS",
+        "yahooTicker": "SHUBHLAXMI-SM.NS",
         "screenerSymbol": "SHUBHLAXMI",
         "bseCode": null
     },
@@ -26700,7 +26700,7 @@
         "company": "Ultra Wiring Connectivity System Limited",
         "exchange": "NSE-SME",
         "isin": "INE00F301010",
-        "yahooTicker": "UWCSL.NS",
+        "yahooTicker": "UWCSL-SM.NS",
         "screenerSymbol": "UWCSL",
         "bseCode": null
     },
@@ -26709,7 +26709,7 @@
         "company": "Parin Enterprises Limited",
         "exchange": "NSE-SME",
         "isin": "INE00U801010",
-        "yahooTicker": "PARIN.NS",
+        "yahooTicker": "PARIN-SM.NS",
         "screenerSymbol": "PARIN",
         "bseCode": null
     },
@@ -26718,7 +26718,7 @@
         "company": "Ushanti Colour Chem Limited",
         "exchange": "NSE-SME",
         "isin": "INE00NI01015",
-        "yahooTicker": "UCL.NS",
+        "yahooTicker": "UCL-ST.NS",
         "screenerSymbol": "UCL",
         "bseCode": null
     },
@@ -26727,7 +26727,7 @@
         "company": "AMBANI ORGOCHEM LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE00C501018",
-        "yahooTicker": "AMBANIORGO.NS",
+        "yahooTicker": "AMBANIORGO-ST.NS",
         "screenerSymbol": "AMBANIORGO",
         "bseCode": null
     },
@@ -26736,7 +26736,7 @@
         "company": "JAKHARIA FABRIC LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE00N401018",
-        "yahooTicker": "JAKHARIA.NS",
+        "yahooTicker": "JAKHARIA-ST.NS",
         "screenerSymbol": "JAKHARIA",
         "bseCode": null
     },
@@ -26745,7 +26745,7 @@
         "company": "Mahickra Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE961Y01015",
-        "yahooTicker": "MAHICKRA.NS",
+        "yahooTicker": "MAHICKRA-ST.NS",
         "screenerSymbol": "MAHICKRA",
         "bseCode": null
     },
@@ -26754,7 +26754,7 @@
         "company": "Vera Synthetic Limited",
         "exchange": "NSE-SME",
         "isin": "INE709Z01015",
-        "yahooTicker": "VERA.NS",
+        "yahooTicker": "VERA-SM.NS",
         "screenerSymbol": "VERA",
         "bseCode": null
     },
@@ -26763,7 +26763,7 @@
         "company": "Continental Seeds and Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE340Z01019",
-        "yahooTicker": "CONTI.NS",
+        "yahooTicker": "CONTI-SM.NS",
         "screenerSymbol": "CONTI",
         "bseCode": null
     },
@@ -26772,7 +26772,7 @@
         "company": "Giriraj Civil Developers Limited",
         "exchange": "NSE-SME",
         "isin": "INE614Z01017",
-        "yahooTicker": "GIRIRAJ.NS",
+        "yahooTicker": "GIRIRAJ-ST.NS",
         "screenerSymbol": "GIRIRAJ",
         "bseCode": null
     },
@@ -26781,7 +26781,7 @@
         "company": "Marvel Decor Limited",
         "exchange": "NSE-SME",
         "isin": "INE575Z01010",
-        "yahooTicker": "MDL.NS",
+        "yahooTicker": "MDL-SM.NS",
         "screenerSymbol": "MDL",
         "bseCode": null
     },
@@ -26790,7 +26790,7 @@
         "company": "Mohini Health & Hygiene Limited",
         "exchange": "NSE-SME",
         "isin": "INE450S01011",
-        "yahooTicker": "MHHL.NS",
+        "yahooTicker": "MHHL-SM.NS",
         "screenerSymbol": "MHHL",
         "bseCode": null
     },
@@ -26799,7 +26799,7 @@
         "company": "PARAMPARA DAIRY DELIGHTS LIMITED",
         "exchange": "NSE-SME",
         "isin": "INE749Y01014",
-        "yahooTicker": "PARAMPARA.NS",
+        "yahooTicker": "PARAMPARA-ST.NS",
         "screenerSymbol": "PARAMPARA",
         "bseCode": null
     },
@@ -26808,7 +26808,7 @@
         "company": "Vasa Retail and Overseas Ltd",
         "exchange": "NSE-SME",
         "isin": "INE068Z01016",
-        "yahooTicker": "VASA.NS",
+        "yahooTicker": "VASA-SM.NS",
         "screenerSymbol": "VASA",
         "bseCode": null
     },
@@ -26817,7 +26817,7 @@
         "company": "SMVD Poly Pack Limited",
         "exchange": "NSE-SME",
         "isin": "INE702Y01013",
-        "yahooTicker": "SMVD.NS",
+        "yahooTicker": "SMVD-ST.NS",
         "screenerSymbol": "SMVD",
         "bseCode": null
     },
@@ -26826,7 +26826,7 @@
         "company": "Felix Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE901X01013",
-        "yahooTicker": "FELIX.NS",
+        "yahooTicker": "FELIX-SM.NS",
         "screenerSymbol": "FELIX",
         "bseCode": null
     },
@@ -26835,7 +26835,7 @@
         "company": "Pulz Electronics Limited",
         "exchange": "NSE-SME",
         "isin": "INE335X01014",
-        "yahooTicker": "PULZ.NS",
+        "yahooTicker": "PULZ-SM.NS",
         "screenerSymbol": "PULZ",
         "bseCode": null
     },
@@ -26844,7 +26844,7 @@
         "company": "ANI Integrated Services Limited",
         "exchange": "NSE-SME",
         "isin": "INE635Y01015",
-        "yahooTicker": "AISL.NS",
+        "yahooTicker": "AISL-SM.NS",
         "screenerSymbol": "AISL",
         "bseCode": null
     },
@@ -26853,7 +26853,7 @@
         "company": "Milton Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE376Y01016",
-        "yahooTicker": "MILTON.NS",
+        "yahooTicker": "MILTON-ST.NS",
         "screenerSymbol": "MILTON",
         "bseCode": null
     },
@@ -26862,7 +26862,7 @@
         "company": "Omfurn India Limited",
         "exchange": "NSE-SME",
         "isin": "INE338Y01016",
-        "yahooTicker": "OMFURN.NS",
+        "yahooTicker": "OMFURN-SM.NS",
         "screenerSymbol": "OMFURN",
         "bseCode": null
     },
@@ -26871,7 +26871,7 @@
         "company": "Goldstar Power Limited",
         "exchange": "NSE-SME",
         "isin": "INE405Y01021",
-        "yahooTicker": "GOLDSTAR.NS",
+        "yahooTicker": "GOLDSTAR-ST.NS",
         "screenerSymbol": "GOLDSTAR",
         "bseCode": null
     },
@@ -26880,7 +26880,7 @@
         "company": "Shree Tirupati Balajee FIBC Limited",
         "exchange": "NSE-SME",
         "isin": "INE238Y01018",
-        "yahooTicker": "TIRUPATI.NS",
+        "yahooTicker": "TIRUPATI-SM.NS",
         "screenerSymbol": "TIRUPATI",
         "bseCode": null
     },
@@ -26889,7 +26889,7 @@
         "company": "Cadsys (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE090Y01013",
-        "yahooTicker": "CADSYS.NS",
+        "yahooTicker": "CADSYS-SM.NS",
         "screenerSymbol": "CADSYS",
         "bseCode": null
     },
@@ -26898,7 +26898,7 @@
         "company": "Madhya Pradesh Today Media Limited",
         "exchange": "NSE-SME",
         "isin": "INE105Y01019",
-        "yahooTicker": "MPTODAY.NS",
+        "yahooTicker": "MPTODAY-SM.NS",
         "screenerSymbol": "MPTODAY",
         "bseCode": null
     },
@@ -26907,7 +26907,7 @@
         "company": "Manav Infra Projects Limited",
         "exchange": "NSE-SME",
         "isin": "INE104Y01012",
-        "yahooTicker": "MANAV.NS",
+        "yahooTicker": "MANAV-ST.NS",
         "screenerSymbol": "MANAV",
         "bseCode": null
     },
@@ -26916,7 +26916,7 @@
         "company": "Transwind Infrastructures Limited",
         "exchange": "NSE-SME",
         "isin": "INE792X01016",
-        "yahooTicker": "TRANSWIND.NS",
+        "yahooTicker": "TRANSWIND-SM.NS",
         "screenerSymbol": "TRANSWIND",
         "bseCode": null
     },
@@ -26925,7 +26925,7 @@
         "company": "Accord Synergy Limited",
         "exchange": "NSE-SME",
         "isin": "INE113X01015",
-        "yahooTicker": "ACCORD.NS",
+        "yahooTicker": "ACCORD-SM.NS",
         "screenerSymbol": "ACCORD",
         "bseCode": null
     },
@@ -26934,7 +26934,7 @@
         "company": "Vadivarhe Speciality Chemicals Limited",
         "exchange": "NSE-SME",
         "isin": "INE551Q01028",
-        "yahooTicker": "VSCL.NS",
+        "yahooTicker": "VSCL-SM.NS",
         "screenerSymbol": "VSCL",
         "bseCode": null
     },
@@ -26943,7 +26943,7 @@
         "company": "Jalan Transolutions (India) Limited",
         "exchange": "NSE-SME",
         "isin": "INE349X01015",
-        "yahooTicker": "JALAN.NS",
+        "yahooTicker": "JALAN-SM.NS",
         "screenerSymbol": "JALAN",
         "bseCode": null
     },
@@ -26952,7 +26952,7 @@
         "company": "ASL Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE617I01024",
-        "yahooTicker": "ASLIND.NS",
+        "yahooTicker": "ASLIND-SM.NS",
         "screenerSymbol": "ASLIND",
         "bseCode": null
     },
@@ -26961,7 +26961,7 @@
         "company": "Prolife Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE994V01012",
-        "yahooTicker": "PROLIFE.NS",
+        "yahooTicker": "PROLIFE-SM.NS",
         "screenerSymbol": "PROLIFE",
         "bseCode": null
     },
@@ -26970,7 +26970,7 @@
         "company": "Dhanuka Infra Realty Limited",
         "exchange": "NSE-SME",
         "isin": "INE704V01015",
-        "yahooTicker": "DIRL.NS",
+        "yahooTicker": "DIRL-SM.NS",
         "screenerSymbol": "DIRL",
         "bseCode": null
     },
@@ -26979,7 +26979,7 @@
         "company": "Alcokraft Distilleries Limited",
         "exchange": "NSE-SME",
         "isin": "INE448V01019",
-        "yahooTicker": "ALCODIS.NS",
+        "yahooTicker": "ALCODIS-SM.NS",
         "screenerSymbol": "ALCODIS",
         "bseCode": null
     },
@@ -26988,7 +26988,7 @@
         "company": "Gretex Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE985P01012",
-        "yahooTicker": "GRETEX.NS",
+        "yahooTicker": "GRETEX-ST.NS",
         "screenerSymbol": "GRETEX",
         "bseCode": null
     },
@@ -26997,7 +26997,7 @@
         "company": "Jet Knitwears Limited",
         "exchange": "NSE-SME",
         "isin": "INE564T01017",
-        "yahooTicker": "JETKNIT.NS",
+        "yahooTicker": "JETKNIT-ST.NS",
         "screenerSymbol": "JETKNIT",
         "bseCode": null
     },
@@ -27006,7 +27006,7 @@
         "company": "AVSL Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE522V01011",
-        "yahooTicker": "AVSL.NS",
+        "yahooTicker": "AVSL-ST.NS",
         "screenerSymbol": "AVSL",
         "bseCode": null
     },
@@ -27015,7 +27015,7 @@
         "company": "KKV Agro Powers Limited",
         "exchange": "NSE-SME",
         "isin": "INE239T01016",
-        "yahooTicker": "KKVAPOW.NS",
+        "yahooTicker": "KKVAPOW-SM.NS",
         "screenerSymbol": "KKVAPOW",
         "bseCode": null
     },
@@ -27024,7 +27024,7 @@
         "company": "Perfect Infraengineers Limited",
         "exchange": "NSE-SME",
         "isin": "INE925S01012",
-        "yahooTicker": "PERFECT.NS",
+        "yahooTicker": "PERFECT-SZ.NS",
         "screenerSymbol": "PERFECT",
         "bseCode": null
     },
@@ -27033,7 +27033,7 @@
         "company": "Ahimsa Industries Limited",
         "exchange": "NSE-SME",
         "isin": "INE136T01014",
-        "yahooTicker": "AHIMSA.NS",
+        "yahooTicker": "AHIMSA-ST.NS",
         "screenerSymbol": "AHIMSA",
         "bseCode": null
     },
@@ -27042,7 +27042,7 @@
         "company": "Shaival Reality Limited",
         "exchange": "NSE-SME",
         "isin": "INE262S01010",
-        "yahooTicker": "SHAIVAL.NS",
+        "yahooTicker": "SHAIVAL-ST.NS",
         "screenerSymbol": "SHAIVAL",
         "bseCode": null
     },
@@ -27051,7 +27051,7 @@
         "company": "Emkay Taps and Cutting Tools Limited",
         "exchange": "NSE-SME",
         "isin": "INE332S01011",
-        "yahooTicker": "EMKAYTOOLS.NS",
+        "yahooTicker": "EMKAYTOOLS-SM.NS",
         "screenerSymbol": "EMKAYTOOLS",
         "bseCode": null
     },
@@ -29857,9 +29857,9 @@
     {
         "symbol": "SEL",
         "company": "Sanathnagar Enterprises Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE367E01033",
-        "yahooTicker": "SEL.BO",
+        "yahooTicker": "SEL-SM.NS",
         "screenerSymbol": "509423",
         "bseCode": "509423"
     },
@@ -42772,9 +42772,9 @@
     {
         "symbol": "RAJPUTANA",
         "company": "Rajputana Investment and Finance Ltd.",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE751R01014",
-        "yahooTicker": "RAJPUTANA.BO",
+        "yahooTicker": "RAJPUTANA-SM.NS",
         "screenerSymbol": "539090",
         "bseCode": "539090"
     },
@@ -43789,9 +43789,9 @@
     {
         "symbol": "KEL",
         "company": "Kotia Enterprises Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE079C01012",
-        "yahooTicker": "KEL.BO",
+        "yahooTicker": "KEL-SM.NS",
         "screenerSymbol": "539599",
         "bseCode": "539599"
     },
@@ -44257,9 +44257,9 @@
     {
         "symbol": "ZEAL",
         "company": "Zeal Aqua Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE819S01025",
-        "yahooTicker": "ZEAL.BO",
+        "yahooTicker": "ZEAL-SM.NS",
         "screenerSymbol": "539963",
         "bseCode": "539963"
     },
@@ -44995,9 +44995,9 @@
     {
         "symbol": "GSTL",
         "company": "GlobalSpace Technologies Limited",
-        "exchange": "BSE",
+        "exchange": "NSE-SME",
         "isin": "INE632W01016",
-        "yahooTicker": "GSTL.BO",
+        "yahooTicker": "GSTL-ST.NS",
         "screenerSymbol": "540654",
         "bseCode": "540654"
     },
