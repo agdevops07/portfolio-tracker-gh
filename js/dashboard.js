@@ -20,10 +20,11 @@ import {
 
 // ── Full load (history + prices + intraday) ──────
 export async function loadDashboard() {
-  showScreen('dashboard-screen');
-
-  // Remove any "no portfolio" overlays injected by openStockScreener
-  if (typeof window._clearNoPortMsgs === 'function') window._clearNoPortMsgs();
+  // Show dashboard, hide drilldown
+  const ds = document.getElementById('dashboard-screen');
+  const dd = document.getElementById('drilldown-screen');
+  if (ds) ds.style.display = 'block';
+  if (dd) dd.style.display = 'none';
 
   // Always land on Overview tab
   if (typeof window.switchDashTab === 'function') {

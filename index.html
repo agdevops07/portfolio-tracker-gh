@@ -71,7 +71,7 @@
           Try with sample portfolio
         </button>
         <div class="or-divider"><span>just browsing?</span></div>
-        <button class="sample-btn" id="screener-btn" onclick="window.openStockScreener()">
+        <button class="sample-btn" id="screener-btn" onclick="window.location.href='screener.html'">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           Open Stock Screener
         </button>
@@ -98,7 +98,7 @@
     <div class="btn-group">
       <button class="btn btn-secondary" onclick="goBack()">← Back</button>
       <button class="btn btn-secondary" onclick="exportHoldingsCSV()">📥 Export CSV</button>
-      <button class="btn btn-primary" onclick="window._clearNoPortMsgs&&window._clearNoPortMsgs();loadDashboard()">Load Dashboard →</button>
+      <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">Load Dashboard →</button>
     </div>
   </div>
   <div id="preview-error"></div>
@@ -115,517 +115,47 @@
       <tbody></tbody>
     </table>
   </div>
-  <button class="btn btn-primary" style="width:100%" onclick="window._clearNoPortMsgs&&window._clearNoPortMsgs();loadDashboard()">Load Dashboard →</button>
+  <button class="btn btn-primary" style="width:100%" onclick="window.location.href='dashboard.html'">Load Dashboard →</button>
 </div>
 
-<!-- DASHBOARD SCREEN -->
-<div id="dashboard-screen">
-  <div class="dash-header">
-    <div class="dash-logo">📈 Portfolio Tracker</div>
-    <div class="header-actions">
-      <div class="refresh-controls">
-        <span id="last-refresh-time" class="refresh-timestamp"></span>
-        <select id="refresh-interval-sel" name="refresh-interval" class="interval-sel" onchange="setRefreshInterval(+this.value)">
-          <option value="30000">30s</option>
-          <option value="60000">1m</option>
-          <option value="120000">2m</option>
-          <option value="300000" selected>5m</option>
-          <option value="600000">10m</option>
-        </select>
-        <button id="refresh-pause-btn" class="export-btn" onclick="toggleRefreshPause()">⏸ Pause</button>
-        <button class="export-btn" onclick="refreshPricesOnly()">🔄 Refresh Prices</button>
-        <button class="export-btn" onclick="refreshDashboard()">⟳ Full Refresh</button>
-      </div>
-      <div class="export-dropdown" id="export-dropdown">
-        <button class="export-btn" onclick="toggleExportMenu()">⬇ Export ▾</button>
-        <div class="export-menu" id="export-menu">
-          <div class="export-menu-item" onclick="exportPDF()">📄 Download as PDF</div>
-          <div class="export-menu-item" onclick="exportHoldingsCSV()">📥 Export Holdings CSV</div>
-        </div>
-      </div>
-      <button class="btn btn-secondary" onclick="goBack()">← Upload New</button>
-    </div>
-  </div>
-
-  <div id="dash-loading" class="loading">
-    <div class="spinner"></div>
-    <div class="loading-text" id="loading-msg">Fetching live prices…</div>
-  </div>
-
-  <div id="dash-content" style="display:none">
-    <!-- Dashboard Tab Nav -->
-    <div class="dash-tabs">
-      <button class="dash-tab active" data-tab="overview" onclick="switchDashTab('overview',this)">📊 Overview</button>
-      <button class="dash-tab" data-tab="holdings" onclick="switchDashTab('holdings',this)">📋 Holdings</button>
-      <button class="dash-tab" data-tab="stocksearch" onclick="switchDashTab('stocksearch',this)">🔍 Stock Search</button>
-    </div>
-
-    <!-- OVERVIEW TAB -->
-    <div id="dash-tab-overview">
-    <!-- Stat cards -->
-    <div class="cards-grid" id="stat-cards" data-portfolio-content></div>
-
-    <!-- Portfolio History Chart -->
-    <div class="chart-card collapsible-card" data-portfolio-content>
-      <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
-        <div class="chart-title">Portfolio Value Selected Period
-          <span id="port-period-chg" style="font-size:15px;font-weight:700;"></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="time-filters" onclick="event.stopPropagation()">
-            <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
-            <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
-            <button class="tf-btn active" onclick="setTimeFilter('1Y',this)">1Y</button>
-            <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
-            <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)">Custom</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="collapse-btn" id="portfolio-chart-toggle">▲ Collapse</button>
-          </div>
-        </div>
-      </div>
-      <div id="portfolio-chart-body" class="collapsible-body">
-        <div id="port-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
-          <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-          <span style="color:var(--text3)">to</span>
-          <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-          <button class="tf-btn active" onclick="applyPortCustom()">Apply</button>
-        </div>
-        <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Portfolio Day Chart (collapsible) -->
-    <div class="chart-card collapsible-card" data-portfolio-content>
-      <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
-        <div class="chart-title">Today's Performance
-          <span class="chart-subtitle">(Intraday 15-min delay)</span>
-        </div>
-        <button class="collapse-btn" id="day-chart-toggle">▲ Collapse</button>
-      </div>
-      <div id="day-chart-body" class="collapsible-body">
-        <div id="portfolio-day-wrap" class="chart-wrap" style="height:240px;">
-          <canvas id="portfolioDayChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Allocation -->
-    <div class="chart-card collapsible-card" data-portfolio-content style="margin-bottom:1rem">
-      <div class="chart-header collapsible-header" onclick="toggleSection('alloc-body','alloc-toggle')">
-        <div class="chart-title">Allocation</div>
-        <button class="collapse-btn" id="alloc-toggle">▲ Collapse</button>
-      </div>
-      <div id="alloc-body" class="collapsible-body">
-        <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Overall P&L + Today P&L side by side -->
-    <div class="two-col" data-portfolio-content>
-      <div class="chart-card collapsible-card">
-        <div class="chart-header collapsible-header" onclick="toggleSection('pnl-body','pnl-toggle')">
-          <div class="chart-title">P&amp;L by Stock (Overall)</div>
-          <button class="collapse-btn" id="pnl-toggle">▲ Collapse</button>
-        </div>
-        <div id="pnl-body" class="collapsible-body">
-          <div style="position:relative;width:100%;height:280px;"><canvas id="pnlChart"></canvas></div>
-        </div>
-      </div>
-      <div class="chart-card collapsible-card">
-        <div class="chart-header collapsible-header" onclick="toggleSection('today-pnl-body','today-pnl-toggle')">
-          <div class="chart-title">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
-          <button class="collapse-btn" id="today-pnl-toggle">▲ Collapse</button>
-        </div>
-        <div id="today-pnl-body" class="collapsible-body">
-          <div id="today-pnl-wrap" style="position:relative;width:100%;height:280px;">
-            <canvas id="todayPnlChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    </div><!-- /dash-tab-overview -->
-
-    <!-- HOLDINGS TAB -->
-    <div id="dash-tab-holdings" style="display:none">
-    <div class="section-header" data-portfolio-content style="margin-top:0.5rem">
-      <div class="section-title">Holdings</div>
-      <button class="holdings-detail-btn" onclick="openHoldingsModal()">📋 Full Holdings View</button>
-    </div>
-    <div class="holdings-grid" id="holdings-grid" data-portfolio-content></div>
-    </div><!-- /dash-tab-holdings -->
-
-    <!-- STOCK SEARCH TAB -->
-    <div id="dash-tab-stocksearch" style="display:none">
-
-      <!-- Immersive search hero -->
-      <div id="ss-hero" style="text-align:center;padding:2.5rem 1rem 2rem;max-width:640px;margin:0 auto;">
-        <div style="font-size:2rem;margin-bottom:0.5rem;">🔍</div>
-        <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.4rem;">Explore any Indian Stock</div>
-        <div style="font-size:13px;color:var(--text3);margin-bottom:1.5rem;">Search across 5,000+ NSE &amp; BSE listed companies — prices, charts, and fundamentals from Screener.in</div>
-
-        <!-- Search bar -->
-        <div id="ss-search-wrap" style="position:relative;margin-bottom:0.75rem;">
-          <div style="position:relative;">
-            <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text3);pointer-events:none;">🔍</span>
-            <input type="text" id="ss-search-input" name="ss-search"
-              placeholder="Enter company name or ticker (e.g. Reliance, INFY…)"
-              autocomplete="off"
-              style="width:100%;box-sizing:border-box;padding:12px 38px 12px 38px;border-radius:10px;border:1px solid var(--border2);
-                     background:var(--bg3);color:var(--text);font-size:14px;outline:none;">
-            <button id="ss-clear-btn" onclick="window._ssClear()"
-              style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);
-                     background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;
-                     line-height:1;padding:2px 4px;" title="Clear">✕</button>
-          </div>
-          <div id="ss-dropdown" class="sp-dropdown" style="display:none;top:48px;left:0;right:0;text-align:left;"></div>
-        </div>
-
-        <div id="ss-db-status" style="display:none;font-size:12px;color:var(--text2);margin-top:0.5rem;"></div>
-
-        <!-- Hint chips -->
-        <div id="ss-hints" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:1.25rem;">
-          <span style="font-size:12px;color:var(--text3);align-self:center;">Try:</span>
-          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='Reliance';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">Reliance</button>
-          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='TCS';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">TCS</button>
-          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='HDFC Bank';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">HDFC Bank</button>
-          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='Infosys';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">Infosys</button>
-          <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();document.getElementById('ss-search-input').value='Eternal';document.getElementById('ss-search-input').dispatchEvent(new Event('input'))">Eternal</button>
-        </div>
-      </div>
-
-      <!-- Results panel (populated dynamically) -->
-      <div id="ss-result-panel" style="display:none;"></div>
-    </div><!-- /dash-tab-stocksearch -->
-  </div>
-</div>
-
-<!-- DRILLDOWN SCREEN -->
-<div id="drilldown-screen">
-  <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
-
-  <!-- Stock header with sector/about inline -->
-  <div class="dd-header-row">
-    <div>
-      <div class="dd-title" id="dd-ticker"></div>
-      <div class="dd-subtitle" id="dd-subtitle"></div>
-      <div class="dd-meta" id="dd-meta"></div>
-      <div class="dd-about" id="dd-about"></div>
-    </div>
-  </div>
-
-  <div class="cards-grid" id="dd-cards" style="margin-bottom:1rem"></div>
-
-  <!-- Charts side by side -->
-  <div class="dd-charts-row">
-    <!-- Price History -->
-    <div class="chart-card collapsible-card dd-chart-half" id="dd-history-card">
-      <div class="chart-header" onclick="toggleSection('dd-history-body','dd-history-toggle')">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div class="chart-title">Price History Over Selected Period </div>
-          <span id="dd-period-chg" style="font-size:12px;font-weight:600;"></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
-          <div class="time-filters">
-            <button class="tf-btn dd-tf-btn" data-f="1M" onclick="setDDFilter('1M',this)">1M</button>
-            <button class="tf-btn dd-tf-btn" data-f="3M" onclick="setDDFilter('3M',this)">3M</button>
-            <button class="tf-btn dd-tf-btn active" data-f="1Y" onclick="setDDFilter('1Y',this)">1Y</button>
-            <button class="tf-btn dd-tf-btn" data-f="ALL" onclick="setDDFilter('ALL',this)">ALL</button>
-            <button class="tf-btn dd-tf-btn" data-f="CUSTOM" onclick="setDDFilter('CUSTOM',this)">Custom</button>
-          </div>
-          <button class="icon-btn" title="Maximize" onclick="maximizeChart('dd-history-card','dd-history-body','ddChart')">⤢</button>
-          <button class="collapse-btn" id="dd-history-toggle" onclick="toggleSection('dd-history-body','dd-history-toggle')">▲</button>
-        </div>
-      </div>
-      <div id="dd-history-body" class="collapsible-body">
-        <div id="dd-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.4rem 0 0.6rem;flex-wrap:wrap;">
-          <input type="date" id="dd-from" name="dd-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-          <span style="color:var(--text3)">to</span>
-          <input type="date" id="dd-to" name="dd-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-          <button class="tf-btn active" onclick="applyDDCustom()">Apply</button>
-        </div>
-        <div class="chart-wrap" style="height:260px;"><canvas id="ddChart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Today's Price -->
-    <div class="chart-card collapsible-card dd-chart-half" id="dd-day-card">
-      <div class="chart-header" onclick="toggleSection('dd-day-body','dd-day-toggle')">
-        <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
-        <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
-          <button class="icon-btn" title="Maximize" onclick="maximizeChart('dd-day-card','dd-day-body','ddDayChart')">⤢</button>
-          <button class="collapse-btn" id="dd-day-toggle" onclick="toggleSection('dd-day-body','dd-day-toggle')">▲</button>
-        </div>
-      </div>
-      <div id="dd-day-body" class="collapsible-body">
-        <div id="dd-day-wrap" style="position:relative;width:100%;height:260px;">
-          <canvas id="ddDayChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Fundamentals (full width, after charts) -->
-  <div class="chart-card collapsible-card" style="margin-bottom:1rem">
-    <div class="chart-header" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">
-      <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
-      <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
-        <div class="fund-mode-toggle">
-          <button class="fund-mode-btn" id="fund-mode-cons" onclick="switchFundMode('consolidated',this)">Consolidated</button>
-          <button class="fund-mode-btn active" id="fund-mode-stand" onclick="switchFundMode('standalone',this)">Standalone</button>
-        </div>
-        <button class="collapse-btn" id="dd-fund-toggle" onclick="toggleSection('dd-fund-body','dd-fund-toggle')">▲</button>
-      </div>
-    </div>
-    <div id="dd-fund-body" class="collapsible-body">
-      <div class="fund-tabs" onclick="event.stopPropagation()">
-        <button class="fund-tab active" data-tab="ratios" onclick="switchFundTab('ratios',this)">Key Ratios</button>
-        <button class="fund-tab" data-tab="pnl" onclick="switchFundTab('pnl',this)">P&amp;L</button>
-        <button class="fund-tab" data-tab="balance" onclick="switchFundTab('balance',this)">Balance Sheet</button>
-        <button class="fund-tab" data-tab="cashflow" onclick="switchFundTab('cashflow',this)">Cash Flow</button>
-        <button class="fund-tab" data-tab="quarterly" onclick="switchFundTab('quarterly',this)">Quarterly Results</button>
-      </div>
-      <div id="dd-fundamentals" style="padding:0.5rem 0 0.25rem;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- HOLDINGS MODAL -->
-<div id="holdings-modal" class="modal-overlay" onclick="if(event.target===this)closeHoldingsModal()">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title">📋 All Holdings</div>
-      <button class="modal-close" onclick="closeHoldingsModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-table-wrap">
-        <table class="modal-table">
-          <thead>
-            <tr>
-              <th onclick="sortHoldingsModal('ticker')" class="sortable-th" id="mth-ticker">Ticker</th>
-              <th onclick="sortHoldingsModal('totalQty')" class="sortable-th" id="mth-totalQty">Qty</th>
-              <th onclick="sortHoldingsModal('avgBuy')" class="sortable-th" id="mth-avgBuy">Avg Buy</th>
-              <th onclick="sortHoldingsModal('livePrice')" class="sortable-th" id="mth-livePrice">Live Price</th>
-              <th onclick="sortHoldingsModal('prevClose')" class="sortable-th" id="mth-prevClose">Prev Close</th>
-              <th onclick="sortHoldingsModal('invested')" class="sortable-th" id="mth-invested">Invested</th>
-              <th onclick="sortHoldingsModal('currentVal')" class="sortable-th" id="mth-currentVal">Current Value</th>
-              <th onclick="sortHoldingsModal('pnlAbs')" class="sortable-th" id="mth-pnlAbs">P&amp;L (₹)</th>
-              <th onclick="sortHoldingsModal('pnlPct')" class="sortable-th" id="mth-pnlPct">P&amp;L (%)</th>
-              <th onclick="sortHoldingsModal('dayChgAbs')" class="sortable-th" id="mth-dayChgAbs">Day Change</th>
-              <th onclick="sortHoldingsModal('dayChgPct')" class="sortable-th" id="mth-dayChgPct">Day Change %</th>
-              <th onclick="sortHoldingsModal('allocPct')" class="sortable-th" id="mth-allocPct">Allocation</th>
-            </tr>
-          </thead>
-          <tbody id="holdings-modal-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- Footer pinned inside upload screen -->
-<!-- <footer class="app-footer" style="position:absolute;bottom:0;left:0;right:0;margin-top:0;z-index:2;">
-  <span>📈 Portfolio Tracker</span>
-  <span class="footer-sep">·</span>
-  <span>Data via <a href="https://finance.yahoo.com" target="_blank">Yahoo Finance</a> &amp; <a href="https://www.screener.in" target="_blank">Screener.in</a></span>
-  <span class="footer-sep">·</span>
-  <span>Prices delayed · Not financial advice</span>
-</footer> -->
 
 <script>
-window.openStockScreener = function() {
-  const screens = ['upload-screen','preview-screen','dashboard-screen','drilldown-screen'];
-  screens.forEach(s => {
-    const el = document.getElementById(s);
-    if (el) el.style.display = s === 'dashboard-screen' ? 'block' : 'none';
-  });
-  const loadingDiv = document.getElementById('dash-loading');
-  const contentDiv = document.getElementById('dash-content');
-  if (loadingDiv) loadingDiv.style.display = 'none';
-  if (contentDiv) contentDiv.style.display = 'block';
-
-  // Hide all portfolio-only content in overview and holdings tabs
-  document.querySelectorAll('[data-portfolio-content]').forEach(el => {
-    el.style.display = 'none';
-    el.setAttribute('data-pc-hidden', '1');
-  });
-
-  // Show 'no portfolio' message in overview and holdings tabs
-  ['dash-tab-overview','dash-tab-holdings'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el || el.querySelector('.no-port-msg')) return;
-    const msg = document.createElement('div');
-    msg.className = 'no-port-msg';
-    msg.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 1rem;text-align:center;color:var(--text3);';
-    msg.innerHTML = '<div style="font-size:2rem;margin-bottom:0.75rem;">📂</div>'
-      + '<div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:0.4rem;">No portfolio loaded</div>'
-      + '<div style="font-size:13px;margin-bottom:1.25rem;">Load your portfolio CSV to see your holdings, P&L and charts here.</div>'
-      + '<button class="btn btn-primary" style="font-size:13px;padding:8px 20px;" onclick="goBack()">&larr; Load Portfolio</button>';
-    el.insertBefore(msg, el.firstChild);
-  });
-
-  // Activate stocksearch tab
-  if (typeof window.switchDashTab === 'function') {
-    window.switchDashTab('stocksearch', document.querySelector('[data-tab="stocksearch"]'));
-  }
-};
-
-function toggleSection(bodyId, btnId) {
-  const body = document.getElementById(bodyId);
-  const btn  = document.getElementById(btnId);
-  const collapsed = body.classList.toggle('collapsed');
-  btn.textContent = collapsed ? '▼' : '▲';
-}
-
-// Chart registry — charts.js writes here after each render
-window._chartInstances = window._chartInstances || {};
-
-// Remove screener-mode overlays when real dashboard loads
-window._clearNoPortMsgs = function() {
-  document.querySelectorAll('.no-port-msg').forEach(el => el.remove());
-  // Restore portfolio content that was hidden in screener mode
-  document.querySelectorAll('[data-pc-hidden]').forEach(el => {
-    el.style.display = '';
-    el.removeAttribute('data-pc-hidden');
-  });
-};
-
 function downloadSampleCSV() {
   var csv = "ticker,quantity,average_buy_price,buy_date,upstox_ticker\nRELIANCE.NS,10,2400.50,2023-06-01,INE002A01018\nTCS.NS,5,3800.00,2023-04-15,\nINFY.NS,20,1500.00,2023-01-10,";
-  var a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'portfolio_sample.csv';
+  var a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = "portfolio_sample.csv";
   a.click();
 }
-
-// Maximize: re-renders chart at full resolution using stored Chart.js config
-function maximizeChart(cardId, bodyId, canvasId) {
-  const existing = document.getElementById('chart-maximized-overlay');
-  if (existing) { existing.remove(); return; }
-
-  const overlay = document.createElement('div');
-  overlay.id = 'chart-maximized-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;';
-
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = '✕ Close';
-  closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;z-index:1;';
-  closeBtn.onclick = () => overlay.remove();
-
-  const canvasWrap = document.createElement('div');
-  canvasWrap.style.cssText = 'position:relative;width:min(900px,90vw);height:min(560px,80vh);background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1rem;box-sizing:border-box;';
-  const bigCanvas = document.createElement('canvas');
-  bigCanvas.style.cssText = 'width:100%;height:100%;display:block;';
-  canvasWrap.appendChild(bigCanvas);
-  overlay.appendChild(closeBtn);
-  overlay.appendChild(canvasWrap);
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(() => {
-    const srcChart = window._chartInstances[canvasId];
-    if (srcChart) {
-      try {
-        // Read actual rendered data directly — always plain arrays
-        const labels = srcChart.data.labels.slice();
-        const cleanDatasets = srcChart.data.datasets.map(ds => ({
-          data: ds.data.slice(),
-          borderColor: ds.borderColor,
-          borderWidth: ds.borderWidth || 2,
-          backgroundColor: 'rgba(0,0,0,0)',
-          fill: false,
-          pointRadius: 0,
-          pointHoverRadius: ds.pointHoverRadius || 5,
-          tension: ds.tension || 0.3,
-        }));
-        // Build axis config from scratch — avoids Scale instance serialization issue
-        const axisStyle = { color: '#7777a0', font: { size: 11 } };
-        new Chart(bigCanvas, {
-          type: srcChart.config.type,
-          data: { labels, datasets: cleanDatasets },
-          options: {
-            animation: false, responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false },
-              tooltip: { mode: 'index', intersect: false } },
-            scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.03)' },
-                   border: { color: 'rgba(255,255,255,0.1)' },
-                   ticks: { ...axisStyle, maxTicksLimit: 12, maxRotation: 0, autoSkip: true } },
-              y: { grid: { color: 'rgba(255,255,255,0.03)' },
-                   border: { color: 'rgba(255,255,255,0.1)' },
-                   ticks: { ...axisStyle } },
-            },
-            interaction: { mode: 'index', intersect: false },
-          },
-        });
-        return;
-      } catch(e) { console.warn('Chart re-render failed, falling back', e); }
-    }
-    // High-DPI fallback
-    const src = document.getElementById(canvasId);
-    if (!src) return;
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvasWrap.offsetWidth, h = canvasWrap.offsetHeight;
-    bigCanvas.width = w * dpr; bigCanvas.height = h * dpr;
-    bigCanvas.style.width = w + 'px'; bigCanvas.style.height = h + 'px';
-    const ctx = bigCanvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.drawImage(src, 0, 0, w, h);
-  });
-
-  const esc = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } };
-  document.addEventListener('keydown', esc);
-}
+window._chartInstances = {};
+window._clearNoPortMsgs = function() {};
 </script>
 
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/index-main.js"></script>
 
-<!-- STOCK PICKER MODAL -->
 <div id="stock-picker-modal" class="modal-overlay" style="display:none;align-items:flex-start;padding-top:40px;" onclick="if(event.target===this)closeStockPicker()">
   <div class="sp-modal-box">
-    <!-- Header -->
     <div class="sp-modal-header">
-      <div class="sp-modal-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Holdings
-      </div>
+      <div class="sp-modal-title">Add Holdings</div>
       <div style="display:flex;gap:8px;align-items:center;">
         <div id="sp-db-status" style="display:none;font-size:12px;color:var(--text2);padding:4px 10px;background:var(--bg3);border-radius:6px;"></div>
         <button class="modal-close" onclick="closeStockPicker()">✕</button>
       </div>
     </div>
-
-    <!-- Rows container -->
     <div class="sp-modal-body">
       <div id="sp-rows"></div>
-
-      <!-- Error box -->
       <div id="sp-errors" style="display:none;margin:12px 0;padding:10px 14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:var(--red);font-size:13px;line-height:1.7;"></div>
-
-      <!-- Add row button -->
-      <button class="sp-add-row-btn" onclick="_spAddRow()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Another Stock
-      </button>
+      <button class="sp-add-row-btn" onclick="_spAddRow()">+ Add Another Stock</button>
     </div>
-
-    <!-- Footer -->
     <div class="sp-modal-footer">
-      <button class="btn btn-ghost" onclick="_spReset()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
-        Reset
-      </button>
+      <button class="btn btn-ghost" onclick="_spReset()">Reset</button>
       <div style="flex:1"></div>
       <button class="btn btn-secondary" onclick="closeStockPicker()">Cancel</button>
-      <button class="btn btn-primary sp-submit-btn" onclick="_spSubmit()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Preview Holdings
-      </button>
+      <button class="btn btn-primary sp-submit-btn" onclick="_spSubmit()">Preview Holdings</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
 </body>
 </html>

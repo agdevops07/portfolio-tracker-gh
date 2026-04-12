@@ -31,47 +31,24 @@ const SCREENS = ['upload-screen', 'preview-screen', 'dashboard-screen', 'drilldo
 
 export function showScreen(id) {
   SCREENS.forEach((s) => {
-    document.getElementById(s).style.display =
-      s === id ? (s === 'upload-screen' ? 'flex' : 'block') : 'none';
+    const el = document.getElementById(s);
+    if (!el) return; // element may not exist on this page
+    el.style.display = s === id ? (s === 'upload-screen' ? 'flex' : 'block') : 'none';
   });
 }
 
 export function goBack() {
-  // Stop any running auto-refresh
+  // Clear session and go back to upload page
+  try { sessionStorage.removeItem('portfolio_csv'); } catch(_e) {}
   if (typeof window._stopAutoRefresh === 'function') window._stopAutoRefresh();
-
-  // Dynamically import state and reset everything
-  import('./state.js').then(({ state, resetAllCaches }) => {
-    resetAllCaches();
-    state.rawRows             = [];
-    state.holdings            = {};
-    state.portfolioTimeSeries = [];
-    state.fullTimeSeries      = [];
-    state.histories           = {};
-    state.dayHistories        = {};
-    state.currentFilter       = '1Y';
-    state.refreshPaused       = false;
-    if (state.refreshIntervalId) {
-      clearInterval(state.refreshIntervalId);
-      state.refreshIntervalId = null;
-    }
-  });
-
-  // Destroy charts
   if (typeof window._destroyAllCharts === 'function') window._destroyAllCharts();
-
-  // Remove any no-portfolio overlays
-  if (typeof window._clearNoPortMsgs === 'function') window._clearNoPortMsgs();
-
-  // Reset upload screen UI
-  const fileInput = document.getElementById('file-input');
-  if (fileInput) fileInput.value = '';
-  const errDiv = document.getElementById('preview-error');
-  if (errDiv) errDiv.innerHTML = '';
-
-  showScreen('upload-screen');
+  window.location.href = 'index.html';
 }
 
 export function showDashboard() {
-  showScreen('dashboard-screen');
+  // On dashboard.html, hide drilldown, show dashboard content
+  const ds = document.getElementById('dashboard-screen');
+  const dd = document.getElementById('drilldown-screen');
+  if (ds) ds.style.display = 'block';
+  if (dd) dd.style.display = 'none';
 }

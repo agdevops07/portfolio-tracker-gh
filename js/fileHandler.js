@@ -60,16 +60,22 @@ export function initFileHandlers() {
 // ── Public entry points ──────────────────────────
 export function handleFile(file) {
   clearPortfolioState();
-  Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    complete: (r) => processCSV(r.data),
-    error: (err) => alert('CSV parse error: ' + err.message),
-  });
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const csvText = ev.target.result;
+    try { sessionStorage.setItem('portfolio_csv', csvText); } catch(_e) {}
+    Papa.parse(csvText, {
+      header: true, skipEmptyLines: true,
+      complete: (r) => processCSV(r.data),
+      error: (err) => alert('CSV parse error: ' + err.message),
+    });
+  };
+  reader.readAsText(file);
 }
 
 export function loadSampleData() {
   clearPortfolioState();
+  try { sessionStorage.setItem('portfolio_csv', SAMPLE_CSV); } catch(_e) {}
   Papa.parse(SAMPLE_CSV, {
     header: true,
     skipEmptyLines: true,
@@ -82,6 +88,7 @@ export async function loadMyPortfolio() {
   showToast('Loading your portfolio...');
   try {
     const csvText = await fetchPortfolioCSV();
+    try { sessionStorage.setItem('portfolio_csv', csvText); } catch(_e) {}
     Papa.parse(csvText, {
       header: true,
       skipEmptyLines: true,
@@ -111,7 +118,7 @@ function normalizeDate(raw) {
 // ── CSV processing ───────────────────────────────
 export function processCSV(rows) {
   const errDiv = document.getElementById('preview-error');
-  errDiv.innerHTML = '';
+  if (errDiv) errDiv.innerHTML = '';
   const errors = [];
   const clean = [];
 
@@ -131,10 +138,10 @@ export function processCSV(rows) {
   });
 
   if (errors.length) {
-    errDiv.innerHTML = `<div class="error-box">${errors.join('<br>')}</div>`;
+    if (errDiv) errDiv.innerHTML = `<div class="error-box">${errors.join('<br>')}</div>`;
   }
   if (!clean.length) {
-    errDiv.innerHTML += `<div class="error-box">No valid rows found.</div>`;
+    if (errDiv) errDiv.innerHTML += `<div class="error-box">No valid rows found.</div>`;
     return;
   }
 
