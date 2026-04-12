@@ -8,6 +8,67 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="stylesheet" href="styles/main.css">
+<script>
+  function maximizeChart(cardId, bodyId, canvasId) {
+  const existing = document.getElementById('chart-maximized-overlay');
+  if (existing) { existing.remove(); return; }
+  const overlay = document.createElement('div');
+  overlay.id = 'chart-maximized-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;';
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ Close';
+  closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;z-index:1;';
+  closeBtn.onclick = () => overlay.remove();
+  const canvasWrap = document.createElement('div');
+  canvasWrap.style.cssText = 'position:relative;width:min(900px,90vw);height:min(560px,80vh);background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1rem;box-sizing:border-box;';
+  const bigCanvas = document.createElement('canvas');
+  bigCanvas.style.cssText = 'width:100%;height:100%;display:block;';
+  canvasWrap.appendChild(bigCanvas);
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(canvasWrap);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => {
+    const srcChart = window._chartInstances[canvasId];
+    if (srcChart) {
+      try {
+        const labels = srcChart.data.labels.slice();
+        const cleanDatasets = srcChart.data.datasets.map(ds => ({
+          data: ds.data.slice(), borderColor: ds.borderColor, borderWidth: ds.borderWidth || 2,
+          backgroundColor: 'rgba(0,0,0,0)', fill: false, pointRadius: 0,
+          pointHoverRadius: ds.pointHoverRadius || 5, tension: ds.tension || 0.3,
+        }));
+        const axisStyle = { color: '#7777a0', font: { size: 11 } };
+        new Chart(bigCanvas, {
+          type: srcChart.config.type,
+          data: { labels, datasets: cleanDatasets },
+          options: { animation: false, responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
+                   ticks: { ...axisStyle, maxTicksLimit: 12, maxRotation: 0, autoSkip: true } },
+              y: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
+                   ticks: { ...axisStyle } },
+            }, interaction: { mode: 'index', intersect: false },
+          },
+        });
+        return;
+      } catch(e) { console.warn('Chart re-render failed', e); }
+    }
+    const src = document.getElementById(canvasId);
+    if (!src) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvasWrap.offsetWidth, h = canvasWrap.offsetHeight;
+    bigCanvas.width = w * dpr; bigCanvas.height = h * dpr;
+    bigCanvas.style.width = w + 'px'; bigCanvas.style.height = h + 'px';
+    const ctx = bigCanvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.drawImage(src, 0, 0, w, h);
+  });
+  const esc = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } };
+  document.addEventListener('keydown', esc);
+}
+</script>
+
 <style>
 /* ── Screener page nav ── */
 .screener-nav {
@@ -232,6 +293,7 @@
                 <button class="tf-btn ss-tf-btn" data-f="ALL" onclick="window._ssSetFilter('ALL',this)">ALL</button>
                 <button class="tf-btn ss-tf-btn active" data-f="CUSTOM" onclick="window._ssSetFilter('CUSTOM',this)">Custom</button>
               </div>
+              <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-history-card','ss-history-body','ssChart')">⤢</button>
               <button class="collapse-btn" id="ss-history-toggle" onclick="toggleSection('ss-history-body','ss-history-toggle')">▲</button>
             </div>
           </div>
@@ -249,6 +311,7 @@
       <div class="chart-card dd-chart-half" id="ss-day-card">
         <div class="chart-header" onclick="toggleSection('ss-day-body','ss-day-toggle')">
           <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
+           <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-day-card','ss-day-body','ssDayChart')">⤢</button>
           <button class="collapse-btn" id="ss-day-toggle" onclick="toggleSection('ss-day-body','ss-day-toggle')">▲</button>
         </div>
         <div id="ss-day-body" class="collapsible-body">
