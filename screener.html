@@ -190,7 +190,7 @@
     <div class="ss-compact-search" style="position:relative;">
       <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none;">🔍</span>
       <input type="text" id="ss-search-input-compact" placeholder="Search another stock…" autocomplete="off" style="padding-right:36px;">
-      <button class="ss-clear-btn" id="ss-clear-btn-compact" onclick="window._ssClear()" title="Clear" style="display:none;right:8px;">✕</button>
+      <button class="ss-clear-btn" id="ss-clear-btn-compact" onclick="window._ssClear()" title="Clear" style="display:block;right:8px;">✕</button>
       <div id="ss-dropdown-compact" class="sp-dropdown" style="display:none;top:42px;left:0;right:0;text-align:left;"></div>
     </div>
   </div>
@@ -287,7 +287,7 @@
     <div class="ai-insights-box" id="ss-ai-box">
       <div class="ai-header">
         <span class="ai-badge">✨ AI</span>
-        <span class="ai-title">Filing Insights</span>
+        <span class="ai-title">Filing Insights [ Coming Soon... ]</span>
         <span class="ai-model-tag">Powered by Pollinations.ai · Open Source · No API Key</span>
       </div>
       <div class="ai-tab-bar" id="ai-tab-bar">
@@ -316,7 +316,7 @@
     <div class="ss-section" id="ss-filings-section">
       <div class="ss-section-header">
         <div>
-          <div class="ss-section-title">📋 Exchange Filings</div>
+          <div class="ss-section-title">📋 Exchange Filings [ Under Developement... ]</div>
           <div class="ss-section-sub">NSE &amp; BSE regulatory disclosures</div>
         </div>
         <div style="display:flex;gap:0.5rem;">
@@ -325,6 +325,19 @@
         </div>
       </div>
       <div id="ss-filings-grid" class="filings-grid">
+        <div class="news-skeleton"></div><div class="news-skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Concall Transcripts -->
+    <div class="ss-section" id="ss-concalls-section">
+      <div class="ss-section-header">
+        <div>
+          <div class="ss-section-title">🎙️ Conference Call Transcripts [ Under Developement... ]</div>
+          <div class="ss-section-sub">Earnings calls and investor presentations</div>
+        </div>
+      </div>
+      <div id="ss-concalls-grid" class="filings-grid">
         <div class="news-skeleton"></div><div class="news-skeleton"></div>
       </div>
     </div>

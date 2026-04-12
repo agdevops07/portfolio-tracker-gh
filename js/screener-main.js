@@ -193,6 +193,7 @@ async function loadStock(ticker, meta) {
   // Load news and filings in parallel
   loadNews(ticker, meta);
   loadFilings(ticker, meta);
+  loadConcalls(ticker, meta);
 }
 
 // ── Skeleton ──────────────────────────────────────
@@ -291,7 +292,7 @@ function renderExchangeLinks(ticker, meta) {
       const isNseSme = meta?.exchange === 'NSE-SME';
       if (isNseSme) {
         // For NSE SME stocks, link directly to the SME tab this is the base page not the stock page
-        nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements#Annoucement_sme`;
+        nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(nseSym)}&tabIndex=sme`;
       } else {
         // For regular NSE stocks
         nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(nseSym)}`;
@@ -652,11 +653,38 @@ async function loadFilings(ticker, meta) {
 
   // 4. Direct exchange links — always useful as reference
   const slug = ((_meta?.company || sym).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
-  if (bseCode) filings.push({ exchange: 'BSE', title: 'BSE Filings Page', date: '', type: '',
-    link: 'https://www.bseindia.com/corporates/ann.html?scrip=' + bseCode + '&type=0', isPdf: false });
-  filings.push({ exchange: 'NSE', title: 'NSE Filings Page', date: '', type: '',
-    link: 'https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=' + encodeURIComponent(sym), isPdf: false });
 
+  const isNseSme = meta?.exchange === 'NSE-SME';
+
+  // BSE link (unchanged)
+  if (bseCode) {
+    filings.push({
+      exchange: 'BSE',
+      title: 'BSE Filings Page',
+      date: '',
+      type: '',
+      link: 'https://www.bseindia.com/corporates/ann.html?scrip=' + bseCode + '&type=0',
+      isPdf: false
+    });
+  }
+
+  // NSE link (conditional)
+  let nseLink = 'https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=' + encodeURIComponent(sym);
+
+  if (isNseSme) {
+    nseLink += '&tabIndex=sme';
+  }
+
+  filings.push({
+    exchange: 'NSE',
+    title: 'NSE Filings Page',
+    date: '',
+    type: '',
+    link: nseLink,
+    isPdf: false
+  });
+
+  // limit
   filings = filings.slice(0, 15);
 
   // Badge color map
@@ -677,6 +705,61 @@ async function loadFilings(ticker, meta) {
   
   // Store filings for AI analysis
   window._currentFilings = filings;
+}
+
+// ── Conference Calls ──────────────────────────────
+async function loadConcalls(ticker, meta) {
+  const grid = document.getElementById('ss-concalls-grid');
+  if (!grid) return;
+
+  const sym = ticker.replace(/\.(NS|BO)$/i, '').replace(/-SM$/, '');
+  
+  // Try to fetch from Screener.in concall section
+  let concalls = [];
+  try {
+    const screenerUrl = `https://www.screener.in/company/${sym}/`;
+    const res = await fetch(proxyUrl(screenerUrl));
+    if (res.ok) {
+      const html = await res.text();
+      
+      // Parse concall links from HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const concallLinks = doc.querySelectorAll('.concall-link');
+      
+      concallLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        const title = link.getAttribute('title') || link.textContent.trim();
+        if (href && href.toLowerCase().includes('.pdf')) {
+          concalls.push({
+            title: title || 'Conference Call Transcript',
+            link: href.startsWith('http') ? href : 'https://www.screener.in' + href,
+            date: '', // Screener doesn't provide dates easily
+          });
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Concalls fetch failed', e);
+  }
+
+  if (!concalls.length) {
+    grid.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:0.5rem 0;">
+      No conference call transcripts found. <a href="https://www.screener.in/company/${sym}/" target="_blank" style="color:var(--accent2);">Check Screener.in ↗</a>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = concalls.slice(0, 5).map((c, idx) =>
+    '<div class="filing-item">' +
+    '<span style="font-size:20px;">🎙️</span>' +
+    '<div class="filing-body">' +
+    '<div class="filing-title" title="' + c.title + '">' + c.title + '</div>' +
+    (c.date ? '<div class="filing-meta">' + c.date + '</div>' : '') +
+    '</div>' +
+    '<a class="filing-link" href="' + c.link + '" target="_blank" rel="noopener">📄 Transcript</a>' +
+    '</div>'
+  ).join('');
 }
 
 // ── AI Insights ───────────────────────────────────
