@@ -27,7 +27,7 @@ jobs:
 
       - name: Inject API Key
         run: |
-          sed -i "s/YOUR_GROQ_API_KEY_HERE/${{ secrets.GROQ_API_KEY }}/g" screener-main.js
+          sed -i "s/YOUR_GROQ_API_KEY_HERE/${{ secrets.GROQ_API_KEY }}/g" js/screener-main.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
