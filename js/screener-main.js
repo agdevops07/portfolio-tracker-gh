@@ -1015,10 +1015,10 @@ window.generateAI = async function(tab) {
   const shortAbout = (_fundData?.about||'').slice(0, 150);
 
   const prompts = {
-    filings: 'Tell me about ' + company + ' in 6 bullet points. What does it do, which sector, is it profitable. ' + shortAbout,
+    filings: 'Tell me about ' + company + ' in 4 bullet points. What does it do, which sector, is it profitable. ' + shortAbout,
     results: 'Summarise the yoy and qoq quarterly results of ' + company + ' in 4 bullet points. Are revenues and profits growing? ' + qSummary,
     ar:      'Summarise the balance sheet health of ' + company + ' in 4 bullet points. Ratios: ' + ratios,
-    orders:  'What are the growth prospects, ordebook and risks for ' + company + ' in 6 bullet points.',
+    orders:  'What are the growth prospects, ordebook and risks for ' + company + ' in 4 bullet points.',
   };
 
   try {
