@@ -311,8 +311,10 @@
       <div class="chart-card dd-chart-half" id="ss-day-card">
         <div class="chart-header" onclick="toggleSection('ss-day-body','ss-day-toggle')">
           <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
-           <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-day-card','ss-day-body','ssDayChart')">⤢</button>
-          <button class="collapse-btn" id="ss-day-toggle" onclick="toggleSection('ss-day-body','ss-day-toggle')">▲</button>
+          <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
+            <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-day-card','ss-day-body','ssDayChart')">⤢</button>
+            <button class="collapse-btn" id="ss-day-toggle" onclick="toggleSection('ss-day-body','ss-day-toggle')">▲</button>
+          </div>
         </div>
         <div id="ss-day-body" class="collapsible-body">
           <div id="ss-day-wrap" style="position:relative;width:100%;height:260px;"></div>
