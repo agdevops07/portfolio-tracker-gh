@@ -141,12 +141,35 @@ export function processCSV(rows) {
     if (errDiv) errDiv.innerHTML = `<div class="error-box">${errors.join('<br>')}</div>`;
   }
   if (!clean.length) {
-    if (errDiv) errDiv.innerHTML += `<div class="error-box">No valid rows found.</div>`;
+    const detail = errors.length
+      ? errors.join('\n')
+      : 'Make sure your CSV has ticker, quantity and average_buy_price columns with at least one valid row.';
+    const msg = errors.length
+      ? `Your file has ${rows.length} row(s) but none passed validation:\n\n${detail}`
+      : detail;
+    if (typeof window.showUploadError === 'function') {
+      window.showUploadError(msg, 'No valid holdings found');
+    } else {
+      alert(msg);
+    }
     return;
   }
 
   state.rawRows = clean;
   state.holdings = aggregateHoldings(clean);
+
+  // Ensure sessionStorage always has a valid CSV regardless of how holdings were added
+  // (file upload, sample, or stock-picker). dashboard-main.js reads from sessionStorage on boot.
+  if (!sessionStorage.getItem('portfolio_csv')) {
+    try {
+      const reconstructed = [
+        'ticker,quantity,average_buy_price,buy_date,upstox_ticker',
+        ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''}`)
+      ].join('\n');
+      sessionStorage.setItem('portfolio_csv', reconstructed);
+    } catch (_e) {}
+  }
+
   showPreview();
 }
 
