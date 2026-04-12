@@ -190,10 +190,10 @@ async function loadStock(ticker, meta) {
   syncFilterUI();
   renderExchangeLinks(ticker, meta);
 
-  // Load news and filings in parallel
+  // Load news and filings — pass fund so concalls don't race against _fundData assignment
   loadNews(ticker, meta);
   loadFilings(ticker, meta);
-  loadConcalls(ticker, meta);
+  loadConcalls(ticker, meta, fund);
 }
 
 // ── Skeleton ──────────────────────────────────────
@@ -571,18 +571,64 @@ async function loadNews(ticker, meta) {
 
 // ── Filings ───────────────────────────────────────
 
-// ── Free AI — Ollama local + Mistral AI free tier ───────────────────────────
-async function callFreeAI(prompt) {
-  const p = encodeURIComponent(prompt.slice(0, 500));
-  // Pollinations text endpoint — free, no auth
+// ── AI — Groq (primary) + Ollama fallback ─────────────────────────────────
+// Key resolution order:
+//   1. sessionStorage (user pasted via ⚙ API Key UI — works in any deployment)
+//   2. window.__GROQ_KEY (set in a non-committed local config.js for dev)
+//   3. Vercel build-time injection — add to vite.config.js:
+//        define: { __GROQ_KEY: JSON.stringify(process.env.VITE_GROQ_API_KEY||'') }
+//      and add VITE_GROQ_API_KEY to Vercel env vars + GitHub Actions secrets.
+function getGroqKey() {
+  const session = sessionStorage.getItem('groq_api_key');
+  if (session) return session;
+  if (window.__GROQ_KEY) return window.__GROQ_KEY;
+  // Safe build-time constant check — only works if bundler injects it
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 25000);
-    const res = await fetch('https://text.pollinations.ai/' + p, { signal: ctrl.signal });
-    clearTimeout(t);
-    if (res.ok) { const txt = (await res.text()).trim(); if (txt.length > 20) return txt; }
+    // eslint-disable-next-line no-undef
+    if (typeof __GROQ_KEY !== 'undefined' && __GROQ_KEY) return __GROQ_KEY;
   } catch(_) {}
-  // Fallback: Ollama local
+  return null;
+}
+
+async function callFreeAI(prompt) {
+  const key = getGroqKey();
+
+  // ── Primary: Groq ────────────────────────────────
+  if (key) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 20000);
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          max_tokens: 512,
+          temperature: 0.4,
+          messages: [
+            { role: 'system', content: 'You are a concise Indian stock market analyst. Reply in 4-5 bullet points. No disclaimers, no preamble.' },
+            { role: 'user',   content: prompt.slice(0, 1500) },
+          ],
+        }),
+      });
+      clearTimeout(t);
+      if (res.ok) {
+        const d = await res.json();
+        const txt = d?.choices?.[0]?.message?.content?.trim();
+        if (txt && txt.length > 20) return txt;
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.warn('Groq API error:', res.status, err?.error?.message);
+        throw new Error('Groq error ' + res.status + ': ' + (err?.error?.message || 'unknown'));
+      }
+    } catch (e) {
+      if (e.message.startsWith('Groq error')) throw e;
+      console.warn('Groq fetch failed:', e.message);
+    }
+  }
+
+  // ── Fallback: Ollama local ───────────────────────
   for (const model of ['llama3.2', 'mistral', 'phi3']) {
     try {
       const ctrl = new AbortController();
@@ -590,13 +636,27 @@ async function callFreeAI(prompt) {
       const res = await fetch('http://localhost:11434/api/generate', {
         method: 'POST', signal: ctrl.signal,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: prompt.slice(0, 500), stream: false }),
+        body: JSON.stringify({ model, prompt: prompt.slice(0, 800), stream: false }),
       });
       if (res.ok) { const d = await res.json(); if (d?.response?.trim().length > 20) return d.response.trim(); }
     } catch(_) {}
   }
-  throw new Error('AI unavailable. Try again in a moment.');
+
+  if (!key) {
+    throw new Error('No Groq API key found. Click ⚙ API Key above to paste your free key from console.groq.com');
+  }
+  throw new Error('AI unavailable. Check your Groq API key or try again.');
 }
+
+// ── Runtime key setter (called from screener.html ⚙ button) ──
+window._setGroqKey = function(key) {
+  if (!key?.trim()) return;
+  sessionStorage.setItem('groq_api_key', key.trim());
+  showToast('Groq API key saved for this session ✓');
+  // Update the model tag to show key is active
+  const tag = document.getElementById('ai-model-tag');
+  if (tag) tag.textContent = 'Groq · Llama 3 · Key active ✓';
+};
 
 async function loadFilings(ticker, meta) {
   const grid = document.getElementById('ss-filings-grid');
@@ -689,58 +749,98 @@ async function loadFilings(ticker, meta) {
 
   // Badge color map
   const badgeColor = { 'AR': '#7c3aed', 'CC': '#0891b2', 'BSE': '#b45309', 'NSE': '#1d4ed8' };
-  grid.innerHTML = filings.map((f, idx) =>
-    '<div class="filing-item" id="filing-' + idx + '">' +
-    '<span class="filing-exchange" style="background:' + (badgeColor[f.exchange] || '#374151') + ';color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;">' + f.exchange + '</span>' +
-    '<div class="filing-body">' +
-    '<div class="filing-title" title="' + f.title + '">' + f.title + '</div>' +
-    (f.date ? '<div class="filing-meta">' + f.date + (f.type ? ' · ' + f.type : '') + '</div>' : '') +
-    '</div>' +
-    '<div style="display:flex;gap:8px;align-items:center;">' +
-    '<a class="filing-link" href="' + f.link + '" target="_blank" rel="noopener">' + (f.isPdf ? '📄 PDF' : 'View ↗') + '</a>' +
-    (f.isPdf ? '<button class="filing-ai-btn" onclick="analyzeFilingWithAI(' + idx + ', \'' + f.link.replace(/'/g, "\\'") + '\', \'' + f.exchange + '\')" title="Analyze with AI">✨ AI</button>' : '') +
-    '</div>' +
-    '</div>'
-  ).join('');
-  
-  // Store filings for AI analysis
+
+  // Build a human-readable label — Screener often gives "Result Raw PDF - Raw PDF"
+  // The useful info is in f.date (quarter/period) and f.type
+  function buildFilingLabel(f) {
+    // Exchange page links — already have good titles
+    if (!f.isPdf) return f.title || 'View Filings';
+
+    // For PDFs: prefer date + type combo over raw Screener title
+    if (f.date && f.type) return `${f.type} · ${f.date}`;
+    if (f.date) return f.date;
+
+    // Clean up raw Screener title as last resort
+    const cleaned = (f.title || '')
+      .replace(/\bRaw PDF\b\s*[-–·]\s*/gi, '')
+      .replace(/\bRaw PDF\b/gi, '')
+      .replace(/^\s*[-–·\s]+|[-–·\s]+\s*$/g, '')
+      .trim();
+    return cleaned || (f.type || 'Filing');
+  }
+
+  const pdfIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
+
+  grid.innerHTML = filings.map((f, idx) => {
+    const label = buildFilingLabel(f);
+    const isNavLink = !f.isPdf;
+    const linkContent = isNavLink ? 'View ↗' : `<span style="display:flex;align-items:center;gap:4px;">${pdfIcon} PDF</span>`;
+
+    return (
+      '<div class="filing-item" id="filing-' + idx + '">' +
+      '<span class="filing-exchange" style="background:' + (badgeColor[f.exchange] || '#374151') + ';color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;">' + f.exchange + '</span>' +
+      '<div class="filing-body">' +
+      '<div class="filing-title" title="' + label + '">' + label + '</div>' +
+      (f.type && f.isPdf && !f.date ? '<div class="filing-meta">' + f.type + '</div>' : '') +
+      '</div>' +
+      '<a class="filing-link" href="' + f.link + '" target="_blank" rel="noopener">' + linkContent + '</a>' +
+      '</div>'
+    );
+  }).join('');
+
   window._currentFilings = filings;
 }
 
 // ── Conference Calls ──────────────────────────────
-async function loadConcalls(ticker, meta) {
+async function loadConcalls(ticker, meta, fundData) {
   const grid = document.getElementById('ss-concalls-grid');
   if (!grid) return;
 
   const sym = ticker.replace(/\.(NS|BO)$/i, '').replace(/-SM$/, '');
-  
-  // Try to fetch from Screener.in concall section
+
+  // Use already-scraped fundData (passed in after parallel fetches complete)
+  // rather than re-fetching Screener. Falls back to a direct parse if empty.
   let concalls = [];
-  try {
-    const screenerUrl = `https://www.screener.in/company/${sym}/`;
-    const res = await fetch(proxyUrl(screenerUrl));
-    if (res.ok) {
-      const html = await res.text();
-      
-      // Parse concall links from HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const concallLinks = doc.querySelectorAll('.concall-link');
-      
-      concallLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        const title = link.getAttribute('title') || link.textContent.trim();
-        if (href && href.toLowerCase().includes('.pdf')) {
-          concalls.push({
-            title: title || 'Conference Call Transcript',
-            link: href.startsWith('http') ? href : 'https://www.screener.in' + href,
-            date: '', // Screener doesn't provide dates easily
+
+  const source = fundData || _fundData;
+
+  if (source?.concalls?.length) {
+    concalls = source.concalls.map(cc => {
+      let label = (cc.label || '').trim();
+      // PPT → Investor Presentation
+      label = label.replace(/\bPPT\b/gi, 'Investor Presentation');
+      // If label is just a generic word with no detail, replace
+      if (/^(transcript|concall|raw transcript)$/i.test(label)) label = '';
+
+      const dateMatch = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]+20\d{2}/i);
+      const dateStr = cc.date || (dateMatch ? dateMatch[0] : '');
+
+      if (!label || label === dateStr) {
+        label = (cc.url || '').toLowerCase().includes('ppt') ? 'Investor Presentation' : 'Earnings Call Transcript';
+      }
+      return { label, date: dateStr, url: cc.url, isPdf: cc.isPdf };
+    });
+  }
+
+  // Fallback: direct Screener parse only if we got nothing from fundData
+  if (!concalls.length) {
+    try {
+      const res = await fetch(proxyUrl(`https://www.screener.in/company/${sym}/`));
+      if (res.ok) {
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+        ['#concalls a[href]', '#investor-presentations a[href]', 'a.concall-link[href]'].forEach(sel => {
+          doc.querySelectorAll(sel).forEach(a => {
+            const href = a.getAttribute('href') || '';
+            if (!href || href === '#') return;
+            const url = href.startsWith('http') ? href : 'https://www.screener.in/' + href.replace(/^\//, '');
+            const rawLabel = (a.textContent.trim() || a.title || '').replace(/\bPPT\b/gi, 'Investor Presentation');
+            const dateMatch = rawLabel.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]+20\d{2}/i);
+            const label = rawLabel || (url.includes('ppt') ? 'Investor Presentation' : 'Earnings Call Transcript');
+            concalls.push({ label, date: dateMatch ? dateMatch[0] : '', url, isPdf: url.includes('.pdf') || href.includes('source') });
           });
-        }
-      });
-    }
-  } catch (e) {
-    console.warn('Concalls fetch failed', e);
+        });
+      }
+    } catch (e) { console.warn('Concalls fallback fetch failed', e); }
   }
 
   if (!concalls.length) {
@@ -750,14 +850,25 @@ async function loadConcalls(ticker, meta) {
     return;
   }
 
-  grid.innerHTML = concalls.slice(0, 5).map((c, idx) =>
+  // Sort latest first; undated at the bottom
+  concalls.sort((a, b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  const micSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;flex-shrink:0"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>`;
+  const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+
+  grid.innerHTML = concalls.slice(0, 8).map(c =>
     '<div class="filing-item">' +
-    '<span style="font-size:20px;">🎙️</span>' +
+    micSvg +
     '<div class="filing-body">' +
-    '<div class="filing-title" title="' + c.title + '">' + c.title + '</div>' +
+    '<div class="filing-title">' + c.label + '</div>' +
     (c.date ? '<div class="filing-meta">' + c.date + '</div>' : '') +
     '</div>' +
-    '<a class="filing-link" href="' + c.link + '" target="_blank" rel="noopener">📄 Transcript</a>' +
+    '<a class="filing-link" href="' + c.url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:4px;">' + docSvg + ' Transcript</a>' +
     '</div>'
   ).join('');
 }
@@ -806,7 +917,7 @@ window.analyzeFilingWithAI = async function(filingIdx, pdfLink, exchange) {
     analysisContainer.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;">
         <span class="ai-badge">✨ AI Analysis</span>
-        <span style="font-size:10px;color:var(--text3);">Powered by Pollinations.ai</span>
+        <span style="font-size:10px;color:var(--text3);">Powered by Groq · Llama 3</span>
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.6;">${html}</div>
       <div style="font-size:10px;color:var(--text3);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
@@ -861,7 +972,7 @@ function renderAITab() {
       ✨ Generate ${labels[_aiTab]} Insights
     </button>
     <div style="font-size:11px;color:var(--text3);margin-top:0.6rem;">
-      Uses Pollinations.ai (open-source AI, no API key required). Not financial advice.
+      Uses Groq + Llama 3 (free tier). Add your key via ⚙ API Key above.
     </div>`;
 }
 
@@ -904,10 +1015,10 @@ window.generateAI = async function(tab) {
   const shortAbout = (_fundData?.about||'').slice(0, 150);
 
   const prompts = {
-    filings: 'Tell me about ' + company + ' in 4 bullet points. What does it do, which sector, is it profitable. ' + shortAbout,
-    results: 'Summarise the latest quarterly results of ' + company + ' in 4 bullet points. Are revenues and profits growing? ' + qSummary,
+    filings: 'Tell me about ' + company + ' in 6 bullet points. What does it do, which sector, is it profitable. ' + shortAbout,
+    results: 'Summarise the yoy and qoq quarterly results of ' + company + ' in 4 bullet points. Are revenues and profits growing? ' + qSummary,
     ar:      'Summarise the balance sheet health of ' + company + ' in 4 bullet points. Ratios: ' + ratios,
-    orders:  'What are the growth prospects and risks for ' + company + ' in 4 bullet points.',
+    orders:  'What are the growth prospects, ordebook and risks for ' + company + ' in 6 bullet points.',
   };
 
   try {
@@ -918,7 +1029,8 @@ window.generateAI = async function(tab) {
     console.error('AI error:', e);
     area.innerHTML = `<div style="color:var(--red);font-size:13px;margin-bottom:0.5rem;">⚠ ${e.message}</div>
       <div style="font-size:12px;color:var(--text3);margin-top:0.5rem;">
-        For local AI: install <a href="https://ollama.com" target="_blank" style="color:var(--accent2);">Ollama</a>
+        Click <strong>⚙ API Key</strong> above to add your free Groq key, or for local AI: install
+        <a href="https://ollama.com" target="_blank" style="color:var(--accent2);">Ollama</a>
         and run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;">ollama pull llama3.2</code>
       </div>`;
   }
