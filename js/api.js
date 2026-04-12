@@ -331,6 +331,90 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
       fund.cashflow  = parseScreenerTable(doc, 'cash-flow');
       fund.quarterly = parseScreenerTable(doc, 'quarters');
 
+      // Annual Reports + Concalls — parse from Screener HTML
+      // Screener loads these dynamically, but static HTML contains document links
+      // Pattern: /company/source/annual-report/ID/month/year/ or external PDF URLs
+      fund.annualReports = [];
+      fund.concalls = [];
+
+      function parseDocLinks(section, isAR) {
+        if (!section) return;
+        section.querySelectorAll('a[href]').forEach(a => {
+          const href = a.getAttribute('href') || '';
+          const text = a.textContent.trim();
+          if (!href || href === '#') return;
+          // Only keep actual document links — skip bare company page links like /company/SYM/
+          const isDocLink = href.includes('source') || href.includes('annual-report') ||
+                            href.includes('concall') || href.includes('transcript') ||
+                            href.includes('.pdf') || href.includes('bseindia') ||
+                            href.includes('nseindia') || href.includes('sebi') ||
+                            /\/company\/[^/]+\/[^/]+\/\d+\//.test(href); // /company/SYM/type/ID/...
+          if (!isDocLink) return;
+          const base = href.startsWith('http') ? href : 'https://www.screener.in/' + href.replace(/^\//, '');
+          // Extract month/year from href like /company/source/quarter/1298/3/2024/
+          const hrefDate = href.match(/\/(\d{1,2})\/(20\d{2})\/?$/);
+          const textDate = text.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[\s,]+20\d{2}/i);
+          const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const date = textDate ? textDate[0] : (hrefDate ? months[parseInt(hrefDate[1])] + ' ' + hrefDate[2] : '');
+          const yearMatch = (text + href).match(/20\d{2}/);
+          const entry = {
+            label: text || ((isAR ? 'Annual Report' : 'Concall') + (date ? ' · ' + date : (yearMatch ? ' ' + yearMatch[0] : ''))),
+            date, url: base, isPdf: base.includes('.pdf') || href.includes('source'),
+          };
+          if (isAR) fund.annualReports.push(entry);
+          else fund.concalls.push(entry);
+        });
+      }
+
+      parseDocLinks(doc.querySelector('#annual-reports'), true);
+
+      // Concalls: Screener uses class="concall-link" for transcript anchors
+      // These are external PDF links (e.g. company website, BSE)
+      const concallSections = ['#concalls', '#investor-presentations'];
+      concallSections.forEach(sel => {
+        const sec = doc.querySelector(sel);
+        if (!sec) return;
+        // First try class="concall-link" anchors (direct PDF links)
+        const directLinks = sec.querySelectorAll('a.concall-link[href], a[href*=".pdf"], a[href*="transcript"], a[href*="concall"]');
+        if (directLinks.length) {
+          directLinks.forEach(a => {
+            const href = a.getAttribute('href') || '';
+            const text = a.textContent.trim() || a.title || 'Transcript';
+            if (!href || href === '#') return;
+            const base = href.startsWith('http') ? href : 'https://www.screener.in/' + href.replace(/^\//, '');
+            const row = a.closest('tr, li');
+            const rowText = row ? row.textContent : text;
+            const hrefDate = href.match(/\/(\d{1,2})\/(20\d{2})\/?$/);
+            const textDate = rowText.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[\s,]+20\d{2}/i);
+            const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const date = textDate ? textDate[0] : (hrefDate ? months[parseInt(hrefDate[1])] + ' ' + hrefDate[2] : '');
+            fund.concalls.push({ label: text, date, url: base, isPdf: base.includes('.pdf') });
+          });
+        } else {
+          // Fallback to generic parseDocLinks
+          parseDocLinks(sec, false);
+        }
+      });
+
+      // Quarterly result PDFs — from #quarters section attachment links
+      if (!fund.quarterlyPdfs) fund.quarterlyPdfs = [];
+      const qSec = doc.querySelector('#quarters');
+      if (qSec) {
+        qSec.querySelectorAll('a[href]').forEach(a => {
+          const href = a.getAttribute('href') || '';
+          const text = a.textContent.trim();
+          if (!href || href === '#') return;
+          const isDoc = href.includes('.pdf') || href.includes('bseindia') ||
+                        href.includes('nseindia') || href.includes('source') ||
+                        /\/company\/[^/]+\/[^/]+\/\d+\//.test(href);
+          if (!isDoc) return;
+          const base = href.startsWith('http') ? href : 'https://www.screener.in/' + href.replace(/^\//, '');
+          const row = a.closest('tr');
+          const period = row ? row.querySelector('td:first-child')?.textContent?.trim() : '';
+          fund.quarterlyPdfs.push({ label: text || ('Result ' + period), date: period, url: base, isPdf: true });
+        });
+      }
+
       if (Object.keys(fund).length > 2) {
         fund._source = 'screener';
         fund._url    = targetUrl;

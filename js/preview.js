@@ -17,6 +17,7 @@ const COLUMN_LABELS = {
 
 // ── Public ───────────────────────────────────────
 export function showPreview() {
+  if (!document.getElementById("preview-table")) return;
   const holdings = getSortedHoldings();
   renderRows(holdings);
   updateSortIndicators();

@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════
 
 import { state } from './state.js';
-import { fmt, pct, colorPnl, showScreen } from './utils.js';
+import { fmt, pct, colorPnl } from './utils.js';
 import { renderDrilldownChart, renderDrilldownDayChart } from './charts.js';
 import { fetchDayHistory, fetchScreenerFundamentals } from './api.js';
 
@@ -49,7 +49,17 @@ function renderFinTable(tableData, note = 'Figures in ₹ Cr') {
     }).join('');
     return `<tr><td>${row.label}</td>${cells}</tr>`;
   }).join('');
-  return `<div style="overflow-x:auto;"><table class="fund-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>
+  const uid = 'ft_' + Math.random().toString(36).slice(2,7);
+  setTimeout(() => {
+    const wrap = document.getElementById(uid);
+    if (wrap) wrap.querySelectorAll('th:first-child,td:first-child')
+      .forEach(c => c.style.cssText += ';position:sticky;left:0;background:var(--bg2);z-index:2;white-space:nowrap;');
+  }, 0);
+  return `<div class="fund-table-wrap" id="${uid}" style="overflow-x:auto;direction:rtl;">
+            <table class="fund-table" style="direction:ltr;">
+              <thead>${thead}</thead><tbody>${tbody}</tbody>
+            </table>
+          </div>
           <div class="fund-table-note">${note} · Source: <a href="${_fundData?._url||''}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a></div>`;
 }
 
@@ -125,7 +135,11 @@ function renderFundFallback(ticker) {
 
 // ── Open drilldown ────────────────────────────────
 export async function openDrilldown(ticker) {
-  showScreen('drilldown-screen');
+  // Show drilldown, hide dashboard content
+  const ds = document.getElementById('dashboard-screen');
+  const dd = document.getElementById('drilldown-screen');
+  if (ds) ds.style.display = 'none';
+  if (dd) dd.style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   _currentTicker = ticker;
   _fundTab  = 'ratios';

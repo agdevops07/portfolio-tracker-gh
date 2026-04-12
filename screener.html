@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Screener — Portfolio Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>" type="image/svg+xml">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="styles/main.css">
+<script>
+  function maximizeChart(cardId, bodyId, canvasId) {
+  const existing = document.getElementById('chart-maximized-overlay');
+  if (existing) { existing.remove(); return; }
+  const overlay = document.createElement('div');
+  overlay.id = 'chart-maximized-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;';
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ Close';
+  closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;z-index:1;';
+  closeBtn.onclick = () => overlay.remove();
+  const canvasWrap = document.createElement('div');
+  canvasWrap.style.cssText = 'position:relative;width:min(900px,90vw);height:min(560px,80vh);background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1rem;box-sizing:border-box;';
+  const bigCanvas = document.createElement('canvas');
+  bigCanvas.style.cssText = 'width:100%;height:100%;display:block;';
+  canvasWrap.appendChild(bigCanvas);
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(canvasWrap);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => {
+    const srcChart = window._chartInstances[canvasId];
+    if (srcChart) {
+      try {
+        const labels = srcChart.data.labels.slice();
+        const cleanDatasets = srcChart.data.datasets.map(ds => ({
+          data: ds.data.slice(), borderColor: ds.borderColor, borderWidth: ds.borderWidth || 2,
+          backgroundColor: 'rgba(0,0,0,0)', fill: false, pointRadius: 0,
+          pointHoverRadius: ds.pointHoverRadius || 5, tension: ds.tension || 0.3,
+        }));
+        const axisStyle = { color: '#7777a0', font: { size: 11 } };
+        new Chart(bigCanvas, {
+          type: srcChart.config.type,
+          data: { labels, datasets: cleanDatasets },
+          options: { animation: false, responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
+                   ticks: { ...axisStyle, maxTicksLimit: 12, maxRotation: 0, autoSkip: true } },
+              y: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
+                   ticks: { ...axisStyle } },
+            }, interaction: { mode: 'index', intersect: false },
+          },
+        });
+        return;
+      } catch(e) { console.warn('Chart re-render failed', e); }
+    }
+    const src = document.getElementById(canvasId);
+    if (!src) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvasWrap.offsetWidth, h = canvasWrap.offsetHeight;
+    bigCanvas.width = w * dpr; bigCanvas.height = h * dpr;
+    bigCanvas.style.width = w + 'px'; bigCanvas.style.height = h + 'px';
+    const ctx = bigCanvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.drawImage(src, 0, 0, w, h);
+  });
+  const esc = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } };
+  document.addEventListener('keydown', esc);
+}
+</script>
+
+<style>
+/* ── Screener page nav ── */
+.screener-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 2rem; border-bottom: 1px solid var(--border);
+  background: var(--bg); position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(8px);
+}
+.screener-nav-logo { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; text-decoration: none; }
+.screener-nav-links { display: flex; gap: 6px; align-items: center; }
+.nav-link { color: var(--text2); text-decoration: none; padding: 5px 12px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+.nav-link:hover { color: var(--text); background: var(--bg3); }
+.nav-link.active { color: var(--accent2); background: rgba(99,102,241,0.1); }
+
+/* ── Search hero ── */
+.ss-page { padding: 0 2rem 4rem; max-width: 1100px; margin: 0 auto; }
+.ss-hero-full { text-align: center; padding: 3rem 1rem 2rem; }
+.ss-hero-full h1 { font-size: clamp(1.6rem,4vw,2.4rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+.ss-hero-full p { color: var(--text2); font-size: 14px; margin-bottom: 2rem; }
+.ss-search-bar { position: relative; max-width: 620px; margin: 0 auto 1rem; }
+.ss-search-bar input {
+  width: 100%; padding: 14px 44px 14px 44px; border-radius: 12px;
+  border: 1px solid var(--border2); background: var(--bg2); color: var(--text);
+  font-size: 15px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.ss-search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+.ss-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; font-size: 16px; }
+.ss-clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; display: none; padding: 2px 4px; }
+.ss-hint-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 1rem; }
+
+/* ── Result panel sections ── */
+.ss-result { display: none; }
+.ss-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.ss-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+.ss-section-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.ss-section-sub { font-size: 12px; color: var(--text3); }
+.ss-section-link { font-size: 12px; color: var(--accent2); text-decoration: none; font-weight: 500; }
+.ss-section-link:hover { text-decoration: underline; }
+
+/* ── News cards ── */
+.news-grid { display: grid; gap: 0.65rem; }
+.news-item { display: flex; gap: 1rem; align-items: flex-start; padding: 0.75rem; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); transition: border-color 0.15s; text-decoration: none; color: inherit; }
+.news-item:hover { border-color: var(--border2); }
+.news-source-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 4px; background: rgba(99,102,241,0.15); color: var(--accent2); white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+.news-content { flex: 1; min-width: 0; }
+.news-title { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 3px; color: var(--text); }
+.news-meta { font-size: 11px; color: var(--text3); }
+.news-skeleton { height: 64px; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); animation: shimmer 1.4s infinite; }
+@keyframes shimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+/* ── Filings ── */
+.filings-grid { display: grid; gap: 0.6rem; }
+.filing-item { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 0.9rem; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); }
+.filing-exchange { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.filing-exchange.nse { background: rgba(34,197,94,0.15); color: var(--green); }
+.filing-exchange.bse { background: rgba(245,158,11,0.15); color: var(--gold); }
+.filing-body { flex: 1; min-width: 0; }
+.filing-title { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.filing-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.filing-link { font-size: 12px; color: var(--accent2); text-decoration: none; white-space: nowrap; flex-shrink: 0; }
+.filing-link:hover { text-decoration: underline; }
+.filing-type-badge { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: var(--bg4); color: var(--text2); flex-shrink: 0; }
+
+/* ── AI Insights ── */
+.ai-insights-box { background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(34,197,94,0.03)); border: 1px solid rgba(99,102,241,0.2); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; flex-wrap: wrap; }
+.ai-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: rgba(99,102,241,0.18); color: var(--accent2); letter-spacing: 0.05em; }
+.ai-title { font-size: 14px; font-weight: 700; }
+.ai-model-tag { font-size: 10px; color: var(--text3); margin-left: auto; }
+.ai-content { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.ai-content strong { color: var(--text); }
+.ai-content ul { padding-left: 1.2rem; margin: 0.5rem 0; }
+.ai-content li { margin-bottom: 0.3rem; }
+.ai-loading { display: flex; align-items: center; gap: 10px; color: var(--text3); font-size: 13px; }
+.ai-loading .spinner { width: 16px; height: 16px; border-width: 2px; }
+.ai-generate-btn { display: flex; align-items: center; gap: 7px; background: linear-gradient(135deg,#6366f1,#818cf8); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.ai-generate-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.ai-generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.ai-disclaimer { font-size: 11px; color: var(--text3); margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.ai-tab-bar { display: flex; gap: 6px; margin-bottom: 0.75rem; flex-wrap: wrap; }
+.ai-tab { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.ai-tab.active { background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.4); color: var(--accent2); }
+
+/* ── Exchange links row ── */
+.exchange-links { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem; }
+.exch-link-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.15s; }
+.exch-link-btn:hover { border-color: var(--accent2); color: var(--accent2); background: rgba(99,102,241,0.07); }
+.exch-link-btn .exch-icon { font-size: 14px; }
+
+/* ── Compact header after search ── */
+.ss-compact-header { display: none; align-items: center; gap: 0.75rem; padding: 0.6rem 0 1rem; flex-wrap: wrap; }
+.ss-compact-search { flex: 1; min-width: 240px; }
+.ss-compact-search input { width: 100%; padding: 9px 36px 9px 36px; border-radius: 9px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 13px; outline: none; box-sizing: border-box; }
+.ss-compact-search input:focus { border-color: var(--accent); }
+
+  /* ── Responsive ──────────────────────────────── */
+  @media (max-width: 768px) {
+    .ss-page { padding: 0 1rem 3rem; }
+    .ss-hero-full { padding: 1.5rem 0 1rem; }
+    .ss-hero-full h1 { font-size: 1.5rem; }
+    .ss-hero-full p { font-size: 13px; margin-bottom: 1.25rem; }
+    .ss-search-bar { max-width: 100%; }
+    .dd-header-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .dd-cards { grid-template-columns: repeat(2, 1fr); }
+    .dd-charts-row { flex-direction: column; }
+    .dd-chart-half { width: 100%; min-width: 0; }
+    .exchange-links { gap: 0.5rem; }
+    .exch-link-btn { font-size: 12px; padding: 5px 10px; }
+    .fund-tabs { gap: 4px; }
+    .fund-tab { font-size: 11px; padding: 5px 10px; }
+    .fund-grid { grid-template-columns: repeat(2, 1fr); }
+    .ai-tab-bar { gap: 4px; }
+    .ai-tab-btn { font-size: 11px; padding: 5px 10px; }
+    .chart-header { flex-wrap: wrap; gap: 6px; }
+    .time-filters { gap: 3px; }
+    .tf-btn { font-size: 11px; padding: 3px 8px; }
+    #ss-custom-wrap { flex-wrap: wrap; }
+    .ss-compact-header { padding: 0.5rem 0 0.75rem; }
+    .filing-item { flex-wrap: wrap; gap: 6px; }
+    .news-item { flex-direction: column; gap: 6px; }
+  }
+  @media (max-width: 480px) {
+    .dd-cards { grid-template-columns: repeat(2, 1fr); }
+    .fund-grid { grid-template-columns: 1fr 1fr; }
+    .ss-hero-full h1 { font-size: 1.25rem; }
+    .ss-hint-chips { gap: 6px; }
+    .tf-btn { font-size: 10px; padding: 3px 7px; }
+    .stat-card { padding: 0.75rem; }
+    .stat-value { font-size: 1.2rem; }
+  }
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .ss-page { padding: 0 1.5rem 3rem; }
+    .dd-cards { grid-template-columns: repeat(3, 1fr); }
+    .fund-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="screener-nav">
+  <a href="index.html" class="screener-nav-logo">📈 Portfolio Tracker</a>
+  <div class="screener-nav-links">
+    <a href="index.html" class="nav-link">⬆ Upload Portfolio</a>
+    <a id="nav-dashboard-link" href="dashboard.html" class="nav-link" style="display:none">📊 Dashboard</a>
+    <span class="nav-link active">🔍 Stock Search</span>
+  </div>
+</nav>
+
+<div class="ss-page">
+
+  <!-- HERO / SEARCH -->
+  <div id="ss-hero">
+    <div class="ss-hero-full">
+      <h1>Explore any Indian Stock</h1>
+      <p>Search across 5,000+ NSE &amp; BSE listed companies — prices, charts, fundamentals, filings &amp; AI-powered insights</p>
+      <div class="ss-search-bar" id="ss-search-wrap">
+        <span class="ss-search-icon">🔍</span>
+        <input type="text" id="ss-search-input" name="ss-search"
+          placeholder="Enter company name or ticker (e.g. Reliance, INFY…)"
+          autocomplete="off">
+        <button class="ss-clear-btn" id="ss-clear-btn" onclick="window._ssClear()" title="Clear">✕</button>
+        <div id="ss-dropdown" class="sp-dropdown" style="display:none;top:52px;left:0;right:0;text-align:left;"></div>
+      </div>
+      <div id="ss-db-status" style="display:none;font-size:12px;color:var(--text2);margin-top:0.5rem;"></div>
+      <div class="ss-hint-chips" id="ss-hints">
+        <span style="font-size:12px;color:var(--text3);align-self:center;">Try:</span>
+        <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();_ssTrigger('Reliance')">Reliance</button>
+        <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();_ssTrigger('TCS')">TCS</button>
+        <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();_ssTrigger('HDFC Bank')">HDFC Bank</button>
+        <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();_ssTrigger('Infosys')">Infosys</button>
+        <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();_ssTrigger('Eternal')">Eternal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPACT SEARCH (shown after first search) -->
+  <div id="ss-compact" class="ss-compact-header">
+    <div class="ss-compact-search" style="position:relative;">
+      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none;">🔍</span>
+      <input type="text" id="ss-search-input-compact" placeholder="Search another stock…" autocomplete="off" style="padding-right:36px;">
+      <button class="ss-clear-btn" id="ss-clear-btn-compact" onclick="window._ssClear()" title="Clear" style="display:block;right:8px;">✕</button>
+      <div id="ss-dropdown-compact" class="sp-dropdown" style="display:none;top:42px;left:0;right:0;text-align:left;"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS PANEL -->
+  <div id="ss-result" class="ss-result">
+
+    <!-- Stock header -->
+    <div class="dd-header-row" style="margin-bottom:0.75rem;">
+      <div style="flex:1;min-width:0;">
+        <div class="dd-title" id="ss-ticker-el"></div>
+        <div class="dd-subtitle" id="ss-subtitle-el"></div>
+        <div class="dd-meta" id="ss-meta-el"></div>
+        <div class="dd-about" id="ss-about-el" style="display:none;margin-top:0.5rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:800px;"></div>
+      </div>
+      <!-- Exchange links -->
+      <div style="flex-shrink:0;display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
+        <div class="exchange-links" id="ss-exchange-links"></div>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="cards-grid" id="ss-cards" style="margin-bottom:1rem"></div>
+
+    <!-- Charts row -->
+    <div class="dd-charts-row">
+      <div class="ss-section dd-chart-half" id="ss-history-card" style="display:block;padding:0;">
+        <div class="chart-card" style="margin-bottom:0;">
+          <div class="chart-header" onclick="toggleSection('ss-history-body','ss-history-toggle')">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div class="chart-title">Price History</div>
+              <span id="ss-period-chg" style="font-size:12px;font-weight:600;"></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
+              <div class="time-filters">
+                <button class="tf-btn ss-tf-btn" data-f="1M" onclick="window._ssSetFilter('1M',this)">1M</button>
+                <button class="tf-btn ss-tf-btn" data-f="3M" onclick="window._ssSetFilter('3M',this)">3M</button>
+                <button class="tf-btn ss-tf-btn" data-f="1Y" onclick="window._ssSetFilter('1Y',this)">1Y</button>
+                <button class="tf-btn ss-tf-btn" data-f="ALL" onclick="window._ssSetFilter('ALL',this)">ALL</button>
+                <button class="tf-btn ss-tf-btn active" data-f="CUSTOM" onclick="window._ssSetFilter('CUSTOM',this)">Custom</button>
+              </div>
+              <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-history-card','ss-history-body','ssChart')">⤢</button>
+              <button class="collapse-btn" id="ss-history-toggle" onclick="toggleSection('ss-history-body','ss-history-toggle')">▲</button>
+            </div>
+          </div>
+          <div id="ss-history-body" class="collapsible-body">
+            <div id="ss-custom-wrap" style="display:flex;align-items:center;gap:8px;padding:0.4rem 0 0.6rem;flex-wrap:wrap;">
+              <input type="date" id="ss-from" name="ss-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+              <span style="color:var(--text3)">to</span>
+              <input type="date" id="ss-to" name="ss-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+              <button class="tf-btn active" onclick="window._ssApplyCustom()">Apply</button>
+            </div>
+            <div class="chart-wrap" style="height:260px;"><canvas id="ssChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card dd-chart-half" id="ss-day-card">
+        <div class="chart-header" onclick="toggleSection('ss-day-body','ss-day-toggle')">
+          <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
+          <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
+            <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-day-card','ss-day-body','ssDayChart')">⤢</button>
+            <button class="collapse-btn" id="ss-day-toggle" onclick="toggleSection('ss-day-body','ss-day-toggle')">▲</button>
+          </div>
+        </div>
+        <div id="ss-day-body" class="collapsible-body">
+          <div id="ss-day-wrap" style="position:relative;width:100%;height:260px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fundamentals -->
+    <div class="chart-card collapsible-card" style="margin-bottom:1rem;">
+      <div class="chart-header" onclick="toggleSection('ss-fund-body','ss-fund-toggle')">
+        <div class="chart-title">Fundamentals <span class="chart-subtitle">(Screener.in)</span></div>
+        <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+          <div class="fund-mode-toggle">
+            <button class="fund-mode-btn" id="ss-fund-mode-cons" onclick="window._ssSwitchMode('consolidated',this)">Consolidated</button>
+            <button class="fund-mode-btn active" id="ss-fund-mode-stand" onclick="window._ssSwitchMode('standalone',this)">Standalone</button>
+          </div>
+          <button class="collapse-btn" id="ss-fund-toggle" onclick="toggleSection('ss-fund-body','ss-fund-toggle')">▲</button>
+        </div>
+      </div>
+      <div id="ss-fund-body" class="collapsible-body">
+        <div class="fund-tabs" onclick="event.stopPropagation()">
+          <button class="fund-tab active" data-tab="ratios"   onclick="window._ssSwitchFundTab('ratios',this)">Key Ratios</button>
+          <button class="fund-tab" data-tab="pnl"      onclick="window._ssSwitchFundTab('pnl',this)">P&amp;L</button>
+          <button class="fund-tab" data-tab="balance"  onclick="window._ssSwitchFundTab('balance',this)">Balance Sheet</button>
+          <button class="fund-tab" data-tab="cashflow" onclick="window._ssSwitchFundTab('cashflow',this)">Cash Flow</button>
+          <button class="fund-tab" data-tab="quarterly" onclick="window._ssSwitchFundTab('quarterly',this)">Quarterly Results</button>
+        </div>
+        <div id="ss-fundamentals" style="padding:0.5rem 0 0.25rem;">
+          <div class="ss-loading"><div class="ss-spinner"></div><span>Loading fundamentals…</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div class="ai-insights-box" id="ss-ai-box">
+      <div class="ai-header">
+        <span class="ai-badge">✨ AI</span>
+        <span class="ai-title">Filing Insights [ Coming Soon... ]</span>
+        <span class="ai-model-tag">Powered by Pollinations.ai · Open Source · No API Key</span>
+      </div>
+      <div class="ai-tab-bar" id="ai-tab-bar">
+        <button class="ai-tab active" onclick="setAiTab('filings')">📄 Latest Filings</button>
+        <button class="ai-tab" onclick="setAiTab('results')">📊 Results Analysis</button>
+        <button class="ai-tab" onclick="setAiTab('ar')">📘 Annual Report</button>
+        <button class="ai-tab" onclick="setAiTab('orders')">🏆 Order Wins</button>
+      </div>
+      <div id="ai-content-area">
+        <div style="color:var(--text3);font-size:13px;">Search for a stock to generate AI-powered filing insights.</div>
+      </div>
+    </div>
+
+    <!-- News -->
+    <div class="ss-section" id="ss-news-section">
+      <div class="ss-section-header">
+        <div class="ss-section-title">📰 Latest News</div>
+        <a id="ss-news-more" href="#" target="_blank" class="ss-section-link" style="display:none">More news ↗</a>
+      </div>
+      <div id="ss-news-grid" class="news-grid">
+        <div class="news-skeleton"></div><div class="news-skeleton"></div><div class="news-skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Filings -->
+    <div class="ss-section" id="ss-filings-section">
+      <div class="ss-section-header">
+        <div>
+          <div class="ss-section-title">📋 Exchange Filings [ Under Developement... ]</div>
+          <div class="ss-section-sub">NSE &amp; BSE regulatory disclosures</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <a id="ss-nse-filings-link" href="#" target="_blank" class="ss-section-link" style="display:none">NSE Filings ↗</a>
+          <a id="ss-bse-filings-link" href="#" target="_blank" class="ss-section-link" style="display:none">BSE Filings ↗</a>
+        </div>
+      </div>
+      <div id="ss-filings-grid" class="filings-grid">
+        <div class="news-skeleton"></div><div class="news-skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Concall Transcripts -->
+    <div class="ss-section" id="ss-concalls-section">
+      <div class="ss-section-header">
+        <div>
+          <div class="ss-section-title">🎙️ Conference Call Transcripts [ Under Developement... ]</div>
+          <div class="ss-section-sub">Earnings calls and investor presentations</div>
+        </div>
+      </div>
+      <div id="ss-concalls-grid" class="filings-grid">
+        <div class="news-skeleton"></div><div class="news-skeleton"></div>
+      </div>
+    </div>
+
+  </div><!-- /ss-result -->
+</div><!-- /ss-page -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleSection(bodyId, btnId) {
+  const body = document.getElementById(bodyId);
+  const btn  = document.getElementById(btnId);
+  if (!body || !btn) return;
+  const collapsed = body.classList.toggle('collapsed');
+  btn.textContent = collapsed ? '▼' : '▲';
+}
+window._chartInstances = {};
+
+// Show dashboard link if session has portfolio
+if (sessionStorage.getItem('portfolio_csv')) {
+  const dl = document.getElementById('nav-dashboard-link');
+  if (dl) dl.style.display = '';
+}
+
+// Chip trigger
+window._ssTrigger = function(q) {
+  document.getElementById('ss-search-input').value = q;
+  document.getElementById('ss-search-input').dispatchEvent(new Event('input'));
+};
+</script>
+
+<script type="module" src="js/screener-main.js"></script>
+</body>
+</html>
