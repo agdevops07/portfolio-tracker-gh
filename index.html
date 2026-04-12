@@ -98,7 +98,7 @@
     <div class="btn-group">
       <button class="btn btn-secondary" onclick="goBack()">← Back</button>
       <button class="btn btn-secondary" onclick="exportHoldingsCSV()">📥 Export CSV</button>
-      <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">Load Dashboard →</button>
+      <button class="btn btn-primary" onclick="loadDashboardFromPreview()">Load Dashboard →</button>
     </div>
   </div>
   <div id="preview-error"></div>
@@ -115,7 +115,7 @@
       <tbody></tbody>
     </table>
   </div>
-  <button class="btn btn-primary" style="width:100%" onclick="window.location.href='dashboard.html'">Load Dashboard →</button>
+  <button class="btn btn-primary" style="width:100%" onclick="loadDashboardFromPreview()">Load Dashboard →</button>
 </div>
 
 
@@ -129,6 +129,41 @@ function downloadSampleCSV() {
 }
 window._chartInstances = {};
 window._clearNoPortMsgs = function() {};
+
+// ── Ensure state.holdings is in sessionStorage before navigating to dashboard ──
+// The stock-picker path never writes sessionStorage, so we serialise holdings here.
+function loadDashboardFromPreview() {
+  // If sessionStorage already has valid CSV (file/sample path), just navigate.
+  var existing = sessionStorage.getItem('portfolio_csv');
+  if (existing) { window.location.href = 'dashboard.html'; return; }
+
+  // Stock-picker path: rebuild CSV from state.holdings (set by processCSV).
+  // state is available because index-main.js imported it into module scope —
+  // we reach it via the window-exposed _getHoldings helper set in index-main.js.
+  var holdings = window._getHoldings ? window._getHoldings() : null;
+  if (holdings && Object.keys(holdings).length > 0) {
+    var rows = Object.values(holdings).map(function(h) {
+      return [h.ticker, h.totalQty, h.avgBuy.toFixed(4), h.earliestDate || '', h.upstoxTicker || ''].join(',');
+    });
+    var csv = 'ticker,quantity,average_buy_price,buy_date,upstox_ticker\n' + rows.join('\n');
+    try { sessionStorage.setItem('portfolio_csv', csv); } catch(_e) {}
+    window.location.href = 'dashboard.html';
+  } else {
+    showUploadError('No holdings found. Please add at least one stock before loading the dashboard.');
+  }
+}
+
+// ── Themed error dialog ──────────────────────────
+function showUploadError(msg, title) {
+  document.getElementById('upload-err-title').textContent = title || 'Unable to load file';
+  document.getElementById('upload-err-body').textContent  = msg;
+  document.getElementById('upload-err-modal').style.display = 'flex';
+}
+function closeUploadError() {
+  document.getElementById('upload-err-modal').style.display = 'none';
+}
+window.showUploadError  = showUploadError;
+window.closeUploadError = closeUploadError;
 </script>
 
 <script type="module" src="js/index-main.js"></script>
@@ -152,6 +187,21 @@ window._clearNoPortMsgs = function() {};
       <div style="flex:1"></div>
       <button class="btn btn-secondary" onclick="closeStockPicker()">Cancel</button>
       <button class="btn btn-primary sp-submit-btn" onclick="_spSubmit()">Preview Holdings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Themed upload-error modal ──────────────────── -->
+<div id="upload-err-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeUploadError()">
+  <div style="background:var(--bg2,#1a1a2e);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.5);position:relative;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⚠️</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text,#e8e8f0);" id="upload-err-title">Unable to load file</div>
+    </div>
+    <div style="font-size:14px;color:var(--text2,#9090a8);line-height:1.65;margin-bottom:24px;" id="upload-err-body"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeUploadError()" style="padding:9px 20px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text,#e8e8f0);font-size:13px;font-weight:500;cursor:pointer;">Dismiss</button>
+      <button onclick="closeUploadError();document.getElementById('file-input').click()" style="padding:9px 20px;border-radius:8px;border:none;background:var(--accent,#6366f1);color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Try Again</button>
     </div>
   </div>
 </div>

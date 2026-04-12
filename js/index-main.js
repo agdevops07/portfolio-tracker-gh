@@ -20,6 +20,9 @@ window.exportHoldingsCSV = exportHoldingsCSV;
 window._stopAutoRefresh  = () => {};
 window._destroyAllCharts = () => {};
 
+// Expose state.holdings so the inline loadDashboardFromPreview() can serialise it
+window._getHoldings = () => state.holdings;
+
 // Paste CSV text input
 window.toggleCsvTextInput = function() {
   const wrap = document.getElementById('csv-text-wrap');
@@ -43,9 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initFileHandlers();
 
   const browseBtn = document.getElementById('browse-btn');
+  const fileInput = document.getElementById('file-input');
   const demoBtn   = document.getElementById('demo-btn');
-  if (browseBtn) browseBtn.addEventListener('click', () => document.getElementById('file-input').click());
+
+  if (browseBtn) browseBtn.addEventListener('click', () => fileInput.click());
   if (demoBtn)   demoBtn.addEventListener('click', () => loadMyPortfolio());
+
+  // Reset input value after each selection so the same file can be re-uploaded
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      // Let fileHandler process the file first, then reset so change fires next time
+      setTimeout(() => { fileInput.value = ''; }, 500);
+    });
+  }
 
   // Drag-drop visual feedback
   const dz = document.getElementById('drop-zone');

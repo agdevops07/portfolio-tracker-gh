@@ -45,11 +45,24 @@ window.switchDashTab = function(tab, btn) {
 
 // ── Boot ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  const csv = sessionStorage.getItem('portfolio_csv');
+  let csv = sessionStorage.getItem('portfolio_csv');
+
   if (!csv) {
-    // Nothing loaded — redirect to upload
-    window.location.href = 'index.html';
-    return;
+    // No CSV in session — but the stock-picker flow populates state.holdings
+    // directly without writing to sessionStorage.  Reconstruct a CSV from
+    // whatever holdings are already in state so we don't bounce back to upload.
+    const holdingValues = Object.values(state.holdings);
+    if (holdingValues.length > 0) {
+      const rows = holdingValues.map(h =>
+        `${h.ticker},${h.totalQty},${h.avgBuy.toFixed(4)},${h.earliestDate || ''},${h.upstoxTicker || ''}`
+      );
+      csv = 'ticker,quantity,average_buy_price,buy_date,upstox_ticker\n' + rows.join('\n');
+      try { sessionStorage.setItem('portfolio_csv', csv); } catch (_e) {}
+    } else {
+      // Truly nothing loaded — redirect to upload
+      window.location.href = 'index.html';
+      return;
+    }
   }
 
   // Parse CSV and boot dashboard
