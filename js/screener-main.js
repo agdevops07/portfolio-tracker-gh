@@ -28,9 +28,12 @@ window._ssTrigger = function(name) {
   inp.value = name;
   const clr = document.getElementById('ss-clear-btn');
   if (clr) clr.style.display = 'block';
-  // Fire input event to show dropdown
-  inp.dispatchEvent(new Event('input'));
+  // Focus first to ensure input is active
   inp.focus();
+  // Small delay to ensure focus is set before showing dropdown
+  setTimeout(() => {
+    inp.dispatchEvent(new Event('input'));
+  }, 50);
 };
 // ── Init ──────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,19 +52,19 @@ async function loadDB() {
   if (_db) return;
   const st = document.getElementById('ss-db-status');
   try {
-    if (st) { st.textContent = 'Loading stock database…'; st.style.display = 'block'; }
+    if (st) { st.textContent = 'Loading...'; st.style.display = 'block'; }
     const base = document.location.pathname.replace(/\/[^/]*$/, '') || '';
     const res = await fetch(base + '/data/stocks_db.json');
     if (!res.ok) throw new Error('Failed');
     _db = await res.json();
     _dbLoaded = true;
     if (st) {
-      st.textContent = `✓ ${_db.length.toLocaleString()} stocks (NSE + BSE)`;
+      st.textContent = `✓ ${_db.length.toLocaleString()} stocks`;
       st.style.color = 'var(--green)';
-      setTimeout(() => { st.style.display = 'none'; }, 2500);
+      st.style.display = 'block';
     }
   } catch {
-    if (st) { st.textContent = '⚠ Could not load stock DB. Type a ticker manually.'; st.style.color = 'var(--red)'; }
+    if (st) { st.textContent = '⚠ DB load failed'; st.style.color = 'var(--red)'; }
   }
 }
 
@@ -274,17 +277,39 @@ function renderExchangeLinks(ticker, meta) {
       <span class="exch-icon">🔎</span> Screener.in
     </a>`;
 
+  // Exchange filing links - show only relevant exchanges
+  const exchange = meta?.exchange || '';
+  const bseCode = meta?.bseCode;
+  const isBseOnly = /\.BO$/i.test(ticker) || exchange === 'BSE';
+  const isNseOnly = /\.NS$/i.test(ticker) || exchange === 'NSE' || exchange === 'NSE-SME';
+  
   // NSE Filings link
   const nseFilingsLink = document.getElementById('ss-nse-filings-link');
   if (nseFilingsLink) {
-    nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(nseSym)}`;
-    nseFilingsLink.style.display = '';
+    if (!isBseOnly) {
+      // Check if this is an NSE SME stock
+      const isNseSme = meta?.exchange === 'NSE-SME';
+      if (isNseSme) {
+        // For NSE SME stocks, link directly to the SME tab this is the base page not the stock page
+        nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements#Annoucement_sme`;
+      } else {
+        // For regular NSE stocks
+        nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(nseSym)}`;
+      }
+      nseFilingsLink.style.display = '';
+    } else {
+      nseFilingsLink.style.display = 'none';
+    }
   }
   // BSE Filings link
   const bseFilingsLink = document.getElementById('ss-bse-filings-link');
   if (bseFilingsLink) {
-    bseFilingsLink.href = `https://www.bseindia.com/corporates/ann.html?scrip=${encodeURIComponent(sym)}&type=0`;
-    bseFilingsLink.style.display = '';
+    if (bseCode && !isNseOnly) {
+      bseFilingsLink.href = `https://www.bseindia.com/corporates/ann.html?scrip=${bseCode}`;
+      bseFilingsLink.style.display = '';
+    } else {
+      bseFilingsLink.style.display = 'none';
+    }
   }
 }
 
@@ -464,33 +489,29 @@ async function loadNews(ticker, meta) {
   const company = meta?.company || ticker.replace(/\.(NS|BO)$/i, '');
   const sym = ticker.replace(/\.(NS|BO)$/i, '');
 
-  // Use Yahoo Finance news via the chart API (it includes news items)
   let articles = [];
   try {
-    // Use ticker directly for stock-specific news
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d&includePrePost=false`;
+    // Use company name for more relevant news
+    const searchQuery = company || sym;
+    const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(searchQuery)}&newsCount=10&quotesCount=0&enableFuzzyQuery=false`;
     const res = await fetch(proxyUrl(url));
     if (res.ok) {
       const data = await res.json();
-      const news = data?.chart?.result?.[0]?.events?.dividends; // not news here, use search endpoint
-    }
-  } catch(_e) {}
-  try {
-    // Stock-specific news via Yahoo search with ticker symbol
-    const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(sym)}&newsCount=8&quotesCount=0&enableFuzzyQuery=false`;
-    const res = await fetch(proxyUrl(url));
-    if (res.ok) {
-      const data = await res.json();
-      articles = (data?.news || []).slice(0, 6).map(n => ({
-        title: n.title,
-        publisher: n.publisher,
-        link: n.link,
-        time: n.providerPublishTime ? new Date(n.providerPublishTime * 1000).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '',
-      }));
+      articles = (data?.news || [])
+        .filter(n => n.title && (
+          n.title.toLowerCase().includes(company.toLowerCase()) ||
+          n.title.toLowerCase().includes(sym.toLowerCase())
+        ))
+        .slice(0, 6)
+        .map(n => ({
+          title: n.title,
+          publisher: n.publisher,
+          link: n.link,
+          time: n.providerPublishTime ? new Date(n.providerPublishTime * 1000).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '',
+        }));
     }
   } catch (e) { console.warn('News fetch failed', e); }
 
-  // More link
   const moreLink = document.getElementById('ss-news-more');
   if (moreLink) {
     moreLink.href = `https://finance.yahoo.com/quote/${encodeURIComponent(ticker)}/news/`;
@@ -521,75 +542,194 @@ async function loadFilings(ticker, meta) {
 
   const sym = ticker.replace(/\.(NS|BO)$/i, '').replace(/-SM$/, '');
   const bseCode = meta?.bseCode || null;
-  let filings = [];
+  const exchange = meta?.exchange || '';
+  const isBseOnly = /\.BO$/i.test(ticker) || exchange === 'BSE';
+  const isNseOnly = /\.NS$/i.test(ticker) || exchange === 'NSE' || exchange === 'NSE-SME';
+  
+  let bseFilings = [];
+  let nseFilings = [];
 
-  // 1. Try BSE announcements API (returns actual PDF links)
-  if (bseCode) {
+  // 1. Fetch BSE announcements if available (not NSE-only)
+  if (bseCode && !isNseOnly) {
     try {
       const bseUrl = `https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w?pageno=1&strCat=-1&strPrevDate=&strScrip=${bseCode}&strSearch=P&strToDate=&strType=C&subcategory=-1`;
       const res = await fetch(proxyUrl(bseUrl), { headers: { 'Accept': 'application/json' } });
       if (res.ok) {
         const data = await res.json();
         const items = data?.Table || [];
-        filings = items.slice(0, 6).map(f => {
+        bseFilings = items.slice(0, 8).map(f => {
           const pdfLink = f.ATTACHMENTNAME
             ? 'https://www.bseindia.com/xml-data/corpfiling/AttachLive/' + f.ATTACHMENTNAME
-            : 'https://www.bseindia.com/corporates/ann.html?scrip=' + bseCode + '&type=0';
+            : null;
           return {
             exchange: 'BSE',
-            title: f.NEWSSUB || f.SUBCATNAME || 'Announcement',
+            title: (f.NEWSSUB || f.SUBCATNAME || 'Announcement').trim(),
             date: f.NEWS_DT ? new Date(f.NEWS_DT).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '',
-            type: f.SUBCATNAME || '',
-            link: pdfLink,
-            isPdf: !!f.ATTACHMENTNAME,
+            type: (f.SUBCATNAME || '').trim(),
+            link: pdfLink || ('https://www.bseindia.com/corporates/ann.html?scrip=' + bseCode),
+            isPdf: !!pdfLink,
           };
-        });
+        }).filter(f => f.title && f.title !== 'Announcement');
       }
-    } catch (e) { console.warn('BSE filings failed', e); }
+    } catch (e) { 
+      console.warn('BSE filings failed', e);
+    }
   }
 
-  // 2. Try NSE announcements API
-  if (!filings.length) {
+  // 2. Fetch NSE announcements if available (not BSE-only)
+  if (!isBseOnly) {
     try {
-      const nseUrl = `https://www.nseindia.com/api/corp-announcements?index=equities&symbol=\${encodeURIComponent(sym)}`;
-      const res = await fetch(proxyUrl(nseUrl), { headers: { 'Accept': 'application/json' } });
+      const nseUrl = `https://www.nseindia.com/api/corp-announcements?index=equities&symbol=${encodeURIComponent(sym)}`;
+      const res = await fetch(proxyUrl(nseUrl), { 
+        headers: { 
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0'
+        } 
+      });
       if (res.ok) {
         const data = await res.json();
         const items = Array.isArray(data) ? data : (data?.data || []);
-        filings = items.slice(0, 5).map(f => ({
-          exchange: 'NSE',
-          title: f.desc || f.attchmntText || f.subject || 'Announcement',
-          date: f.an_dt ? new Date(f.an_dt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '',
-          type: f.attchmntType || f.purpose || '',
-          link: f.attchmntFile ? 'https://www.nseindia.com' + f.attchmntFile : 'https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=' + encodeURIComponent(sym),
-          isPdf: !!f.attchmntFile,
-        }));
+        nseFilings = items.slice(0, 8).map(f => {
+          const pdfLink = f.attchmntFile ? ('https://www.nseindia.com' + f.attchmntFile) : null;
+          return {
+            exchange: 'NSE',
+            title: (f.desc || f.attchmntText || f.subject || '').trim(),
+            date: f.an_dt ? new Date(f.an_dt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '',
+            type: (f.attchmntType || f.purpose || '').trim(),
+            link: pdfLink || ('https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=' + encodeURIComponent(sym)),
+            isPdf: !!pdfLink,
+          };
+        }).filter(f => f.title);
       }
-    } catch (e) { console.warn('NSE filings failed', e); }
+    } catch (e) { 
+      console.warn('NSE filings failed', e);
+    }
   }
 
-  // 3. Fallback: direct links to exchange filing pages
+  // 3. Combine and sort by date
+  let filings = [...bseFilings, ...nseFilings];
+  
+  // If no filings fetched, show fallback links only for available exchanges
   if (!filings.length) {
-    filings = [
-      { exchange: 'BSE', title: 'View all BSE corporate filings', date: '', type: '', link: 'https://www.bseindia.com/corporates/ann.html?scrip=' + (bseCode || sym) + '&type=0', isPdf: false },
-      { exchange: 'NSE', title: 'View all NSE corporate filings', date: '', type: '', link: 'https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=' + encodeURIComponent(sym), isPdf: false },
-    ];
+    filings = [];
+    if (bseCode && !isNseOnly) {
+      filings.push({ 
+        exchange: 'BSE', 
+        title: 'View all BSE corporate filings', 
+        date: '', 
+        type: '', 
+        link: 'https://www.bseindia.com/corporates/ann.html?scrip=' + bseCode, 
+        isPdf: false 
+      });
+    }
+    if (!isBseOnly) {
+      filings.push({ 
+        exchange: 'NSE', 
+        title: 'View all NSE corporate filings', 
+        date: '', 
+        type: '', 
+        link: 'https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=' + encodeURIComponent(sym), 
+        isPdf: false 
+      });
+    }
   }
 
-  grid.innerHTML = filings.map(f =>
-    '<div class="filing-item">' +
+  // Limit to 10 total filings
+  filings = filings.slice(0, 10);
+
+  grid.innerHTML = filings.map((f, idx) =>
+    '<div class="filing-item" id="filing-' + idx + '">' +
     '<span class="filing-exchange ' + f.exchange.toLowerCase() + '">' + f.exchange + '</span>' +
     '<div class="filing-body">' +
     '<div class="filing-title" title="' + f.title + '">' + f.title + '</div>' +
-    (f.date ? '<div class="filing-meta">' + f.date + '</div>' : '') +
+    (f.date ? '<div class="filing-meta">' + f.date + (f.type ? ' · ' + f.type : '') + '</div>' : '') +
     '</div>' +
-    (f.type ? '<span class="filing-type-badge">' + f.type + '</span>' : '') +
+    '<div style="display:flex;gap:8px;align-items:center;">' +
     '<a class="filing-link" href="' + f.link + '" target="_blank" rel="noopener">' + (f.isPdf ? '📄 PDF' : 'View ↗') + '</a>' +
+    (f.isPdf ? '<button class="filing-ai-btn" onclick="analyzeFilingWithAI(' + idx + ', \'' + f.link.replace(/'/g, "\\'") + '\', \'' + f.exchange + '\')" title="Analyze with AI">✨ AI</button>' : '') +
+    '</div>' +
     '</div>'
   ).join('');
+  
+  // Store filings for AI analysis
+  window._currentFilings = filings;
 }
 
 // ── AI Insights ───────────────────────────────────
+window.analyzeFilingWithAI = async function(filingIdx, pdfLink, exchange) {
+  const filing = window._currentFilings?.[filingIdx];
+  if (!filing) return;
+  
+  const filingEl = document.getElementById('filing-' + filingIdx);
+  if (!filingEl) return;
+  
+  // Create or find analysis container
+  let analysisContainer = filingEl.querySelector('.filing-ai-analysis');
+  if (!analysisContainer) {
+    analysisContainer = document.createElement('div');
+    analysisContainer.className = 'filing-ai-analysis';
+    analysisContainer.style.cssText = 'grid-column: 1 / -1; margin-top: 0.75rem; padding: 0.75rem; background: rgba(99,102,241,0.05); border: 1px solid rgba(99,102,241,0.2); border-radius: 8px;';
+    filingEl.appendChild(analysisContainer);
+  }
+  
+  analysisContainer.innerHTML = '<div class="ai-loading"><div class="spinner"></div><span>Analyzing filing content with AI...</span></div>';
+  
+  try {
+    // For demonstration: since we can't actually scrape PDFs via CORS proxy,
+    // we'll use the filing metadata to generate insights
+    const company = _meta?.company || _ticker.replace(/\.(NS|BO)$/i, '');
+    const filingTitle = filing.title;
+    const filingDate = filing.date;
+    const filingType = filing.type;
+    
+    const prompt = `Analyze ${company} filing: ${filingTitle}. Key info, stock impact, investor actions. Brief bullets only.`;
+
+    const encoded = encodeURIComponent(prompt);
+    const response = await fetch(`https://text.pollinations.ai/${encoded}`, {
+      method: 'GET',
+      headers: { 'Accept': 'text/plain' },
+    });
+    
+    if (!response.ok) throw new Error(`AI API error ${response.status}`);
+    let text = await response.text();
+    if (!text?.trim()) throw new Error('Empty response');
+    
+    // Filter out deprecation notice - improved
+    text = text.replace(/⚠️[\s\S]*?NOTE:.*?normally\./gi, '')
+               .replace(/⚠️.*IMPORTANT.*NOTICE.*[\s\S]*?normally\./gi, '')
+               .replace(/The Pollinations.*deprecated.*[\s\S]*?normally\./gi, '')
+               .trim();
+    if (!text) throw new Error('Empty response after filtering');
+    
+    // Format the response
+    let html = text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^#{1,3} (.+)$/gm, '<strong style="font-size:13px;color:var(--text);">$1</strong>')
+      .replace(/^(\d+)\. \*\*(.+?)\*\*/gm, '<br><strong style="color:var(--text);">$1. $2</strong>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul style="margin:0.5rem 0;padding-left:1.2rem;">${m}</ul>`)
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+    
+    analysisContainer.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;">
+        <span class="ai-badge">✨ AI Analysis</span>
+        <span style="font-size:10px;color:var(--text3);">Powered by Pollinations.ai</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">${html}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+        ⚠ AI-generated analysis based on filing metadata. Always read the full filing. Not financial advice.
+      </div>`;
+  } catch (e) {
+    console.error('Filing AI analysis error:', e);
+    analysisContainer.innerHTML = `
+      <div style="color:var(--red);font-size:12px;margin-bottom:0.5rem;">⚠ Could not generate analysis: ${e.message}</div>
+      <div style="font-size:11px;color:var(--text3);">
+        The AI service may be temporarily unavailable. Try again in a moment.
+      </div>`;
+  }
+};
+
 window.setAiTab = function(tab) {
   _aiTab = tab;
   document.querySelectorAll('.ai-tab').forEach((b, i) => {
@@ -668,86 +808,32 @@ window.generateAI = async function(tab) {
   }
 
   const prompts = {
-    filings: `You are an expert Indian stock market analyst. Analyse the latest regulatory filings and announcements for ${company} (${_ticker}) on NSE/BSE.
-
-Company context:
-- Sector: ${sector}
-- Market Cap: ${mktCap}
-- P/E: ${pe}, ROCE: ${roce}, ROE: ${roe}
-- About: ${about}
-${financialContext}
-
-Provide a structured analysis covering:
-1. **Recent Filing Activity** — what types of filings are typically submitted (board meetings, shareholding patterns, financial results)
-2. **Key Observations** — any material events investors should note
-3. **Regulatory Compliance** — SEBI disclosure adherence assessment
-4. **What to Watch** — upcoming expected filings (quarterly results, AGM, etc.)
-
-Be concise, factual, and specific to this company. Format with bullet points. 3-4 key points per section.`,
-
-    results: `You are an expert Indian stock market analyst. Analyse the financial results for ${company} (${_ticker}).
-
-Financial data:
-${financialContext || 'No detailed financial data available — use general knowledge about this company.'}
-
-Key ratios: P/E: ${pe}, ROCE: ${roce}, ROE: ${roe}, Market Cap: ${mktCap}
-Sector: ${sector}
-
-Provide analysis covering:
-1. **Revenue & Profit Trend** — growth trajectory, margins
-2. **Key Metrics Assessment** — ROCE, ROE, P/E vs sector norms
-3. **Quarterly Performance** — recent quarter highlights, YoY comparison
-4. **Analyst Perspective** — key positives and concerns from results
-
-Be direct, data-driven, and use ₹ for Indian currency. Format with bullet points.`,
-
-    ar: `You are an expert Indian equity research analyst. Provide insights on the Annual Report of ${company} (${_ticker}).
-
-Company: ${company}
-Sector: ${sector}
-About: ${about}
-Key ratios: Market Cap: ${mktCap}, P/E: ${pe}, ROCE: ${roce}, ROE: ${roe}
-
-${financialContext}
-
-Cover these areas:
-1. **Business Overview** — core segments, revenue mix
-2. **Management Commentary** — typical themes management discusses (growth drivers, risks)
-3. **Balance Sheet Health** — debt, working capital, cash position
-4. **Dividend & Capital Allocation** — payout history and policy
-5. **ESG & Governance** — board composition, sustainability initiatives
-
-Note: Infer from financial data and company profile. Format with clear headers and bullet points.`,
-
-    orders: `You are an expert Indian stock market analyst focused on order wins and business development.
-
-Company: ${company} (${_ticker})
-Sector: ${sector}
-About: ${about}
-Market Cap: ${mktCap}
-
-${financialContext}
-
-Analyse order wins and business pipeline:
-1. **Order Book Overview** — typical order book size, visibility for this type of company
-2. **Recent Wins** — categories of contracts/orders this company typically announces
-3. **Pipeline Assessment** — sectors and geographies driving new business
-4. **Revenue Visibility** — order-to-execution timeline and revenue recognition pattern
-5. **Competitive Position** — key moats enabling order wins
-
-If this is not a capital-goods/infrastructure company, adapt to discuss revenue wins, new contracts, or business development milestones. Format with bullet points.`,
+    filings: `Analyze ${company} recent filings. Key regulatory activity, material events, compliance status, upcoming filings. Concise bullet points only.`,
+    
+    results: `Analyze ${company} Q results. Revenue trend, profit margins, key metrics vs sector, YoY comparison. Data-driven bullets only.`,
+    
+    ar: `${company} annual report insights. Business segments, management commentary, balance sheet health, dividend policy, governance. Brief bullets.`,
+    
+    orders: `${company} order wins and pipeline. Order book size, recent contracts, revenue visibility, competitive position. Brief bullets.`,
   };
 
   try {
-    // Pollinations.ai — free, no API key, uses open-source models (Mistral/LLaMA)
     const encoded = encodeURIComponent(prompts[tab]);
     const response = await fetch(`https://text.pollinations.ai/${encoded}`, {
       method: 'GET',
       headers: { 'Accept': 'text/plain' },
     });
     if (!response.ok) throw new Error(`API error ${response.status}`);
-    const text = await response.text();
+    let text = await response.text();
     if (!text?.trim()) throw new Error('Empty response');
+    
+    // Filter out Pollinations deprecation notice - improved regex
+    text = text.replace(/⚠️[\s\S]*?NOTE:.*?normally\./gi, '')
+               .replace(/⚠️.*IMPORTANT.*NOTICE.*[\s\S]*?normally\./gi, '')
+               .replace(/The Pollinations.*deprecated.*[\s\S]*?normally\./gi, '')
+               .trim();
+    if (!text) throw new Error('Empty response after filtering');
+    
     _aiCache[tab] = text;
     area.innerHTML = formatAIResponse(text);
   } catch (e) {
