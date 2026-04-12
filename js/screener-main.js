@@ -59,7 +59,7 @@ async function loadDB() {
     _db = await res.json();
     _dbLoaded = true;
     if (st) {
-      st.textContent = `✓ ${_db.length.toLocaleString()} stocks`;
+      st.textContent = `✓ ${_db.length.toLocaleString()} stocks loaded (NSE + BSE)`;
       st.style.color = 'var(--green)';
       st.style.display = 'block';
     }
