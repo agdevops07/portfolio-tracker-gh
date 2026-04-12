@@ -882,3 +882,20 @@ input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(
   flex-shrink: 0;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Financial table: frozen first col, newest data on right ── */
+.fund-table-wrap { overflow-x: auto; direction: rtl; -webkit-overflow-scrolling: touch; }
+.fund-table-wrap .fund-table { direction: ltr; border-collapse: collapse; min-width: 100%; }
+.fund-table th:first-child,
+.fund-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--bg2);
+  z-index: 2;
+  white-space: nowrap;
+  font-weight: 600;
+  border-right: 1px solid var(--border2);
+  min-width: 140px;
+  max-width: 200px;
+}
+.fund-table thead th:first-child { background: var(--bg3); z-index: 3; }

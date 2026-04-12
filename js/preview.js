@@ -17,7 +17,7 @@ const COLUMN_LABELS = {
 
 // ── Public ───────────────────────────────────────
 export function showPreview() {
-  if (!document.getElementById('preview-table')) return;
+  if (!document.getElementById("preview-table")) return;
   const holdings = getSortedHoldings();
   renderRows(holdings);
   updateSortIndicators();
@@ -71,7 +71,7 @@ export function sortHoldings(holdings) {
 // ── Rendering ────────────────────────────────────
 function renderRows(holdings) {
   const tbody = document.querySelector('#preview-table tbody');
-  if (!tbody) return;
+  tbody.innerHTML = '';
 
   holdings.forEach((h, index) => {
     const tr = document.createElement('tr');

@@ -61,7 +61,7 @@
 
 /* ── Filings ── */
 .filings-grid { display: grid; gap: 0.6rem; }
-.filing-item { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1rem; padding: 0.7rem 0.9rem; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); }
+.filing-item { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 0.9rem; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); }
 .filing-exchange { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
 .filing-exchange.nse { background: rgba(34,197,94,0.15); color: var(--green); }
 .filing-exchange.bse { background: rgba(245,158,11,0.15); color: var(--gold); }
@@ -71,9 +71,6 @@
 .filing-link { font-size: 12px; color: var(--accent2); text-decoration: none; white-space: nowrap; flex-shrink: 0; }
 .filing-link:hover { text-decoration: underline; }
 .filing-type-badge { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: var(--bg4); color: var(--text2); flex-shrink: 0; }
-.filing-ai-btn { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(99,102,241,0.3); background: rgba(99,102,241,0.1); color: var(--accent2); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-.filing-ai-btn:hover { background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.5); transform: translateY(-1px); }
-.filing-ai-btn:active { transform: translateY(0); }
 
 /* ── AI Insights ── */
 .ai-insights-box { background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(34,197,94,0.03)); border: 1px solid rgba(99,102,241,0.2); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
@@ -106,6 +103,47 @@
 .ss-compact-search { flex: 1; min-width: 240px; }
 .ss-compact-search input { width: 100%; padding: 9px 36px 9px 36px; border-radius: 9px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 13px; outline: none; box-sizing: border-box; }
 .ss-compact-search input:focus { border-color: var(--accent); }
+
+  /* ── Responsive ──────────────────────────────── */
+  @media (max-width: 768px) {
+    .ss-page { padding: 0 1rem 3rem; }
+    .ss-hero-full { padding: 1.5rem 0 1rem; }
+    .ss-hero-full h1 { font-size: 1.5rem; }
+    .ss-hero-full p { font-size: 13px; margin-bottom: 1.25rem; }
+    .ss-search-bar { max-width: 100%; }
+    .dd-header-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .dd-cards { grid-template-columns: repeat(2, 1fr); }
+    .dd-charts-row { flex-direction: column; }
+    .dd-chart-half { width: 100%; min-width: 0; }
+    .exchange-links { gap: 0.5rem; }
+    .exch-link-btn { font-size: 12px; padding: 5px 10px; }
+    .fund-tabs { gap: 4px; }
+    .fund-tab { font-size: 11px; padding: 5px 10px; }
+    .fund-grid { grid-template-columns: repeat(2, 1fr); }
+    .ai-tab-bar { gap: 4px; }
+    .ai-tab-btn { font-size: 11px; padding: 5px 10px; }
+    .chart-header { flex-wrap: wrap; gap: 6px; }
+    .time-filters { gap: 3px; }
+    .tf-btn { font-size: 11px; padding: 3px 8px; }
+    #ss-custom-wrap { flex-wrap: wrap; }
+    .ss-compact-header { padding: 0.5rem 0 0.75rem; }
+    .filing-item { flex-wrap: wrap; gap: 6px; }
+    .news-item { flex-direction: column; gap: 6px; }
+  }
+  @media (max-width: 480px) {
+    .dd-cards { grid-template-columns: repeat(2, 1fr); }
+    .fund-grid { grid-template-columns: 1fr 1fr; }
+    .ss-hero-full h1 { font-size: 1.25rem; }
+    .ss-hint-chips { gap: 6px; }
+    .tf-btn { font-size: 10px; padding: 3px 7px; }
+    .stat-card { padding: 0.75rem; }
+    .stat-value { font-size: 1.2rem; }
+  }
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .ss-page { padding: 0 1.5rem 3rem; }
+    .dd-cards { grid-template-columns: repeat(3, 1fr); }
+    .fund-grid { grid-template-columns: repeat(3, 1fr); }
+  }
 </style>
 </head>
 <body>
@@ -134,8 +172,8 @@
           autocomplete="off">
         <button class="ss-clear-btn" id="ss-clear-btn" onclick="window._ssClear()" title="Clear">✕</button>
         <div id="ss-dropdown" class="sp-dropdown" style="display:none;top:52px;left:0;right:0;text-align:left;"></div>
-        <div id="ss-db-status" style="position:absolute;right:0;top:-26px;font-size:11px;color:var(--text3);white-space:nowrap;"></div>
       </div>
+      <div id="ss-db-status" style="display:none;font-size:12px;color:var(--text2);margin-top:0.5rem;"></div>
       <div class="ss-hint-chips" id="ss-hints">
         <span style="font-size:12px;color:var(--text3);align-self:center;">Try:</span>
         <button class="tf-btn" style="font-size:12px;" onmousedown="event.preventDefault();_ssTrigger('Reliance')">Reliance</button>
@@ -151,7 +189,8 @@
   <div id="ss-compact" class="ss-compact-header">
     <div class="ss-compact-search" style="position:relative;">
       <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none;">🔍</span>
-      <input type="text" id="ss-search-input-compact" placeholder="Search another stock…" autocomplete="off">
+      <input type="text" id="ss-search-input-compact" placeholder="Search another stock…" autocomplete="off" style="padding-right:36px;">
+      <button class="ss-clear-btn" id="ss-clear-btn-compact" onclick="window._ssClear()" title="Clear" style="display:none;right:8px;">✕</button>
       <div id="ss-dropdown-compact" class="sp-dropdown" style="display:none;top:42px;left:0;right:0;text-align:left;"></div>
     </div>
   </div>

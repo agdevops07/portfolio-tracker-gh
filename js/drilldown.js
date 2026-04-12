@@ -49,7 +49,17 @@ function renderFinTable(tableData, note = 'Figures in ₹ Cr') {
     }).join('');
     return `<tr><td>${row.label}</td>${cells}</tr>`;
   }).join('');
-  return `<div style="overflow-x:auto;"><table class="fund-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>
+  const uid = 'ft_' + Math.random().toString(36).slice(2,7);
+  setTimeout(() => {
+    const wrap = document.getElementById(uid);
+    if (wrap) wrap.querySelectorAll('th:first-child,td:first-child')
+      .forEach(c => c.style.cssText += ';position:sticky;left:0;background:var(--bg2);z-index:2;white-space:nowrap;');
+  }, 0);
+  return `<div class="fund-table-wrap" id="${uid}" style="overflow-x:auto;direction:rtl;">
+            <table class="fund-table" style="direction:ltr;">
+              <thead>${thead}</thead><tbody>${tbody}</tbody>
+            </table>
+          </div>
           <div class="fund-table-note">${note} · Source: <a href="${_fundData?._url||''}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a></div>`;
 }
 
