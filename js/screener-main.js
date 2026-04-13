@@ -54,21 +54,24 @@ function updateScreenerRefreshUI(marketClosed = false) {
   const pauseBtn = document.getElementById('ss-refresh-pause-btn');
   const sel      = document.getElementById('ss-refresh-interval-sel');
   const tag      = document.getElementById('ss-market-tag');
+  const open     = isMarketOpen();
   if (pauseBtn) {
     if (state.screenerRefreshPaused) {
       pauseBtn.textContent = '▶ Resume';
       pauseBtn.style.color = 'var(--gold)';
-    } else if (marketClosed || !isMarketOpen()) {
-      pauseBtn.textContent = '🔴 Market Closed';
-      pauseBtn.style.color = 'var(--text3)';
+      pauseBtn.disabled = false;
     } else {
-      pauseBtn.textContent = '⏸ Pause';
-      pauseBtn.style.color = '';
+      pauseBtn.textContent = open ? '⏸ Pause' : '⏸ Pause';
+      pauseBtn.style.color = open ? '' : 'var(--text3)';
+      pauseBtn.title = open ? 'Pause auto-refresh' : 'Market is closed — auto-refresh paused';
+      pauseBtn.disabled = !open; // disable pause when market is closed (nothing to pause)
     }
   }
   if (sel) sel.value = state.screenerRefreshIntervalMs;
   if (tag) {
-    tag.textContent = isMarketOpen() ? '🟢 Market Open' : '🔴 Market Closed';
+    tag.textContent  = open ? '🟢 Market Open' : '🔴 Market Closed';
+    tag.style.color  = open ? 'var(--green)'   : 'var(--red)';
+    tag.style.borderColor = open ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
   }
 }
 
@@ -175,16 +178,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const backBtn = document.getElementById('ss-back-dashboard');
     if (backBtn) backBtn.style.display = '';
 
-    // Restore holding context (prices, history) from sessionStorage
+    // Restore holding context from sessionStorage (prices, history prefetched on dashboard)
     let ctx = null;
     try { ctx = JSON.parse(sessionStorage.getItem('drilldown_ctx') || 'null'); } catch(_) {}
     if (ctx && ctx.ticker === incomingTicker) {
-      _holdingCtx = ctx.holding || null;
       if (ctx.livePrice)  state.livePrices[incomingTicker]      = ctx.livePrice;
       if (ctx.prevClose)  state.prevClosePrices[incomingTicker] = ctx.prevClose;
       if (ctx.history)    { _histFull = ctx.history; state.histories = state.histories || {}; state.histories[incomingTicker] = ctx.history; }
       if (ctx.dayHistory) state.dayHistories[incomingTicker]    = ctx.dayHistory;
     }
+    // Always derive holding context from portfolio CSV (more accurate than snapshot)
+    // resolveHoldingCtx is defined later in the file but called after DOMContentLoaded
+    // so we defer with a microtask to ensure the function is available
+    Promise.resolve().then(() => {
+      _holdingCtx = resolveHoldingCtx(incomingTicker) || ctx?.holding || null;
+    });
 
     // Load the stock (will use cached prices/history where available)
     loadDB().then(() => loadStock(incomingTicker, null));
@@ -260,6 +268,51 @@ function closeDropdown(id) {
   if (dd) dd.style.display = 'none';
 }
 
+// ── Resolve holding context for any ticker (search or URL param) ──────────
+function resolveHoldingCtx(ticker) {
+  // Try sessionStorage portfolio CSV to find if this ticker is a holding
+  try {
+    const csv = sessionStorage.getItem('portfolio_csv');
+    if (!csv) return null;
+    // Parse the CSV minimally: look for a row whose ticker matches
+    const lines = csv.split(/\\r?\\n/).filter(l => l.trim());
+    if (lines.length < 2) return null;
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const tickerIdx    = headers.indexOf('ticker');
+    const qtyIdx       = headers.indexOf('quantity');
+    const avgIdx       = headers.indexOf('average_buy_price');
+    const dateIdx      = headers.indexOf('buy_date');
+    const upstoxIdx    = headers.indexOf('upstox_ticker');
+    if (tickerIdx < 0 || qtyIdx < 0 || avgIdx < 0) return null;
+
+    // Normalise ticker for comparison (strip .NS/.BO)
+    const norm = t => t.replace(/\\.(NS|BO)$/i,'').toUpperCase();
+    const incomingNorm = norm(ticker);
+
+    // Aggregate rows for this ticker (there can be multiple buy lots)
+    let totalQty = 0, totalCost = 0, earliestDate = '', upstoxTicker = '';
+    let found = false;
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',');
+      const rowTicker = (cols[tickerIdx] || '').trim();
+      if (norm(rowTicker) !== incomingNorm && rowTicker !== ticker) continue;
+      found = true;
+      const qty = parseFloat(cols[qtyIdx]) || 0;
+      const avg = parseFloat(cols[avgIdx]) || 0;
+      totalQty  += qty;
+      totalCost += qty * avg;
+      if (dateIdx >= 0 && cols[dateIdx]?.trim()) {
+        const d = cols[dateIdx].trim();
+        if (!earliestDate || d < earliestDate) earliestDate = d;
+      }
+      if (upstoxIdx >= 0 && cols[upstoxIdx]?.trim()) upstoxTicker = cols[upstoxIdx].trim();
+    }
+    if (!found || totalQty === 0) return null;
+    const avgBuy = totalCost / totalQty;
+    return { totalQty, avgBuy, invested: totalCost, earliestDate, upstoxTicker };
+  } catch(_) { return null; }
+}
+
 window._ssPick = function(idx, dropdownId) {
   const stock = window._ssResultCache?.[idx];
   if (!stock) return;
@@ -274,6 +327,8 @@ window._ssPick = function(idx, dropdownId) {
   if (inp1) inp1.value = label;
   if (inp2) inp2.value = label;
   _meta = stock;
+  // Always resolve holding context from portfolio CSV for any searched stock
+  _holdingCtx = resolveHoldingCtx(ticker);
   const clr = document.getElementById('ss-clear-btn');
   if (clr) clr.style.display = 'block';
   loadStock(ticker, stock);
@@ -283,6 +338,7 @@ function submitSearch(raw, dropdownId) {
   closeDropdown(dropdownId);
   if (!raw || raw.includes('—')) return;
   _meta = null;
+  _holdingCtx = resolveHoldingCtx(raw);
   loadStock(raw, null);
 }
 
@@ -302,9 +358,8 @@ async function loadStock(ticker, meta) {
   _meta = meta;
   _fundData = null; _fundTab = 'ratios'; _fundMode = 'standalone';
   _aiCache = {};
-  // If navigating from a new search (not dashboard), clear holding context
-  if (!meta && !_holdingCtx) { /* keep _holdingCtx if set by URL param flow */ }
-  else if (meta) { _holdingCtx = null; } // fresh search always clears
+  // _holdingCtx is set by the caller (resolveHoldingCtx / URL param flow)
+  // Don't clear it here — caller manages it.
   const today = new Date().toISOString().split('T')[0];
   _filter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: today };
 
@@ -935,17 +990,47 @@ async function callFreeAI(prompt) {
   }
 
   // ── Fallback: Ollama local ───────────────────────
-  for (const model of ['llama3.2', 'mistral', 'phi3']) {
+  // First discover which models are actually installed
+  let ollamaModels = [];
+  try {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 3000);
+    const listRes = await fetch('http://localhost:11434/api/tags', { signal: ctrl.signal });
+    if (listRes.ok) {
+      const listData = await listRes.json();
+      ollamaModels = (listData?.models || []).map(m => m.name || m.model || '').filter(Boolean);
+    }
+  } catch(_) {}
+
+  // If no models listed, try common names anyway as a best-effort
+  const fallbackModels = ollamaModels.length ? ollamaModels : ['llama3.2', 'llama3', 'mistral', 'phi3', 'gemma'];
+
+  for (const model of fallbackModels.slice(0, 3)) {
     try {
       const ctrl = new AbortController();
-      setTimeout(() => ctrl.abort(), 5000);
+      setTimeout(() => ctrl.abort(), 30000);
       const res = await fetch('http://localhost:11434/api/generate', {
         method: 'POST', signal: ctrl.signal,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: prompt.slice(0, 800), stream: false }),
+        body: JSON.stringify({ model, prompt: prompt.slice(0, 1200), stream: false }),
       });
-      if (res.ok) { const d = await res.json(); if (d?.response?.trim().length > 20) return d.response.trim(); }
-    } catch(_) {}
+      if (res.ok) {
+        const d = await res.json();
+        const txt = (d?.response || '').trim();
+        if (txt.length > 20) {
+          // Show which model responded
+          const tag = document.getElementById('ai-model-tag');
+          if (tag) tag.textContent = `Ollama · ${model} · Local`;
+          return txt;
+        }
+      } else if (res.status === 404) {
+        // Model not found — try next
+        continue;
+      }
+    } catch(e) {
+      if (e.name === 'AbortError') continue; // timeout, try next model
+      break; // Ollama not running at all
+    }
   }
 
   if (!key) {
@@ -1056,23 +1141,48 @@ async function loadFilings(ticker, meta) {
   // Badge color map
   const badgeColor = { 'AR': '#7c3aed', 'CC': '#0891b2', 'BSE': '#b45309', 'NSE': '#1d4ed8' };
 
+  // ── Extract quarter identifier from a PDF URL ──────────────────────────
+  function extractQtrFromUrl(url) {
+    if (!url) return '';
+    // Match patterns like Q1FY25, Q2FY2024, Q3-FY24, FY2024, FY24
+    const m = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\d{2,4})/);
+    if (m) {
+      const fy = m[2].length === 2 ? '20' + m[2] : m[2];
+      return `Q${m[1]} FY${fy}`;
+    }
+    // FY only
+    const fy = url.match(/[Ff][Yy][-_]?(\d{2,4})/);
+    if (fy) {
+      const yr = fy[1].length === 2 ? '20' + fy[1] : fy[1];
+      return `FY${yr}`;
+    }
+    // Try to grab year from filename
+    const yr = url.match(/20(2[0-9])/);
+    if (yr) return `FY20${yr[1]}`;
+    return '';
+  }
+
   // Build a human-readable label — Screener often gives "Result Raw PDF - Raw PDF"
-  // The useful info is in f.date (quarter/period) and f.type
   function buildFilingLabel(f) {
     // Exchange page links — already have good titles
     if (!f.isPdf) return f.title || 'View Filings';
 
-    // For PDFs: prefer date + type combo over raw Screener title
-    if (f.date && f.type) return `${f.type} · ${f.date}`;
-    if (f.date) return f.date;
+    // Try to extract quarter from PDF URL — most reliable source
+    const qtrFromUrl = extractQtrFromUrl(f.link);
+
+    // For PDFs: use type + quarter (from URL or date field)
+    const period = qtrFromUrl || f.date || '';
+    if (f.type && period) return `${f.type} · ${period}`;
+    if (f.type && !period) return f.type;
+    if (period) return period;
 
     // Clean up raw Screener title as last resort
     const cleaned = (f.title || '')
-      .replace(/\bRaw PDF\b\s*[-–·]\s*/gi, '')
-      .replace(/\bRaw PDF\b/gi, '')
-      .replace(/^\s*[-–·\s]+|[-–·\s]+\s*$/g, '')
+      .replace(/\\bRaw PDF\\b\\s*[-–·]\\s*/gi, '')
+      .replace(/\\bRaw PDF\\b/gi, '')
+      .replace(/^\\s*[-–·\\s]+|[-–·\\s]+\\s*$/g, '')
       .trim();
-    return cleaned || (f.type || 'Filing');
+    return cleaned || 'Filing';
   }
 
   const pdfIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
@@ -1113,18 +1223,30 @@ async function loadConcalls(ticker, meta, fundData) {
   if (source?.concalls?.length) {
     concalls = source.concalls.map(cc => {
       let label = (cc.label || '').trim();
+      const url  = cc.url || '';
       // PPT → Investor Presentation
-      label = label.replace(/\bPPT\b/gi, 'Investor Presentation');
-      // If label is just a generic word with no detail, replace
-      if (/^(transcript|concall|raw transcript)$/i.test(label)) label = '';
+      label = label.replace(/\\bPPT\\b/gi, 'Investor Presentation');
+      const isPpt = url.toLowerCase().includes('ppt') || label.toLowerCase().includes('investor presentation');
 
-      const dateMatch = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]+20\d{2}/i);
-      const dateStr = cc.date || (dateMatch ? dateMatch[0] : '');
-
-      if (!label || label === dateStr) {
-        label = (cc.url || '').toLowerCase().includes('ppt') ? 'Investor Presentation' : 'Earnings Call Transcript';
+      // If label is a bare generic word, derive from URL
+      if (/^(transcript|concall|raw transcript|earnings call)$/i.test(label) || !label) {
+        label = isPpt ? 'Investor Presentation' : 'Earnings Call Transcript';
       }
-      return { label, date: dateStr, url: cc.url, isPdf: cc.isPdf };
+
+      // Prefer date from label text, else from cc.date, else try to parse from URL
+      const dateFromLabel = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\\s,]+20\\d{2}/i);
+      // Also try Q1FY25 style from URL or label
+      const qtrFromUrl   = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\\d{2,4})/);
+      const qtrLabel     = qtrFromUrl ? `Q${qtrFromUrl[1]} FY${qtrFromUrl[2].length===2?'20'+qtrFromUrl[2]:qtrFromUrl[2]}` : '';
+
+      const dateStr = cc.date || (dateFromLabel ? dateFromLabel[0] : '') || qtrLabel;
+
+      // Remove the date from the label if it's embedded in it to avoid duplication
+      if (dateStr && label.includes(dateStr)) {
+        label = label.replace(dateStr, '').replace(/[-–·\\s]+$/, '').trim() || label;
+      }
+
+      return { label, date: dateStr, url, isPdf: cc.isPdf };
     });
   }
 
@@ -1251,7 +1373,9 @@ window.setAiTab = function(tab) {
 function renderAIPlaceholder() {
   const area = document.getElementById('ai-content-area');
   if (!area) return;
-  area.innerHTML = `<div style="color:var(--text3);font-size:13px;">Search for a stock to generate AI-powered filing insights.</div>`;
+  area.innerHTML = `<div style="color:var(--text3);font-size:13px;">Search for a stock to generate AI-powered insights.</div>`;
+  const box = document.getElementById('ai-query-box');
+  if (box) box.style.display = 'none';
 }
 
 function renderAITab() {
@@ -1259,17 +1383,19 @@ function renderAITab() {
   if (!area) return;
 
   if (!_ticker) {
-    area.innerHTML = `<div style="color:var(--text3);font-size:13px;">Search for a stock to generate AI-powered filing insights.</div>`;
+    area.innerHTML = `<div style="color:var(--text3);font-size:13px;">Search for a stock to generate AI-powered insights.</div>`;
+    renderAIQueryBox();
     return;
   }
 
   if (_aiCache[_aiTab]) {
     area.innerHTML = formatAIResponse(_aiCache[_aiTab]);
+    renderAIQueryBox();
     return;
   }
 
-  const labels = { filings:'Latest Filings', results:'Results Analysis', ar:'Annual Report', orders:'Order Wins' };
-  const sym = _ticker.replace(/\.(NS|BO)$/i, '');
+  const labels = { filings:'Latest Filings', results:'Results Analysis', ar:'Annual Report', orders:'Growth & Risks' };
+  const sym = _ticker.replace(/\\.(NS|BO)$/i, '');
   area.innerHTML = `
     <div style="color:var(--text2);font-size:13px;margin-bottom:0.75rem;">
       Generate AI insights on <strong>${_meta?.company || sym}</strong>'s ${labels[_aiTab]}.
@@ -1280,7 +1406,37 @@ function renderAITab() {
     <div style="font-size:11px;color:var(--text3);margin-top:0.6rem;">
       Uses Groq + Llama 3 (free tier). Add your key via ⚙ API Key above.
     </div>`;
+  renderAIQueryBox();
 }
+
+function renderAIQueryBox() {
+  const box = document.getElementById('ai-query-box');
+  if (!box) return;
+  // Show the query box once a stock is loaded
+  box.style.display = _ticker ? '' : 'none';
+}
+
+window._ssAskAI = async function() {
+  const inp  = document.getElementById('ai-query-input');
+  const area = document.getElementById('ai-custom-area');
+  if (!inp || !area) return;
+  const q = inp.value.trim();
+  if (!q) return;
+
+  const sym     = _ticker.replace(/\\.(NS|BO)$/i, '');
+  const company = _meta?.company || sym;
+  const ratios  = 'PE: ' + (_fundData?.peRatio||'?') + ', ROCE: ' + (_fundData?.roce||'?') + ', ROE: ' + (_fundData?.roe||'?');
+  const about   = (_fundData?.about||'').slice(0, 200);
+  const prompt  = `Company: ${company} (${sym}). Sector: ${_fundData?.sector||'?'}. ${about}. Key ratios: ${ratios}.\\n\\nUser question: ${q}\\n\\nAnswer concisely in 4-6 bullet points.`;
+
+  area.innerHTML = '<div class="ai-loading"><div class="spinner"></div><span>Thinking…</span></div>';
+  try {
+    const text = await callFreeAI(prompt);
+    area.innerHTML = formatAIResponse(text);
+  } catch (e) {
+    area.innerHTML = `<div style="color:var(--red);font-size:13px;">⚠ ${e.message}</div>`;
+  }
+};
 
 window.generateAI = async function(tab) {
   const area = document.getElementById('ai-content-area');

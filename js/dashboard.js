@@ -95,6 +95,7 @@ export async function loadDashboard() {
     contentDiv.style.display  = 'block';
     renderDashboard();
     startAutoRefresh();
+    updateRefreshUI(); // show market status immediately on page load
 
   } catch (err) {
     console.error(err);
@@ -189,27 +190,25 @@ function updateRefreshUI(marketClosed = false) {
   const pauseBtn    = document.getElementById('refresh-pause-btn');
   const intervalSel = document.getElementById('refresh-interval-sel');
   const marketTag   = document.getElementById('market-status-tag');
+  const open        = isMarketOpen();
   if (pauseBtn) {
     if (state.refreshPaused) {
       pauseBtn.textContent = '▶ Resume';
       pauseBtn.style.color = 'var(--gold)';
-    } else if (marketClosed) {
-      pauseBtn.textContent = '🔴 Market Closed';
-      pauseBtn.style.color = 'var(--text3)';
+      pauseBtn.disabled = false;
     } else {
       pauseBtn.textContent = '⏸ Pause';
-      pauseBtn.style.color = '';
+      pauseBtn.style.color = open ? '' : 'var(--text3)';
+      pauseBtn.title    = open ? 'Pause auto-refresh' : 'Market is closed — auto-refresh suspended';
+      pauseBtn.disabled = !open;
     }
   }
   if (intervalSel) intervalSel.value = state.refreshIntervalMs;
   if (marketTag) {
-    if (!isMarketOpen()) {
-      marketTag.textContent = '🔴 Market Closed';
-      marketTag.style.display = '';
-    } else {
-      marketTag.textContent = '🟢 Market Open';
-      marketTag.style.display = '';
-    }
+    marketTag.textContent   = open ? '🟢 Market Open' : '🔴 Market Closed';
+    marketTag.style.color   = open ? 'var(--green)'   : 'var(--red)';
+    marketTag.style.borderColor = open ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+    marketTag.style.display = '';
   }
 }
 
