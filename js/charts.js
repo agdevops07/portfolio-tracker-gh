@@ -140,7 +140,8 @@ export function renderPortfolioChart(filter) {
       interaction: { mode: 'index', intersect: false },
     },
   });
-}
+  if (!window._chartInstances) window._chartInstances = {};
+  window._chartInstances['portfolioChart'] = state.portfolioChartInstance;}
 
 export function setTimeFilter(filter, btn) {
   state.currentFilter = filter;

@@ -206,15 +206,24 @@
     .fund-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
-  /* ── Holding mode banner ── */
+  /* Holding mode banner */
   .holding-banner { grid-column: 1 / -1; display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1rem;
     background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px;
     font-size: 13px; color: var(--text2); flex-wrap: wrap; }
   .holding-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 6px;
     background: rgba(99,102,241,0.2); color: var(--accent2); letter-spacing: 0.05em; flex-shrink: 0; }
-  /* Holding mode: fix stat cards to not stretch due to banner spanning full grid width */
-  #ss-cards.cards-grid { align-items: start; }
-  #ss-cards .stat-card { min-width: 0; }
+  /* Holding mode: fix stat cards alignment — banner spans full width, then 4 cards in a row */
+  #ss-cards.cards-grid {
+    grid-template-columns: 1fr;  /* banner row */
+    display: grid;
+  }
+  #ss-cards.cards-grid .holding-banner { grid-column: 1; }
+  /* After banner, the 4 stat cards sit in their own sub-grid row */
+  #ss-cards.cards-grid .stat-card { min-width: 0; }
+  /* Use a wrapping flex fallback so cards always align 4-across after the banner */
+  #ss-cards.cards-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  #ss-cards.cards-grid .holding-banner { flex: 0 0 100%; }
+  #ss-cards.cards-grid .stat-card { flex: 1 1 160px; min-width: 0; }
   /* ── Screener refresh bar ── */
   .ss-refresh-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
     padding: 0.5rem 0 0.75rem; font-size: 12px; color: var(--text3); }
@@ -238,7 +247,7 @@
   <a href="index.html" class="screener-nav-logo">📈 Portfolio Tracker</a>
   <div class="screener-nav-links">
     <a href="index.html" class="nav-link">⬆ Upload Portfolio</a>
-    <a id="nav-dashboard-link" href="dashboard.html" class="nav-link" style="display:none">📊 Dashboard</a>
+    <button id="nav-dashboard-link" class="nav-link" style="display:none;background:none;border:none;cursor:pointer;" onclick="navToDashboard()">📊 Dashboard</button>
     <span class="nav-link active">🔍 Stock Search</span>
   </div>
 </nav>
@@ -518,11 +527,36 @@ const _ssRefreshBarObserver = new MutationObserver(() => {
 document.addEventListener('DOMContentLoaded', () => {
   const result = document.getElementById('ss-result');
   if (result) _ssRefreshBarObserver.observe(result, { attributes: true, attributeFilter: ['style'] });
-  // Show dashboard nav link always (user may have come from dashboard)
+  // Only show dashboard nav link if a portfolio CSV exists in session
   const dashLink = document.getElementById('nav-dashboard-link');
-  if (dashLink) dashLink.style.display = '';
+  const hasPortfolio = !!sessionStorage.getItem('portfolio_csv');
+  if (dashLink) dashLink.style.display = hasPortfolio ? '' : 'none';
 });
+
+function navToDashboard() {
+  const hasPortfolio = !!sessionStorage.getItem('portfolio_csv');
+  if (hasPortfolio) {
+    window.location.href = 'dashboard.html';
+  } else {
+    document.getElementById('no-portfolio-modal').style.display = 'flex';
+  }
+}
+function closeNoPortfolioModal() {
+  document.getElementById('no-portfolio-modal').style.display = 'none';
+}
 </script>
+
+<!-- No-portfolio modal -->
+<div id="no-portfolio-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeNoPortfolioModal()">
+  <div style="background:var(--bg2,#1a1a2e);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:36px 32px 28px;max-width:420px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.55);position:relative;text-align:center;">
+    <div style="width:52px;height:52px;border-radius:14px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 18px;">📊</div>
+    <div style="font-size:17px;font-weight:700;color:var(--text,#e8e8f0);margin-bottom:10px;">No Portfolio Loaded</div>
+    <div style="font-size:13px;color:var(--text2,#9090a8);line-height:1.65;margin-bottom:26px;">Upload a CSV or add your holdings to unlock the dashboard — with live P&amp;L, allocation charts, and performance trends.</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="closeNoPortfolioModal()" style="padding:9px 20px;border-radius:9px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text,#e8e8f0);font-size:13px;font-weight:500;cursor:pointer;">Stay Here</button>
+      <button onclick="window.location.href='index.html'" style="padding:9px 22px;border-radius:9px;border:none;background:var(--accent,#6366f1);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Load Portfolio →</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
-  

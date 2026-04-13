@@ -188,11 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ctx.dayHistory) state.dayHistories[incomingTicker]    = ctx.dayHistory;
     }
     // Always derive holding context from portfolio CSV (more accurate than snapshot)
-    // resolveHoldingCtx is defined later in the file but called after DOMContentLoaded
-    // so we defer with a microtask to ensure the function is available
-    Promise.resolve().then(() => {
-      _holdingCtx = resolveHoldingCtx(incomingTicker) || ctx?.holding || null;
-    });
+    _holdingCtx = resolveHoldingCtx(incomingTicker) || ctx?.holding || null;
 
     // Load the stock (will use cached prices/history where available)
     loadDB().then(() => loadStock(incomingTicker, null));
@@ -275,7 +271,7 @@ function resolveHoldingCtx(ticker) {
     const csv = sessionStorage.getItem('portfolio_csv');
     if (!csv) return null;
     // Parse the CSV minimally: look for a row whose ticker matches
-    const lines = csv.split(/\\r?\\n/).filter(l => l.trim());
+    const lines = csv.split(/\r?\n/).filter(l => l.trim());
     if (lines.length < 2) return null;
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     const tickerIdx    = headers.indexOf('ticker');
@@ -286,7 +282,7 @@ function resolveHoldingCtx(ticker) {
     if (tickerIdx < 0 || qtyIdx < 0 || avgIdx < 0) return null;
 
     // Normalise ticker for comparison (strip .NS/.BO)
-    const norm = t => t.replace(/\\.(NS|BO)$/i,'').toUpperCase();
+    const norm = t => t.replace(/\.(NS|BO)$/i,'').toUpperCase();
     const incomingNorm = norm(ticker);
 
     // Aggregate rows for this ticker (there can be multiple buy lots)
@@ -379,12 +375,15 @@ async function loadStock(ticker, meta) {
   showSkeleton(ticker, meta);
   renderAIPlaceholder();
 
+  // Resolve upstox/ISIN identifier: prefer meta (from search), then holding context
+  const upstoxId = meta?.isin || _holdingCtx?.upstoxTicker || null;
+
   // Parallel fetch
   const [livePrice, hist, fund, dayHist] = await Promise.all([
     fetchPrice(ticker),
-    fetchHistory(ticker, meta?.isin),
+    fetchHistory(ticker, upstoxId),
     fetchScreenerFundamentals(ticker, 'standalone'),
-    fetchDayHistory(ticker, meta?.isin),
+    fetchDayHistory(ticker, upstoxId),
   ]);
 
   if (livePrice) state.livePrices[ticker] = livePrice;
