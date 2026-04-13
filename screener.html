@@ -310,7 +310,7 @@
       </div>
       <div class="chart-card dd-chart-half" id="ss-day-card">
         <div class="chart-header" onclick="toggleSection('ss-day-body','ss-day-toggle')">
-          <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span></div>
+          <div class="chart-title">Price Intraday <span class="chart-subtitle">(15-min delay)</span> <span id="ss-day-chg" style="font-size:12px;font-weight:600;margin-left:6px;"></span></div>
           <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
             <button class="icon-btn" title="Maximize" onclick="maximizeChart('ss-day-card','ss-day-body','ssDayChart')">⤢</button>
             <button class="collapse-btn" id="ss-day-toggle" onclick="toggleSection('ss-day-body','ss-day-toggle')">▲</button>
@@ -442,7 +442,7 @@ window._ssTrigger = function(q) {
   document.getElementById('ss-search-input').dispatchEvent(new Event('input'));
 };
 </script>
-
 <script type="module" src="js/screener-main.js"></script>
 </body>
 </html>
+  

@@ -432,12 +432,52 @@ export function renderPnlChart(holdings) {
 // ── Drilldown: price history ──────────────────────
 export function renderDrilldownChart(ticker, hist, buyDate) {
   const dates  = Object.keys(hist).sort();
-  const prices = dates.map(d => hist[d]);
+  let   prices = dates.map(d => hist[d]);
+
+  // ── Patch today's last point with live price ──────
+  // Ensures the rightmost tick is always the current price, not yesterday's close.
+  const todayStr = new Date().toISOString().split('T')[0];
+  const livePrice = state.livePrices[ticker];
+  if (livePrice && livePrice > 0) {
+    const todayIdx = dates.indexOf(todayStr);
+    if (todayIdx >= 0) {
+      prices = [...prices];
+      prices[todayIdx] = livePrice;
+    } else if (dates.length && dates[dates.length - 1] < todayStr) {
+      // Today not in filtered range — append if the filter includes today
+      const [fy, fm, fd] = (dates[dates.length - 1]).split('-').map(Number);
+      const lastDate = new Date(fy, fm - 1, fd);
+      const today = new Date();
+      if (today > lastDate) { dates.push(todayStr); prices.push(livePrice); }
+    }
+  }
+
+  // ── Period % change + ATH badge ───────────────────
+  const periodEl = document.getElementById('dd-period-chg');
+  if (periodEl && prices.length >= 2) {
+    const startP = prices[0], endP = prices[prices.length - 1];
+    const chg    = ((endP - startP) / startP) * 100;
+    // ATH from the full unfiltered history
+    const fullHist = state.histories?.[ticker] || {};
+    const allPrices = Object.values(fullHist);
+    const ath = allPrices.length ? Math.max(...allPrices) : endP;
+    const athChg = ((endP - ath) / ath) * 100;
+    periodEl.innerHTML =
+      `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>` +
+      (Math.abs(athChg) > 0.01
+        ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH</span>`
+        : '');
+  }
+
+  // ── Dynamic colour: green if current > period-start ──
+  const isUp  = prices.length > 1 && prices[prices.length - 1] >= prices[0];
+  const color = isUp ? '#22c55e' : '#ef4444';
 
   if (state.ddChartInstance) state.ddChartInstance.destroy();
 
   const ctx  = document.getElementById('ddChart').getContext('2d');
-  const grad = makeGrad(ctx, 300, 'rgba(99,102,241,0.2)', 'rgba(0,0,0,0)');
+  const grad = makeGrad(ctx, 300,
+    isUp ? 'rgba(34,197,94,0.18)' : 'rgba(239,68,68,0.18)', 'rgba(0,0,0,0)');
   const displayLabels = dates.map(d => formatDateLabel(d));
 
   if (!window._chartInstances) window._chartInstances = {};
@@ -445,7 +485,7 @@ export function renderDrilldownChart(ticker, hist, buyDate) {
     type: 'line',
     data: {
       labels: displayLabels,
-      datasets: [{ data: prices, borderColor: '#6366f1',
+      datasets: [{ data: prices, borderColor: color,
         borderWidth: 2, backgroundColor: grad, fill: true,
         pointRadius: 0, pointHoverRadius: 5, tension: 0.3 }],
     },
@@ -456,7 +496,13 @@ export function renderDrilldownChart(ticker, hist, buyDate) {
         tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
           callbacks: {
             title: (items) => dates[items[0].dataIndex] || items[0].label,
-            label: (c) => ' ₹' + c.parsed.y.toFixed(2),
+            label: (c) => {
+              const price = c.parsed.y;
+              const chgVsStart = prices[0] > 0 ? ((price - prices[0]) / prices[0]) * 100 : null;
+              return chgVsStart != null
+                ? [` ₹${price.toFixed(2)}`, ` ${chgVsStart >= 0 ? '+' : ''}${chgVsStart.toFixed(2)}% from period start`]
+                : ` ₹${price.toFixed(2)}`;
+            },
           },
         },
       },
@@ -481,7 +527,6 @@ export function renderDrilldownChart(ticker, hist, buyDate) {
 // ── Drilldown: intraday day chart ─────────────────
 export function renderDrilldownDayChart(ticker) {
   const wrap   = document.getElementById('dd-day-wrap');
-  const canvas = document.getElementById('ddDayChart');
   if (!wrap) return;
 
   const ticks = state.dayHistories[ticker];
@@ -489,31 +534,93 @@ export function renderDrilldownDayChart(ticker) {
 
   const labels = ticks.map(d => d.time);
   const prices = ticks.map(d => d.price);
-  const isUp   = prices.length > 1 && prices[prices.length - 1] >= prices[0];
-  const color  = isUp ? '#22c55e' : '#ef4444';
+
+  // ── Prev-close anchor ─────────────────────────────
+  // Use prevClosePrices → last history close → first tick as fallback chain
+  let prevClose = state.prevClosePrices[ticker];
+  if (!prevClose || prevClose <= 0) {
+    const hist = state.histories?.[ticker];
+    if (hist && Object.keys(hist).length) {
+      const hdates = Object.keys(hist).sort();
+      prevClose = hist[hdates[hdates.length - 1]];
+    }
+  }
+  if (!prevClose || prevClose <= 0) prevClose = prices[0];
+
+  const lastPrice = prices[prices.length - 1];
+  const dayChgAbs = lastPrice - prevClose;
+  const dayChgPct = prevClose > 0 ? (dayChgAbs / prevClose) * 100 : 0;
+  const isUp  = dayChgAbs >= 0;
+  const color = isUp ? '#22c55e' : '#ef4444';
+
+  // ── Populate day-change badge ─────────────────────
+  const dayChgEl = document.getElementById('dd-day-chg');
+  if (dayChgEl) {
+    dayChgEl.innerHTML =
+      `<span style="color:${isUp?'var(--green)':'var(--red)'}">` +
+      `${dayChgAbs >= 0 ? '+' : ''}₹${Math.abs(dayChgAbs).toFixed(2)} ` +
+      `(${dayChgPct >= 0 ? '+' : ''}${dayChgPct.toFixed(2)}%)</span>` +
+      `<span style="font-size:10px;color:var(--text3);margin-left:6px;">vs prev close</span>`;
+  }
 
   if (state.ddDayChartInstance) state.ddDayChartInstance.destroy();
 
   wrap.innerHTML = '<canvas id="ddDayChart" style="width:100%;height:100%"></canvas>';
   const ctx  = document.getElementById('ddDayChart').getContext('2d');
-  const grad = makeGrad(ctx, 220, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
+  const grad = makeGrad(ctx, 220,
+    isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
 
   if (!window._chartInstances) window._chartInstances = {};
   state.ddDayChartInstance = new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets: [{ data: prices, borderColor: color,
-      borderWidth: 2, backgroundColor: grad, fill: true,
-      pointRadius: 0, pointHoverRadius: 4, tension: 0.2 }] },
+    data: { labels, datasets: [
+      // Prev-close dashed baseline
+      {
+        data: new Array(labels.length).fill(prevClose),
+        borderColor: 'rgba(150,150,180,0.35)',
+        borderWidth: 1,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+        order: 1,
+      },
+      // Live price line
+      {
+        data: prices,
+        borderColor: color,
+        borderWidth: 2,
+        backgroundColor: grad,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.2,
+        order: 0,
+      },
+    ]},
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
-          callbacks: { label: (c) => ' ₹' + c.parsed.y.toFixed(2) } },
+          filter: (item) => item.datasetIndex === 1,
+          callbacks: {
+            label: (c) => {
+              const price  = c.parsed.y;
+              const chgAbs = price - prevClose;
+              const chgPct = prevClose > 0 ? (chgAbs / prevClose) * 100 : 0;
+              return [
+                ` ₹${price.toFixed(2)}`,
+                ` ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toFixed(2)} (${chgPct >= 0?'+':''}${chgPct.toFixed(2)}%) today`,
+              ];
+            },
+          },
+        },
       },
       scales: {
         x: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks, maxTicksLimit: 8, maxRotation: 0 } },
-        y: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks, callback: (v) => v.toFixed(1) } },
+        y: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks,
+          callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 2 }) } },
       },
       interaction: { mode: 'index', intersect: false },
     },

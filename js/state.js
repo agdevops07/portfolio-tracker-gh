@@ -20,7 +20,7 @@ export const state = {
   dayHistories: {},
   previewSort: { key: 'invested', asc: false },
   refreshIntervalId: null,
-  refreshIntervalMs: 300000,
+  refreshIntervalMs: 60000,
   refreshPaused: false,
 };
 

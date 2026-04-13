@@ -7,7 +7,7 @@
 import { state, resetCaches, resetAllCaches } from './state.js';
 import { fmt, pct, colorPnl, showScreen, showToast } from './utils.js';
 import { fetchPrice, fetchHistory, fetchDayHistory } from './api.js';
-import { forwardFill, buildTimeSeries } from './timeSeries.js';
+import { forwardFill, buildTimeSeries, patchTodayTimeSeries } from './timeSeries.js';
 import {
   renderPortfolioChart,
   renderPieChart,
@@ -131,6 +131,9 @@ export async function refreshPricesOnly() {
       state.dayHistories[ticker] = await fetchDayHistory(h.ticker, h.upstoxTicker);
     })
   );
+
+  // Update today's point in the existing time series with fresh live prices
+  patchTodayTimeSeries();
 
   renderDashboard();
   updateRefreshTimestamp();

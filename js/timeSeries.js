@@ -81,12 +81,76 @@ export async function buildTimeSeries(histories) {
     })
     .filter(p => p && p.value > 0);
 
+  // ── Patch / append today's live value ──────────────
+  // Replace or append a point for today using live prices so the chart's
+  // rightmost value always reflects the current portfolio value, not yesterday's close.
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (!isWeekend(todayStr)) {
+    let todayLiveValue = 0;
+    let hasAllPrices = true;
+    holdings.forEach(h => {
+      const lp = state.livePrices[h.ticker];
+      if (lp) {
+        todayLiveValue += lp * h.totalQty;
+      } else {
+        hasAllPrices = false;
+        // Fall back to last known close for this holding
+        const hist = augmented[h.ticker];
+        if (hist) {
+          const dates = Object.keys(hist).sort();
+          const lastClose = hist[dates[dates.length - 1]];
+          if (lastClose) todayLiveValue += lastClose * h.totalQty;
+        }
+      }
+    });
+
+    if (todayLiveValue > 0) {
+      const rounded = Math.round(todayLiveValue);
+      const existing = result.findIndex(p => p.date === todayStr);
+      if (existing >= 0) {
+        result[existing] = { date: todayStr, value: rounded };
+      } else {
+        result.push({ date: todayStr, value: rounded });
+      }
+    }
+  }
+
   return result;
 }
 
 /**
- * Slice fullTimeSeries to the requested time window (weekdays only).
+ * Patch only today's point in state.fullTimeSeries with the latest live prices.
+ * Call this after refreshPricesOnly() instead of rebuilding the full 2-year series.
  */
+export function patchTodayTimeSeries() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (isWeekend(todayStr) || !state.fullTimeSeries.length) return;
+
+  const holdings = Object.values(state.holdings);
+  let todayValue = 0;
+  holdings.forEach(h => {
+    const lp = state.livePrices[h.ticker];
+    if (lp) {
+      todayValue += lp * h.totalQty;
+    } else {
+      const hist = state.histories?.[h.ticker];
+      if (hist) {
+        const dates = Object.keys(hist).sort();
+        const lastClose = hist[dates[dates.length - 1]];
+        if (lastClose) todayValue += lastClose * h.totalQty;
+      }
+    }
+  });
+
+  if (todayValue <= 0) return;
+  const rounded = Math.round(todayValue);
+  const idx = state.fullTimeSeries.findIndex(p => p.date === todayStr);
+  if (idx >= 0) {
+    state.fullTimeSeries[idx].value = rounded;
+  } else {
+    state.fullTimeSeries.push({ date: todayStr, value: rounded });
+  }
+}
 export function filterTimeSeries(filter) {
   const all = state.fullTimeSeries;
   if (!all.length) return all;
