@@ -25,9 +25,17 @@ function getPreviousWeekday(dateStr) {
 export async function fetchPrice(ticker) {
   if (state.priceCache[ticker]) return state.priceCache[ticker];
 
+  // Add a cache-buster so corsproxy.io doesn't serve a stale CDN response.
+  // We use minute-level granularity so the same minute's requests still share cache.
+  const bust = Math.floor(Date.now() / 30000); // changes every 30 seconds
+
+  // Use 2m interval + 1d range — this gives the actual live regularMarketPrice tick
+  // (1d interval only returns the completed EOD bar, which is why prices look stuck)
   const mirrors = [
-    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`,
-    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
+    // v7 quote endpoint — different rate-limit pool, good fallback
+    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&_=${bust}`,
   ];
 
   for (const url of mirrors) {
@@ -35,6 +43,20 @@ export async function fetchPrice(ticker) {
       const res = await fetch(proxyUrl(url));
       if (!res.ok) continue;
       const data = await res.json();
+
+      // v7 quote response
+      if (url.includes('/v7/finance/quote')) {
+        const q = data?.quoteResponse?.result?.[0];
+        if (q?.regularMarketPrice > 0) {
+          state.priceCache[ticker] = q.regularMarketPrice;
+          const pc = q.regularMarketPreviousClose ?? q.chartPreviousClose ?? null;
+          if (pc && pc > 0) state.prevClosePrices[ticker] = pc;
+          return q.regularMarketPrice;
+        }
+        continue;
+      }
+
+      // v8 chart response
       const meta = data?.chart?.result?.[0]?.meta;
       const price = meta?.regularMarketPrice;
       const previousClose = meta?.chartPreviousClose ?? meta?.previousClose ?? null;
@@ -43,7 +65,7 @@ export async function fetchPrice(ticker) {
         if (previousClose && previousClose > 0) state.prevClosePrices[ticker] = previousClose;
         return price;
       }
-    } catch (e) { /* try next */ }
+    } catch (e) { /* try next mirror */ }
   }
   return null;
 }
@@ -127,9 +149,12 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
   const key = `intraday_${ticker}`;
   if (state.dayHistoryCache[key]) return state.dayHistoryCache[key];
 
+  // Cache-bust at 30-second granularity
+  const bust = Math.floor(Date.now() / 30000);
+
   // 1. Try Yahoo Finance for today's intraday
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=1d&_=${bust}`;
     const res = await fetch(proxyUrl(url));
     const data = await res.json();
 
@@ -152,7 +177,16 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       state.prevClosePrices[ticker] = previousClose;
     }
 
-    // If we got meaningful intraday data (>2 points), use it
+    // Patch the last data point with the live regularMarketPrice so the chart
+    // tip matches the price card (Yahoo intraday last bar can lag by a few mins)
+    const livePrice = meta?.regularMarketPrice;
+    if (livePrice && livePrice > 0 && series.length > 0) {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      series.push({ time: `${hh}:${mm}`, ts: now.getTime(), price: livePrice });
+    }
+
     if (series.length > 2) {
       state.dayHistoryCache[key] = series;
       return series;
@@ -200,7 +234,8 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
 
   // 3. Final fallback: try Yahoo previous day (5m range=2d, take yesterday's ticks)
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=2d`;
+    const bust2 = Math.floor(Date.now() / 30000);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=2d&_=${bust2}`;
     const res = await fetch(proxyUrl(url));
     const data = await res.json();
     const result = data?.chart?.result?.[0];

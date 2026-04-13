@@ -317,26 +317,57 @@ function renderExchangeLinks(ticker, meta) {
 // ── Price history chart ───────────────────────────
 function renderChart() {
   const hist   = filterHist();
-  const dates  = Object.keys(hist).sort();
-  const prices = dates.map(d => hist[d]);
+  let   dates  = Object.keys(hist).sort();
+  let   prices = dates.map(d => hist[d]);
+
+  // ── Patch today's last point with live price ──────
+  const todayStr = new Date().toISOString().split('T')[0];
+  const livePrice = state.livePrices[_ticker];
+  if (livePrice && livePrice > 0) {
+    const todayIdx = dates.indexOf(todayStr);
+    if (todayIdx >= 0) {
+      prices = [...prices];
+      prices[todayIdx] = livePrice;
+    } else if (dates.length && dates[dates.length - 1] < todayStr) {
+      dates = [...dates, todayStr];
+      prices = [...prices, livePrice];
+    }
+  }
+
   if (_chartInst) { _chartInst.destroy(); _chartInst = null; }
   const canvas = document.getElementById('ssChart');
   if (!canvas || !dates.length) return;
 
-  if (dates.length >= 2) {
-    const chg = ((prices[prices.length-1] - prices[0]) / prices[0]) * 100;
-    const el  = document.getElementById('ss-period-chg');
-    if (el) el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>`;
+  // ── Period % change + ATH badge ───────────────────
+  if (prices.length >= 2) {
+    const startP = prices[0], endP = prices[prices.length - 1];
+    const chg    = ((endP - startP) / startP) * 100;
+    const allPrices = Object.values(_histFull);
+    const ath = allPrices.length ? Math.max(...allPrices) : endP;
+    const athChg = ((endP - ath) / ath) * 100;
+    const el = document.getElementById('ss-period-chg');
+    if (el) el.innerHTML =
+      `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>` +
+      (Math.abs(athChg) > 0.01
+        ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH</span>`
+        : '');
   }
+
+  // Dynamic colour: green if current > period-start
+  const isUp  = prices.length > 1 && prices[prices.length - 1] >= prices[0];
+  const color = isUp ? '#22c55e' : '#ef4444';
 
   const ctx = canvas.getContext('2d');
   const grad = ctx.createLinearGradient(0, 0, 0, 260);
-  grad.addColorStop(0, 'rgba(99,102,241,0.2)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
+  grad.addColorStop(0, isUp ? 'rgba(34,197,94,0.18)' : 'rgba(239,68,68,0.18)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  const periodStart = prices[0];
   _chartInst = new Chart(ctx, {
     type: 'line',
     data: {
       labels: dates.map(d => { const [y,m,dy] = d.split('-'); return `${dy}/${m}/${y.slice(2)}`; }),
-      datasets: [{ data: prices, borderColor: '#6366f1', borderWidth: 2,
+      datasets: [{ data: prices, borderColor: color, borderWidth: 2,
         backgroundColor: grad, fill: true, pointRadius: 0, pointHoverRadius: 5, tension: 0.3 }],
     },
     options: {
@@ -344,7 +375,18 @@ function renderChart() {
       plugins: { legend: { display: false },
         tooltip: { backgroundColor:'rgba(20,20,35,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1,
           titleColor:'#a0a0c0', bodyColor:'#e0e0ff', padding:10, mode:'index', intersect:false,
-          callbacks: { title: items => dates[items[0].dataIndex], label: c => ' ₹'+c.parsed.y.toFixed(2) } } },
+          callbacks: {
+            title: items => dates[items[0].dataIndex],
+            label: c => {
+              const price = c.parsed.y;
+              const chg = periodStart > 0 ? ((price - periodStart) / periodStart) * 100 : null;
+              return chg != null
+                ? [` ₹${price.toFixed(2)}`, ` ${chg>=0?'+':''}${chg.toFixed(2)}% from period start`]
+                : ` ₹${price.toFixed(2)}`;
+            },
+          },
+        },
+      },
       scales: {
         x: { grid:{color:'rgba(255,255,255,0.03)'}, border:{color:'rgba(255,255,255,0.1)'},
           ticks:{color:'#7777a0', font:{size:11}, maxTicksLimit:10, maxRotation:0} },
@@ -369,28 +411,87 @@ function renderDayChart(ticker) {
   }
   const labels = ticks.map(d => d.time);
   const prices = ticks.map(d => d.price);
-  const isUp   = prices[prices.length-1] >= prices[0];
-  const color  = isUp ? '#22c55e' : '#ef4444';
+
+  // ── Prev-close anchor ─────────────────────────────
+  let prevClose = state.prevClosePrices[ticker];
+  if (!prevClose || prevClose <= 0) {
+    const allDates = Object.keys(_histFull).sort();
+    if (allDates.length) prevClose = _histFull[allDates[allDates.length - 1]];
+  }
+  if (!prevClose || prevClose <= 0) prevClose = prices[0];
+
+  const lastPrice = prices[prices.length - 1];
+  const dayChgAbs = lastPrice - prevClose;
+  const dayChgPct = prevClose > 0 ? (dayChgAbs / prevClose) * 100 : 0;
+  const isUp  = dayChgAbs >= 0;
+  const color = isUp ? '#22c55e' : '#ef4444';
+
+  // ── Populate day-change badge ─────────────────────
+  const dayChgEl = document.getElementById('ss-day-chg');
+  if (dayChgEl) {
+    dayChgEl.innerHTML =
+      `<span style="color:${isUp?'var(--green)':'var(--red)'}">` +
+      `${dayChgAbs >= 0 ? '+' : ''}₹${Math.abs(dayChgAbs).toFixed(2)} ` +
+      `(${dayChgPct >= 0 ? '+' : ''}${dayChgPct.toFixed(2)}%)</span>` +
+      `<span style="font-size:10px;color:var(--text3);margin-left:6px;">vs prev close</span>`;
+  }
+
   if (_dayInst) { _dayInst.destroy(); _dayInst = null; }
   wrap.innerHTML = '<canvas id="ssDayChart" style="width:100%;height:100%"></canvas>';
   const ctx = document.getElementById('ssDayChart').getContext('2d');
   const grad = ctx.createLinearGradient(0, 0, 0, 260);
   grad.addColorStop(0, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)');
   grad.addColorStop(1, 'rgba(0,0,0,0)');
+
   _dayInst = new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets: [{ data:prices, borderColor:color, borderWidth:2,
-      backgroundColor:grad, fill:true, pointRadius:0, pointHoverRadius:4, tension:0.2 }] },
+    data: { labels, datasets: [
+      // Prev-close dashed baseline
+      {
+        data: new Array(labels.length).fill(prevClose),
+        borderColor: 'rgba(150,150,180,0.35)',
+        borderWidth: 1,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+        order: 1,
+      },
+      // Live price line
+      {
+        data: prices,
+        borderColor: color, borderWidth: 2,
+        backgroundColor: grad, fill: true,
+        pointRadius: 0, pointHoverRadius: 4, tension: 0.2,
+        order: 0,
+      },
+    ]},
     options: { responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false},
-        tooltip:{backgroundColor:'rgba(20,20,35,0.95)',borderColor:'rgba(255,255,255,0.1)',
-          borderWidth:1,titleColor:'#a0a0c0',bodyColor:'#e0e0ff',padding:10,
-          mode:'index',intersect:false,callbacks:{label:c=>' ₹'+c.parsed.y.toFixed(2)}} },
+        tooltip:{
+          backgroundColor:'rgba(20,20,35,0.95)', borderColor:'rgba(255,255,255,0.1)',
+          borderWidth:1, titleColor:'#a0a0c0', bodyColor:'#e0e0ff', padding:10,
+          mode:'index', intersect:false,
+          filter: (item) => item.datasetIndex === 1,
+          callbacks:{
+            label: c => {
+              const price  = c.parsed.y;
+              const chgAbs = price - prevClose;
+              const chgPct = prevClose > 0 ? (chgAbs / prevClose) * 100 : 0;
+              return [
+                ` ₹${price.toFixed(2)}`,
+                ` ${chgAbs>=0?'+':''}₹${Math.abs(chgAbs).toFixed(2)} (${chgPct>=0?'+':''}${chgPct.toFixed(2)}%) today`,
+              ];
+            },
+          },
+        },
+      },
       scales:{
         x:{grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.1)'},
           ticks:{color:'#7777a0',font:{size:11},maxTicksLimit:8,maxRotation:0}},
         y:{grid:{color:'rgba(255,255,255,0.04)'},border:{color:'rgba(255,255,255,0.1)'},
-          ticks:{color:'#7777a0',font:{size:11},callback:v=>v.toFixed(1)}},
+          ticks:{color:'#7777a0',font:{size:11},
+            callback:v=>'₹'+v.toLocaleString('en-IN',{notation:'compact',maximumFractionDigits:2})}},
       },
       interaction:{mode:'index',intersect:false},
     },
