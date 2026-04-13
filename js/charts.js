@@ -206,8 +206,38 @@ export function renderPortfolioDayChart() {
   });
 
   const roundedValues = values.map(Math.round);
-  const isUp  = roundedValues.length > 1 && roundedValues[roundedValues.length - 1] >= roundedValues[0];
-  const color = isUp ? '#22c55e' : '#ef4444';
+
+  // ── Compute portfolio-level prev close value ──────
+  let prevClosePortfolioValue = 0;
+  let hasPrevClose = false;
+  holdings.forEach(h => {
+    const pc = state.prevClosePrices[h.ticker];
+    if (pc && pc > 0) { prevClosePortfolioValue += pc * h.totalQty; hasPrevClose = true; }
+    else { const lp = state.livePrices[h.ticker] || h.avgBuy; prevClosePortfolioValue += lp * h.totalQty; }
+  });
+  prevClosePortfolioValue = Math.round(prevClosePortfolioValue);
+
+  // Determine up/down vs prev close if available, otherwise vs first tick
+  const lastVal = roundedValues[roundedValues.length - 1];
+  const baseVal = hasPrevClose ? prevClosePortfolioValue : roundedValues[0];
+  const isUp    = lastVal >= baseVal;
+  const color   = isUp ? '#22c55e' : '#ef4444';
+
+  // ── Update header % change badge ──────────────────
+  const titleEl = document.querySelector('#day-chart-body')?.closest('.chart-card')?.querySelector('.chart-title');
+  if (titleEl) {
+    const chgPct = baseVal > 0 ? ((lastVal - baseVal) / baseVal) * 100 : null;
+    const chgAbs = lastVal - baseVal;
+    const existingSpan = titleEl.querySelector('.day-chg-badge');
+    if (existingSpan) existingSpan.remove();
+    if (chgPct !== null) {
+      const span = document.createElement('span');
+      span.className = 'day-chg-badge';
+      span.style.cssText = `font-size:13px;font-weight:700;margin-left:8px;color:${isUp ? 'var(--green)' : 'var(--red)'}`;
+      span.textContent = `${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%)`;
+      titleEl.appendChild(span);
+    }
+  }
 
   if (state.portfolioDayChartInstance) state.portfolioDayChartInstance.destroy();
 
@@ -215,16 +245,58 @@ export function renderPortfolioDayChart() {
   const ctx  = document.getElementById('portfolioDayChart').getContext('2d');
   const grad = makeGrad(ctx, 220, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
 
+  const datasets = [];
+
+  // Prev close dashed line (if available)
+  if (hasPrevClose) {
+    datasets.push({
+      data: new Array(sortedTimes.length).fill(prevClosePortfolioValue),
+      borderColor: 'rgba(150,150,180,0.35)',
+      borderWidth: 1,
+      borderDash: [4, 4],
+      pointRadius: 0,
+      fill: false,
+      tension: 0,
+      order: 1,
+      label: 'Prev Close',
+    });
+  }
+
+  // Live portfolio value line
+  datasets.push({
+    data: roundedValues,
+    borderColor: color,
+    borderWidth: 2,
+    backgroundColor: grad,
+    fill: true,
+    pointRadius: 0,
+    pointHoverRadius: 4,
+    tension: 0.2,
+    order: 0,
+    label: 'Portfolio',
+  });
+
   state.portfolioDayChartInstance = new Chart(ctx, {
     type: 'line',
-    data: { labels: sortedTimes, datasets: [{ data: roundedValues, borderColor: color,
-      borderWidth: 2, backgroundColor: grad, fill: true, pointRadius: 0, pointHoverRadius: 4, tension: 0.2 }] },
+    data: { labels: sortedTimes, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
-          callbacks: { label: (c) => '  ₹' + c.parsed.y.toLocaleString('en-IN') } },
+          filter: (item) => item.datasetIndex === datasets.length - 1,
+          callbacks: {
+            label: (c) => {
+              const val = c.parsed.y;
+              const chgAbs = val - baseVal;
+              const chgPct = baseVal > 0 ? (chgAbs / baseVal) * 100 : 0;
+              return [
+                '  ₹' + val.toLocaleString('en-IN'),
+                `  ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%) today`,
+              ];
+            },
+          },
+        },
       },
       scales: {
         x: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks, maxTicksLimit: 8, maxRotation: 0 } },
@@ -234,6 +306,8 @@ export function renderPortfolioDayChart() {
       interaction: { mode: 'index', intersect: false },
     },
   });
+  if (!window._chartInstances) window._chartInstances = {};
+  window._chartInstances['portfolioDayChart'] = state.portfolioDayChartInstance;
 }
 
 // ── Today P&L bar chart ───────────────────────────

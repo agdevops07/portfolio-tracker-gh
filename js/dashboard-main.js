@@ -89,12 +89,17 @@ export function sortHoldingsModal(key) {
 }
 
 export function openHoldingsModal() {
-  document.getElementById('holdings-modal').style.display = 'flex';
+  const modal = document.getElementById('holdings-modal');
+  modal.style.display = 'flex';
   renderHoldingsTable();
+  // Listen for in-place refresh events fired by renderDashboardInPlace
+  modal.addEventListener('refreshTable', renderHoldingsTable, { passive: true });
 }
 
 export function closeHoldingsModal() {
-  document.getElementById('holdings-modal').style.display = 'none';
+  const modal = document.getElementById('holdings-modal');
+  modal.style.display = 'none';
+  modal.removeEventListener('refreshTable', renderHoldingsTable);
 }
 
 function computeRow(h, totalCurrent, i) {

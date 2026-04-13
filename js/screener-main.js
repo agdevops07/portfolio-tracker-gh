@@ -19,6 +19,64 @@ let _aiTab = 'filings';
 let _aiCache = {};
 const SS_DEFAULT_FROM = '2026-03-31';
 let _filter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
+let _ssRefreshId = null;   // auto-refresh interval id for screener price updates
+
+// ── Screener price auto-refresh (same interval as dashboard) ─────────────
+function startScreenerRefresh() {
+  stopScreenerRefresh();
+  const ms = 60000; // 1 min default; user can't change on screener page
+  _ssRefreshId = setInterval(async () => {
+    if (!_ticker) return;
+    try {
+      // Clear cache so we get fresh data
+      delete state.priceCache[_ticker];
+      delete state.dayHistoryCache[`intraday_${_ticker}`];
+      const [livePrice, dayHist] = await Promise.all([
+        fetchPrice(_ticker),
+        fetchDayHistory(_ticker, _meta?.isin),
+      ]);
+      if (livePrice) state.livePrices[_ticker] = livePrice;
+      state.dayHistories[_ticker] = dayHist || [];
+      // Update price cards in-place
+      fillCardsInPlace(_ticker);
+      // Refresh intraday chart
+      renderDayChart(_ticker);
+    } catch(e) { /* silently ignore refresh errors */ }
+  }, ms);
+}
+
+function stopScreenerRefresh() {
+  if (_ssRefreshId) { clearInterval(_ssRefreshId); _ssRefreshId = null; }
+}
+
+// ── In-place update of price stat cards (no DOM rebuild) ─────────────────
+function fillCardsInPlace(ticker) {
+  const lp  = state.livePrices[ticker];
+  const pc  = state.prevClosePrices[ticker];
+  const dAbs = (lp && pc) ? lp - pc : null;
+  const dPct = (lp && pc) ? ((lp - pc) / pc) * 100 : null;
+
+  const cards = document.getElementById('ss-cards');
+  if (!cards) return;
+  const statCards = cards.querySelectorAll('.stat-card');
+  if (!statCards.length) { fillCards(ticker, _fundData); return; }
+
+  // Card 0: Current Price
+  const priceVal = statCards[0]?.querySelector('.stat-value');
+  if (priceVal) priceVal.textContent = lp ? '₹' + lp.toFixed(2) : '—';
+
+  // Card 1: Day's Change
+  const dayVal = statCards[1]?.querySelector('.stat-value');
+  const daySub = statCards[1]?.querySelector('.stat-sub');
+  if (dayVal) {
+    dayVal.style.color = dAbs != null ? colorPnl(dAbs) : 'var(--text2)';
+    dayVal.textContent = dAbs != null ? (dAbs >= 0 ? '+' : '') + '₹' + Math.abs(dAbs).toFixed(2) : '—';
+  }
+  if (daySub) {
+    daySub.style.color = dPct != null ? colorPnl(dPct) : 'var(--text2)';
+    daySub.textContent = dPct != null ? pct(dPct) : 'Prev close unavailable';
+  }
+}
 
 
 // ── Hint chip trigger ────────────────────────────
@@ -189,6 +247,9 @@ async function loadStock(ticker, meta) {
   renderFundTab();
   syncFilterUI();
   renderExchangeLinks(ticker, meta);
+
+  // Start auto-refresh for live prices on the screener page
+  startScreenerRefresh();
 
   // Load news and filings — pass fund so concalls don't race against _fundData assignment
   loadNews(ticker, meta);
