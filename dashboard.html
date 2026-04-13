@@ -93,15 +93,15 @@
         <div class="chart-card collapsible-card">
           <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
             <div class="chart-title">Current Holding Value Over Selected Period <span id="port-period-chg" style="font-size:15px;font-weight:700;"></span></div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="time-filters" onclick="event.stopPropagation()">
+            <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+              <div class="time-filters">
                 <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
                 <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
                 <button class="tf-btn active" onclick="setTimeFilter('1Y',this)">1Y</button>
                 <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
                 <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)">Custom</button>
               </div>
-              <button class="icon-btn" title="Maximize" onclick="maximizeSection('portfolio-chart-body','portfolioChart')" style="margin-left:2px;">⤢</button>
+              <button class="icon-btn" title="Maximize" onclick="maximizeChart(null,'portfolio-chart-body','portfolioChart')" style="margin-left:2px;">⤢</button>
               <button class="collapse-btn" id="portfolio-chart-toggle" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">▲ Collapse</button>
             </div>
           </div>
@@ -260,14 +260,26 @@ function maximizeChart(cardId, bodyId, canvasId) {
   closeBtn.textContent = '✕ Close';
   closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;z-index:1;';
   closeBtn.onclick = () => overlay.remove();
+
   const canvasWrap = document.createElement('div');
-  canvasWrap.style.cssText = 'position:relative;width:min(900px,90vw);height:min(560px,80vh);background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1rem;box-sizing:border-box;';
+  canvasWrap.style.cssText = 'position:relative;width:min(960px,92vw);height:min(600px,84vh);background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.5rem 1.5rem 1rem;box-sizing:border-box;display:flex;flex-direction:column;gap:0.5rem;';
+
+  // Period change badge (copy from live DOM)
+  const periodChgEl = document.getElementById('port-period-chg');
+  if (periodChgEl && periodChgEl.innerHTML) {
+    const badge = document.createElement('div');
+    badge.style.cssText = 'font-size:14px;font-weight:700;';
+    badge.innerHTML = 'Portfolio Value &nbsp;' + periodChgEl.innerHTML;
+    canvasWrap.appendChild(badge);
+  }
+
   const bigCanvas = document.createElement('canvas');
-  bigCanvas.style.cssText = 'width:100%;height:100%;display:block;';
+  bigCanvas.style.cssText = 'flex:1;width:100%;display:block;';
   canvasWrap.appendChild(bigCanvas);
   overlay.appendChild(closeBtn);
   overlay.appendChild(canvasWrap);
   document.body.appendChild(overlay);
+
   requestAnimationFrame(() => {
     const srcChart = window._chartInstances[canvasId];
     if (srcChart) {
@@ -283,22 +295,29 @@ function maximizeChart(cardId, bodyId, canvasId) {
           type: srcChart.config.type,
           data: { labels, datasets: cleanDatasets },
           options: { animation: false, responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+            layout: { padding: { bottom: 8 } },
+            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false,
+              backgroundColor: '#1a1a1f', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+              titleColor: '#8a8a9a', bodyColor: '#f0f0f5', padding: 10,
+              callbacks: { label: (c) => '  ₹' + c.parsed.y.toLocaleString('en-IN') },
+            }},
             scales: {
               x: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
-                   ticks: { ...axisStyle, maxTicksLimit: 12, maxRotation: 0, autoSkip: true } },
+                   ticks: { ...axisStyle, maxTicksLimit: 10, maxRotation: 0, autoSkip: true } },
               y: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
-                   ticks: { ...axisStyle } },
+                   ticks: { ...axisStyle,
+                     callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 1 }) } },
             }, interaction: { mode: 'index', intersect: false },
           },
         });
         return;
       } catch(e) { console.warn('Chart re-render failed', e); }
     }
+    // Fallback: copy canvas as image
     const src = document.getElementById(canvasId);
     if (!src) return;
     const dpr = window.devicePixelRatio || 1;
-    const w = canvasWrap.offsetWidth, h = canvasWrap.offsetHeight;
+    const w = canvasWrap.offsetWidth - 48, h = canvasWrap.offsetHeight - 80;
     bigCanvas.width = w * dpr; bigCanvas.height = h * dpr;
     bigCanvas.style.width = w + 'px'; bigCanvas.style.height = h + 'px';
     const ctx = bigCanvas.getContext('2d');
@@ -307,6 +326,7 @@ function maximizeChart(cardId, bodyId, canvasId) {
   });
   const esc = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } };
   document.addEventListener('keydown', esc);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 </script>
 
