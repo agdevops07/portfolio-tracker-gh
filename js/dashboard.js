@@ -135,7 +135,7 @@ export async function refreshPricesOnly() {
   // Update today's point in the existing time series with fresh live prices
   patchTodayTimeSeries();
 
-  renderDashboard();
+  renderDashboardInPlace();
   updateRefreshTimestamp();
   showToast('Prices updated ✓');
 }
@@ -232,6 +232,57 @@ export function renderDashboard() {
   updateRefreshTimestamp();
 }
 
+// ── In-place refresh (no flicker) — called on auto-refresh ───────────────
+// Updates numeric values in existing DOM nodes rather than rebuilding innerHTML.
+// Also refreshes the holdings modal if it's currently open.
+function renderDashboardInPlace() {
+  const holdings = Object.values(state.holdings);
+
+  let totalInvested = 0, totalCurrent = 0, totalPrevClose = 0;
+  holdings.forEach((h) => {
+    const lp = state.livePrices[h.ticker];
+    const pc = state.prevClosePrices[h.ticker];
+    totalInvested  += h.invested;
+    if (lp) totalCurrent   += lp * h.totalQty;
+    if (pc) totalPrevClose += pc * h.totalQty;
+  });
+
+  const totalPnl       = totalCurrent - totalInvested;
+  const totalPnlPct    = totalInvested ? (totalPnl / totalInvested) * 100 : 0;
+  const todayChange    = totalPrevClose > 0 ? totalCurrent - totalPrevClose : null;
+  const todayChangePct = totalPrevClose > 0 ? (todayChange / totalPrevClose) * 100 : null;
+
+  let best = null;
+  holdings.forEach((h) => {
+    const lp = state.livePrices[h.ticker];
+    if (!lp) return;
+    const p = ((lp - h.avgBuy) / h.avgBuy) * 100;
+    if (!best || p > best.pct) best = { ticker: h.ticker, pct: p };
+  });
+
+  // Stat cards: re-render (they are small, fast, no visible flicker)
+  renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct, todayChange, todayChangePct, best, holdings });
+
+  // Charts: update data in-place instead of destroy+recreate
+  renderPortfolioChart(state.currentFilter);
+  renderPortfolioDayChart();
+  renderTodayPnlChart(holdings);
+  renderPieChart(holdings, totalCurrent);
+  renderPnlChart(holdings);
+
+  // Holding cards: update only the numeric cells in-place
+  updateHoldingCardsInPlace(holdings, totalCurrent);
+
+  // If holdings modal is open, refresh its table too
+  const modal = document.getElementById('holdings-modal');
+  if (modal && modal.style.display !== 'none') {
+    // Dispatch a custom event that dashboard-main.js listens to
+    modal.dispatchEvent(new CustomEvent('refreshTable'));
+  }
+
+  updateRefreshTimestamp();
+}
+
 // ── Stat cards ───────────────────────────────────
 function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
                             todayChange, todayChangePct, best, holdings }) {
@@ -298,6 +349,7 @@ function renderHoldingCards(holdings, totalCurrent) {
     const card = document.createElement('div');
     card.className = 'holding-card';
     card.onclick = () => import('./drilldown.js').then((m) => m.openDrilldown(h.ticker));
+    card.dataset.ticker = h.ticker;
     card.innerHTML = `
       <div class="hc-top">
         <div>
@@ -318,21 +370,73 @@ function renderHoldingCards(holdings, totalCurrent) {
       </div>
       <div class="hc-bottom">
         <div><div class="hc-meta-label">Invested</div><div class="hc-meta-val">${fmt(h.invested)}</div></div>
-        <div><div class="hc-meta-label">Current</div><div class="hc-meta-val">${currentVal ? fmt(currentVal) : '—'}</div></div>
-        <div><div class="hc-meta-label">Live Price</div><div class="hc-meta-val">${lp ? lp.toFixed(2) : '—'}</div></div>
+        <div><div class="hc-meta-label">Current</div><div class="hc-meta-val hc-d-current">${currentVal ? fmt(currentVal) : '—'}</div></div>
+        <div><div class="hc-meta-label">Live Price</div><div class="hc-meta-val hc-d-price">${lp ? lp.toFixed(2) : '—'}</div></div>
         <div>
           <div class="hc-meta-label">Today</div>
-          <div class="hc-meta-val" style="color:${todayChgPct != null ? colorPnl(todayChgPct) : 'var(--text2)'}">
+          <div class="hc-meta-val hc-d-today" style="color:${todayChgPct != null ? colorPnl(todayChgPct) : 'var(--text2)'}">
             ${todayChgPct != null ? pct(todayChgPct) : '—'}
           </div>
         </div>
         <div>
           <div class="hc-meta-label">Day P&amp;L</div>
-          <div class="hc-meta-val" style="color:${todayChgAbs != null ? colorPnl(todayChgAbs) : 'var(--text2)'}">
+          <div class="hc-meta-val hc-d-daypnl" style="color:${todayChgAbs != null ? colorPnl(todayChgAbs) : 'var(--text2)'}">
             ${todayChgAbs != null ? (todayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(todayChgAbs)) : '—'}
           </div>
         </div>
       </div>`;
     grid.appendChild(card);
+  });
+}
+
+// ── In-place update of holding cards (no DOM rebuild = no flicker) ────────
+function updateHoldingCardsInPlace(holdings, totalCurrent) {
+  const grid = document.getElementById('holdings-grid');
+  if (!grid) return;
+  const existingCards = [...grid.querySelectorAll('.holding-card[data-ticker]')];
+  // If card count changed (e.g. first render), fall back to full rebuild
+  if (existingCards.length !== holdings.length) {
+    renderHoldingCards(holdings, totalCurrent);
+    return;
+  }
+
+  holdings.forEach((h) => {
+    const card = grid.querySelector(`.holding-card[data-ticker="${h.ticker}"]`);
+    if (!card) return;
+
+    const lp  = state.livePrices[h.ticker];
+    const pc  = state.prevClosePrices[h.ticker];
+    const currentVal  = lp ? lp * h.totalQty : null;
+    const pnlVal      = currentVal != null ? currentVal - h.invested : null;
+    const pnlPct      = pnlVal != null ? (pnlVal / h.invested) * 100 : null;
+    const todayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
+    const todayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+
+    // Update only the changing cells
+    const pnlValEl  = card.querySelector('.hc-pnl-val');
+    const pnlPctEl  = card.querySelector('.hc-pnl-pct');
+    const currEl    = card.querySelector('.hc-d-current');
+    const priceEl   = card.querySelector('.hc-d-price');
+    const todayEl   = card.querySelector('.hc-d-today');
+    const daypnlEl  = card.querySelector('.hc-d-daypnl');
+
+    if (pnlValEl) {
+      pnlValEl.style.color = pnlVal != null ? colorPnl(pnlVal) : 'var(--text2)';
+      pnlValEl.textContent = pnlVal != null ? (pnlVal >= 0 ? '+' : '') + pnlVal.toFixed(0) : '—';
+    }
+    if (pnlPctEl) {
+      pnlPctEl.style.color = pnlPct != null ? colorPnl(pnlPct) : 'var(--text2)';
+      pnlPctEl.textContent = pnlPct != null ? pct(pnlPct) : 'no price';
+    }
+    if (currEl)   currEl.textContent  = currentVal ? fmt(currentVal) : '—';
+    if (priceEl)  priceEl.textContent = lp ? lp.toFixed(2) : '—';
+    if (todayEl) {
+      todayEl.style.color = todayChgPct != null ? colorPnl(todayChgPct) : 'var(--text2)';
+      todayEl.textContent = todayChgPct != null ? pct(todayChgPct) : '—';
+    }
+    if (daypnlEl) {
+      daypnlEl.style.color = todayChgAbs != null ? colorPnl(todayChgAbs) : 'var(--text2)';
+      daypnlEl.textContent = todayChgAbs != null ? (todayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(todayChgAbs)) : '—';
+    }
   });
 }
