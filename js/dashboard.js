@@ -4,7 +4,7 @@
 // auto-refresh, today's change, day charts.
 // ═══════════════════════════════════════════════
 
-import { state, resetCaches, resetAllCaches } from './state.js';
+import { state, resetCaches, resetAllCaches, isMarketOpen } from './state.js';
 import { fmt, pct, colorPnl, showScreen, showToast } from './utils.js';
 import { fetchPrice, fetchHistory, fetchDayHistory } from './api.js';
 import { forwardFill, buildTimeSeries, patchTodayTimeSeries } from './timeSeries.js';
@@ -95,6 +95,7 @@ export async function loadDashboard() {
     contentDiv.style.display  = 'block';
     renderDashboard();
     startAutoRefresh();
+    updateRefreshUI(); // show market status immediately on page load
 
   } catch (err) {
     console.error(err);
@@ -153,7 +154,12 @@ export function startAutoRefresh() {
   stopAutoRefresh();
   if (!state.refreshPaused) {
     state.refreshIntervalId = setInterval(() => {
-      if (!state.refreshPaused) refreshPricesOnly();
+      if (state.refreshPaused) return;
+      if (!isMarketOpen()) {
+        updateRefreshUI(true); // show market closed indicator
+        return;
+      }
+      refreshPricesOnly();
     }, state.refreshIntervalMs);
   }
   updateRefreshUI();
@@ -180,14 +186,30 @@ export function setRefreshInterval(ms) {
   showToast(`Refresh every ${ms / 1000}s`);
 }
 
-function updateRefreshUI() {
-  const pauseBtn   = document.getElementById('refresh-pause-btn');
+function updateRefreshUI(marketClosed = false) {
+  const pauseBtn    = document.getElementById('refresh-pause-btn');
   const intervalSel = document.getElementById('refresh-interval-sel');
+  const marketTag   = document.getElementById('market-status-tag');
+  const open        = isMarketOpen();
   if (pauseBtn) {
-    pauseBtn.textContent = state.refreshPaused ? '▶ Resume' : '⏸ Pause';
-    pauseBtn.style.color = state.refreshPaused ? 'var(--gold)' : '';
+    if (state.refreshPaused) {
+      pauseBtn.textContent = '▶ Resume';
+      pauseBtn.style.color = 'var(--gold)';
+      pauseBtn.disabled = false;
+    } else {
+      pauseBtn.textContent = '⏸ Pause';
+      pauseBtn.style.color = open ? '' : 'var(--text3)';
+      pauseBtn.title    = open ? 'Pause auto-refresh' : 'Market is closed — auto-refresh suspended';
+      pauseBtn.disabled = !open;
+    }
   }
   if (intervalSel) intervalSel.value = state.refreshIntervalMs;
+  if (marketTag) {
+    marketTag.textContent   = open ? '🟢 Market Open' : '🔴 Market Closed';
+    marketTag.style.color   = open ? 'var(--green)'   : 'var(--red)';
+    marketTag.style.borderColor = open ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+    marketTag.style.display = '';
+  }
 }
 
 function updateRefreshTimestamp() {

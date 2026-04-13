@@ -78,6 +78,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   await loadDashboard();
+
+  // Show market status on load
+  if (typeof window._stopAutoRefresh !== 'undefined') {
+    // updateRefreshUI called inside loadDashboard/startAutoRefresh
+  }
+
+  // Expose quick navigate-to-screener for holding cards (alt: Ctrl+click)
+  document.addEventListener('click', e => {
+    const card = e.target.closest('.holding-card[data-ticker]');
+    if (!card) return;
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl/Cmd+click → open screener directly without dashboard context
+      const ticker = card.dataset.ticker;
+      const base = window.location.pathname.replace(/\/[^/]*$/, '') || '';
+      window.open(base + '/screener.html?ticker=' + encodeURIComponent(ticker), '_blank');
+      e.stopPropagation();
+    }
+    // Normal click → openDrilldown (navigates to screener with holding context)
+  });
 });
 
 // ── Holdings Modal ────────────────────────────────
