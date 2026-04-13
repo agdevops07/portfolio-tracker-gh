@@ -3,7 +3,7 @@
 // News, Filings, AI Insights via Claude API
 // ═══════════════════════════════════════════════
 
-import { state } from './state.js';
+import { state, isMarketOpen } from './state.js';
 import { fetchPrice, fetchHistory, fetchDayHistory, fetchScreenerFundamentals } from './api.js';
 import { pct, colorPnl, showToast } from './utils.js';
 
@@ -17,18 +17,19 @@ let _fundTab = 'ratios', _fundMode = 'standalone';
 let _histFull = {}, _chartInst = null, _dayInst = null;
 let _aiTab = 'filings';
 let _aiCache = {};
+let _holdingCtx = null; // populated when navigating from dashboard holding
 const SS_DEFAULT_FROM = '2026-03-31';
 let _filter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
 let _ssRefreshId = null;   // auto-refresh interval id for screener price updates
 
-// ── Screener price auto-refresh (same interval as dashboard) ─────────────
+// ── Screener price auto-refresh (shared interval + market hours guard) ───
 function startScreenerRefresh() {
   stopScreenerRefresh();
-  const ms = 60000; // 1 min default; user can't change on screener page
+  if (state.screenerRefreshPaused) { updateScreenerRefreshUI(); return; }
   _ssRefreshId = setInterval(async () => {
-    if (!_ticker) return;
+    if (state.screenerRefreshPaused || !_ticker) return;
+    if (!isMarketOpen()) { updateScreenerRefreshUI(true); return; }
     try {
-      // Clear cache so we get fresh data
       delete state.priceCache[_ticker];
       delete state.dayHistoryCache[`intraday_${_ticker}`];
       const [livePrice, dayHist] = await Promise.all([
@@ -37,20 +38,75 @@ function startScreenerRefresh() {
       ]);
       if (livePrice) state.livePrices[_ticker] = livePrice;
       state.dayHistories[_ticker] = dayHist || [];
-      // Update price cards in-place
       fillCardsInPlace(_ticker);
-      // Refresh intraday chart
       renderDayChart(_ticker);
+      updateScreenerRefreshUI();
     } catch(e) { /* silently ignore refresh errors */ }
-  }, ms);
+  }, state.screenerRefreshIntervalMs);
+  updateScreenerRefreshUI();
 }
 
 function stopScreenerRefresh() {
   if (_ssRefreshId) { clearInterval(_ssRefreshId); _ssRefreshId = null; }
 }
 
+function updateScreenerRefreshUI(marketClosed = false) {
+  const pauseBtn = document.getElementById('ss-refresh-pause-btn');
+  const sel      = document.getElementById('ss-refresh-interval-sel');
+  const tag      = document.getElementById('ss-market-tag');
+  if (pauseBtn) {
+    if (state.screenerRefreshPaused) {
+      pauseBtn.textContent = '▶ Resume';
+      pauseBtn.style.color = 'var(--gold)';
+    } else if (marketClosed || !isMarketOpen()) {
+      pauseBtn.textContent = '🔴 Market Closed';
+      pauseBtn.style.color = 'var(--text3)';
+    } else {
+      pauseBtn.textContent = '⏸ Pause';
+      pauseBtn.style.color = '';
+    }
+  }
+  if (sel) sel.value = state.screenerRefreshIntervalMs;
+  if (tag) {
+    tag.textContent = isMarketOpen() ? '🟢 Market Open' : '🔴 Market Closed';
+  }
+}
+
+window._ssToggleRefreshPause = function() {
+  state.screenerRefreshPaused = !state.screenerRefreshPaused;
+  state.screenerRefreshPaused ? stopScreenerRefresh() : startScreenerRefresh();
+  updateScreenerRefreshUI();
+};
+
+window._ssSetRefreshInterval = function(ms) {
+  state.screenerRefreshIntervalMs = +ms;
+  if (!state.screenerRefreshPaused) startScreenerRefresh();
+  updateScreenerRefreshUI();
+};
+
+window._ssRefreshNow = async function() {
+  if (!_ticker) return;
+  try {
+    delete state.priceCache[_ticker];
+    delete state.dayHistoryCache[`intraday_${_ticker}`];
+    const [livePrice, dayHist] = await Promise.all([
+      fetchPrice(_ticker),
+      fetchDayHistory(_ticker, _meta?.isin),
+    ]);
+    if (livePrice) state.livePrices[_ticker] = livePrice;
+    state.dayHistories[_ticker] = dayHist || [];
+    fillCardsInPlace(_ticker);
+    renderDayChart(_ticker);
+    const ts = document.getElementById('ss-last-refresh');
+    if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {}
+};
+
 // ── In-place update of price stat cards (no DOM rebuild) ─────────────────
 function fillCardsInPlace(ticker) {
+  // When holding context is active, do a full rebuild (cheap, small card set)
+  if (_holdingCtx) { fillCards(ticker, _fundData); return; }
+
   const lp  = state.livePrices[ticker];
   const pc  = state.prevClosePrices[ticker];
   const dAbs = (lp && pc) ? lp - pc : null;
@@ -76,6 +132,10 @@ function fillCardsInPlace(ticker) {
     daySub.style.color = dPct != null ? colorPnl(dPct) : 'var(--text2)';
     daySub.textContent = dPct != null ? pct(dPct) : 'Prev close unavailable';
   }
+
+  // Update refresh timestamp
+  const ts = document.getElementById('ss-last-refresh');
+  if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString();
 }
 
 
@@ -104,26 +164,60 @@ document.addEventListener('DOMContentLoaded', () => {
       closeDropdown('ss-dropdown-compact');
     }
   });
+
+  // ── Handle incoming holding context from dashboard drilldown ──────────
+  const params = new URLSearchParams(window.location.search);
+  const incomingTicker = params.get('ticker');
+  const fromDashboard  = params.get('from') === 'dashboard';
+
+  if (incomingTicker && fromDashboard) {
+    // Restore back-to-dashboard button
+    const backBtn = document.getElementById('ss-back-dashboard');
+    if (backBtn) backBtn.style.display = '';
+
+    // Restore holding context (prices, history) from sessionStorage
+    let ctx = null;
+    try { ctx = JSON.parse(sessionStorage.getItem('drilldown_ctx') || 'null'); } catch(_) {}
+    if (ctx && ctx.ticker === incomingTicker) {
+      _holdingCtx = ctx.holding || null;
+      if (ctx.livePrice)  state.livePrices[incomingTicker]      = ctx.livePrice;
+      if (ctx.prevClose)  state.prevClosePrices[incomingTicker] = ctx.prevClose;
+      if (ctx.history)    { _histFull = ctx.history; state.histories = state.histories || {}; state.histories[incomingTicker] = ctx.history; }
+      if (ctx.dayHistory) state.dayHistories[incomingTicker]    = ctx.dayHistory;
+    }
+
+    // Load the stock (will use cached prices/history where available)
+    loadDB().then(() => loadStock(incomingTicker, null));
+  }
+
+  updateScreenerRefreshUI();
 });
 
+let _dbLoadPromise = null;
 async function loadDB() {
-  if (_db) return;
+  if (_db) return _db;
+  if (_dbLoadPromise) return _dbLoadPromise;
   const st = document.getElementById('ss-db-status');
-  try {
-    if (st) { st.textContent = 'Loading...'; st.style.display = 'block'; }
-    const base = document.location.pathname.replace(/\/[^/]*$/, '') || '';
-    const res = await fetch(base + '/data/stocks_db.json');
-    if (!res.ok) throw new Error('Failed');
-    _db = await res.json();
-    _dbLoaded = true;
-    if (st) {
-      st.textContent = `✓ ${_db.length.toLocaleString()} stocks loaded (NSE + BSE)`;
-      st.style.color = 'var(--green)';
-      st.style.display = 'block';
+  _dbLoadPromise = (async () => {
+    try {
+      if (st) { st.textContent = 'Loading...'; st.style.display = 'block'; }
+      const base = document.location.pathname.replace(/\/[^/]*$/, '') || '';
+      const res = await fetch(base + '/data/stocks_db.json');
+      if (!res.ok) throw new Error('Failed');
+      _db = await res.json();
+      _dbLoaded = true;
+      if (st) {
+        st.textContent = `✓ ${_db.length.toLocaleString()} stocks loaded (NSE + BSE)`;
+        st.style.color = 'var(--green)';
+        st.style.display = 'block';
+      }
+      return _db;
+    } catch {
+      if (st) { st.textContent = '⚠ DB load failed'; st.style.color = 'var(--red)'; }
+      return null;
     }
-  } catch {
-    if (st) { st.textContent = '⚠ DB load failed'; st.style.color = 'var(--red)'; }
-  }
+  })();
+  return _dbLoadPromise;
 }
 
 // ── Wire search input ─────────────────────────────
@@ -208,6 +302,9 @@ async function loadStock(ticker, meta) {
   _meta = meta;
   _fundData = null; _fundTab = 'ratios'; _fundMode = 'standalone';
   _aiCache = {};
+  // If navigating from a new search (not dashboard), clear holding context
+  if (!meta && !_holdingCtx) { /* keep _holdingCtx if set by URL param flow */ }
+  else if (meta) { _holdingCtx = null; } // fresh search always clears
   const today = new Date().toISOString().split('T')[0];
   _filter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: today };
 
@@ -285,6 +382,7 @@ function fillHeader(ticker, meta, fund) {
 }
 
 // ── Fill stat cards ───────────────────────────────
+// When _holdingCtx is set (navigated from dashboard), shows holding P&L cards too.
 function fillCards(ticker, fund) {
   const lp  = state.livePrices[ticker];
   const pc  = state.prevClosePrices[ticker];
@@ -292,29 +390,75 @@ function fillCards(ticker, fund) {
   const dPct = (lp && pc) ? ((lp - pc) / pc) * 100 : null;
   const cards = document.getElementById('ss-cards');
   if (!cards) return;
-  cards.innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Current Price</div>
-      <div class="stat-value">${lp ? '₹' + lp.toFixed(2) : '—'}</div>
-      ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Day's Change</div>
-      <div class="stat-value" style="color:${dAbs != null ? colorPnl(dAbs) : 'var(--text2)'}">
-        ${dAbs != null ? (dAbs >= 0 ? '+' : '') + '₹' + Math.abs(dAbs).toFixed(2) : '—'}</div>
-      <div class="stat-sub" style="color:${dPct != null ? colorPnl(dPct) : 'var(--text2)'}">
-        ${dPct != null ? pct(dPct) : 'Prev close unavailable'}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Market Cap</div>
-      <div class="stat-value" style="${fund?.marketCap ? '' : 'color:var(--text3)'}">
-        ${fund?.marketCap || '—'}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">P/E Ratio</div>
-      <div class="stat-value" style="${fund?.peRatio ? '' : 'color:var(--text3)'}">
-        ${fund?.peRatio || '—'}</div>
-    </div>`;
+
+  const h = _holdingCtx;
+  if (h) {
+    // ── Holding mode: show portfolio-specific cards ──
+    const cv  = lp ? lp * h.totalQty : null;
+    const pnl = cv != null ? cv - h.invested : null;
+    const pnlPct = pnl != null ? (pnl / h.invested) * 100 : null;
+    const todayAbs = (lp && pc) ? (lp - pc) * h.totalQty : null;
+    const todayPct = (lp && pc) ? ((lp - pc) / pc) * 100 : null;
+    let cagr = null;
+    if (h.earliestDate && lp) {
+      const yrs = (Date.now() - new Date(h.earliestDate)) / (1000*60*60*24*365);
+      if (yrs > 0.1) cagr = (Math.pow(lp / h.avgBuy, 1/yrs) - 1) * 100;
+    }
+    cards.innerHTML = `
+      <div class="holding-banner">
+        <span class="holding-badge">📋 Your Holding</span>
+        <span>${h.totalQty} shares &nbsp;·&nbsp; Avg ₹${h.avgBuy.toFixed(2)} &nbsp;·&nbsp; Invested ₹${h.invested.toLocaleString('en-IN',{maximumFractionDigits:0})}</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Current Price</div>
+        <div class="stat-value">${lp ? '₹'+lp.toFixed(2) : '—'}</div>
+        ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Day's Change</div>
+        <div class="stat-value" style="color:${todayAbs!=null?colorPnl(todayAbs):'var(--text2)'}">
+          ${todayAbs!=null?(todayAbs>=0?'+':'')+' ₹'+Math.abs(todayAbs).toFixed(0):'—'}</div>
+        <div class="stat-sub" style="color:${todayPct!=null?colorPnl(todayPct):'var(--text2)'}">
+          ${todayPct!=null?pct(todayPct)+' today':'Prev close unavailable'}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Overall P&amp;L</div>
+        <div class="stat-value" style="color:${pnl!=null?colorPnl(pnl):'inherit'}">
+          ${pnl!=null?(pnl>=0?'+':'')+' ₹'+Math.abs(pnl).toLocaleString('en-IN',{maximumFractionDigits:0}):'—'}</div>
+        <div class="stat-sub" style="color:${pnlPct!=null?colorPnl(pnlPct):'inherit'}">
+          ${pnlPct!=null?pct(pnlPct):''}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Value${cagr!=null?' · CAGR':''}</div>
+        <div class="stat-value">${cv?'₹'+cv.toLocaleString('en-IN',{maximumFractionDigits:0}):'—'}</div>
+        ${cagr!=null?`<div class="stat-sub" style="color:${colorPnl(cagr)}">CAGR ${pct(cagr)}</div>`:''}
+      </div>`;
+  } else {
+    // ── Standard screener mode: market cap + P/E ──
+    cards.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Current Price</div>
+        <div class="stat-value">${lp ? '₹' + lp.toFixed(2) : '—'}</div>
+        ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Day's Change</div>
+        <div class="stat-value" style="color:${dAbs != null ? colorPnl(dAbs) : 'var(--text2)'}">
+          ${dAbs != null ? (dAbs >= 0 ? '+' : '') + '₹' + Math.abs(dAbs).toFixed(2) : '—'}</div>
+        <div class="stat-sub" style="color:${dPct != null ? colorPnl(dPct) : 'var(--text2)'}">
+          ${dPct != null ? pct(dPct) : 'Prev close unavailable'}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Market Cap</div>
+        <div class="stat-value" style="${fund?.marketCap ? '' : 'color:var(--text3)'}">
+          ${fund?.marketCap || '—'}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">P/E Ratio</div>
+        <div class="stat-value" style="${fund?.peRatio ? '' : 'color:var(--text3)'}">
+          ${fund?.peRatio || '—'}</div>
+      </div>`;
+  }
 }
 
 // ── Exchange links ────────────────────────────────

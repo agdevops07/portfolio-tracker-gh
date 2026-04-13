@@ -1,279 +1,41 @@
 // ═══════════════════════════════════════════════
-// DRILLDOWN — Per-stock detail view
+// DRILLDOWN — Navigates to screener page with
+// holding context embedded in sessionStorage.
+// The screener page reads this and shows
+// portfolio-specific stat cards when present.
 // ═══════════════════════════════════════════════
 
 import { state } from './state.js';
-import { fmt, pct, colorPnl } from './utils.js';
-import { renderDrilldownChart, renderDrilldownDayChart } from './charts.js';
-import { fetchDayHistory, fetchScreenerFundamentals } from './api.js';
 
-const DEFAULT_FROM = '2026-03-31';
-const ddFilter = { value: 'CUSTOM', customFrom: DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
-
-let _fundData = null;
-let _fundMode = 'standalone'; // standalone is default
-let _fundTab  = 'ratios';
-let _currentTicker = '';
-
-// ── Render dd-meta (about + sector above stat cards) ──
-function renderDDMeta(fund) {
-  const metaEl  = document.getElementById('dd-meta');
-  const aboutEl = document.getElementById('dd-about');
-  if (!fund) {
-    if (metaEl) metaEl.innerHTML = '';
-    if (aboutEl) { aboutEl.textContent = ''; aboutEl.style.display = 'none'; }
-    return;
-  }
-  // About in dd-about block (above sector, below subtitle)
-  if (aboutEl && fund.about) {
-    aboutEl.textContent = fund.about;
-    aboutEl.style.display = '';
-  } else if (aboutEl) { aboutEl.style.display = 'none'; }
-  // Sector breadcrumb in dd-meta
-  if (metaEl) {
-    const txt = fund.sectorBreadcrumb || (fund.sector ? fund.sector + (fund.industry ? ' › ' + fund.industry : '') : '');
-    metaEl.innerHTML = txt ? `<span>${txt}</span>` : '';
-  }
-}
-
-// ── Render a financial table ──────────────────────
-function renderFinTable(tableData, note = 'Figures in ₹ Cr') {
-  if (!tableData || !tableData.rows?.length) return '<div style="color:var(--text3);font-size:12px;padding:1rem 0;">No data available</div>';
-  const years = tableData.headers.slice(1); // first th is blank row-label column
-  const thead = `<tr><th>Item</th>${years.map(y => `<th>${y}</th>`).join('')}</tr>`;
-  const tbody = tableData.rows.map(row => {
-    const cells = row.values.map(v => {
-      const n = parseFloat(v.replace(/,/g, ''));
-      const cls = !isNaN(n) ? (n < 0 ? 'negative' : '') : '';
-      return `<td class="${cls}">${v || '—'}</td>`;
-    }).join('');
-    return `<tr><td>${row.label}</td>${cells}</tr>`;
-  }).join('');
-  const uid = 'ft_' + Math.random().toString(36).slice(2,7);
-  setTimeout(() => {
-    const wrap = document.getElementById(uid);
-    if (wrap) wrap.querySelectorAll('th:first-child,td:first-child')
-      .forEach(c => c.style.cssText += ';position:sticky;left:0;background:var(--bg2);z-index:2;white-space:nowrap;');
-  }, 0);
-  return `<div class="fund-table-wrap" id="${uid}" style="overflow-x:auto;direction:rtl;">
-            <table class="fund-table" style="direction:ltr;">
-              <thead>${thead}</thead><tbody>${tbody}</tbody>
-            </table>
-          </div>
-          <div class="fund-table-note">${note} · Source: <a href="${_fundData?._url||''}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a></div>`;
-}
-
-// ── Render current tab content ────────────────────
-function renderFundTab() {
-  const el = document.getElementById('dd-fundamentals');
-  if (!el || !_fundData) return;
-
-  if (_fundTab === 'ratios') {
-    const row = (label, val, hint='') => val
-      ? `<div class="fund-item" title="${hint}"><span class="fund-label">${label}</span><span class="fund-val">${val}</span></div>` : '';
-    el.innerHTML = `
-      <div class="fund-grid">
-        ${row('Market Cap', _fundData.marketCap)}
-        ${row('P/E Ratio', _fundData.peRatio, 'Stock P/E')}
-        ${row('52W High/Low', _fundData.week52HL)}
-        ${row('Book Value', _fundData.bookValue)}
-        ${row('ROCE', _fundData.roce, 'Return on Capital Employed')}
-        ${row('ROE', _fundData.roe, 'Return on Equity')}
-        ${row('Div Yield', _fundData.divYield)}
-        ${row('Debt/Equity', _fundData.debtEquity)}
-        ${row('EPS', _fundData.eps)}
-        ${row('Face Value', _fundData.faceValue)}
-      </div>
-      <div class="fund-table-note" style="margin-top:0.5rem;">Source: <a href="${_fundData._url}" target="_blank" style="color:var(--accent2);text-decoration:none;">Screener.in ↗</a> · ${_fundData._mode}</div>`;
-  } else if (_fundTab === 'pnl') {
-    el.innerHTML = renderFinTable(_fundData.pnl, 'P&L figures in ₹ Cr');
-  } else if (_fundTab === 'balance') {
-    el.innerHTML = renderFinTable(_fundData.balance, 'Balance Sheet in ₹ Cr');
-  } else if (_fundTab === 'cashflow') {
-    el.innerHTML = renderFinTable(_fundData.cashflow, 'Cash Flow in ₹ Cr');
-  } else if (_fundTab === 'quarterly') {
-    el.innerHTML = renderFinTable(_fundData.quarterly, 'Quarterly Results in ₹ Cr');
-  }
-}
-
-// ── Exposed: switch tabs ──────────────────────────
-window.switchFundTab = function(tab, btn) {
-  _fundTab = tab;
-  document.querySelectorAll('.fund-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  if (_fundData) renderFundTab();
-};
-
-// ── Exposed: switch consolidated/standalone ───────
-window.switchFundMode = function(mode, btn) {
-  if (_fundMode === mode) return;
-  _fundMode = mode;
-  document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const el = document.getElementById('dd-fundamentals');
-  const fundBody = document.getElementById('dd-fund-body');
-  // Lock height to prevent layout flicker during fetch
-  if (fundBody) { fundBody.style.minHeight = fundBody.offsetHeight + 'px'; }
-  if (el) el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading…</div>';
-  fetchScreenerFundamentals(_currentTicker, mode).then(fund => {
-    _fundData = fund;
-    renderDDMeta(fund);
-    if (fund) { renderFundTab(); } else { renderFundFallback(_currentTicker); }
-    // Release height lock after render
-    if (fundBody) { requestAnimationFrame(() => { fundBody.style.minHeight = ''; }); }
-  });
-};
-
-function renderFundFallback(ticker) {
-  const sym = ticker.replace(/\.(NS|BO|BSE|NSE|-SM)$/i, '').replace('-SM', '');
-  const el = document.getElementById('dd-fundamentals');
-  if (el) el.innerHTML = `
-    <div style="color:var(--text3);font-size:12px;padding:0.5rem 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <span>Could not load from Screener.in (may be geo-restricted via proxy).</span>
-      <a href="https://www.screener.in/company/${sym}/" target="_blank" style="color:var(--accent2);text-decoration:none;">Open Screener.in ↗</a>
-    </div>`;
-}
-
-// ── Open drilldown ────────────────────────────────
-export async function openDrilldown(ticker) {
-  // Show drilldown, hide dashboard content
-  const ds = document.getElementById('dashboard-screen');
-  const dd = document.getElementById('drilldown-screen');
-  if (ds) ds.style.display = 'none';
-  if (dd) dd.style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  _currentTicker = ticker;
-  _fundTab  = 'ratios';
-  _fundMode = 'standalone'; // default
-  _fundData = null;
-
-  document.getElementById('dd-meta') && (document.getElementById('dd-meta').innerHTML = '');
-  const today = new Date().toISOString().split('T')[0];
-  ddFilter.value = 'CUSTOM'; ddFilter.customFrom = DEFAULT_FROM; ddFilter.customTo = today;
-
+// ── Open drilldown: pass context to screener page ──
+export function openDrilldown(ticker) {
   const h   = state.holdings[ticker];
   const lp  = state.livePrices[ticker];
   const pc  = state.prevClosePrices[ticker];
-  const cv  = lp ? lp * h.totalQty : null;
-  const pnl = cv != null ? cv - h.invested : null;
-  const pnlPct = pnl != null ? (pnl / h.invested) * 100 : null;
-  const todayAbs = (lp && pc) ? (lp - pc) * h.totalQty : null;
-  const todayPct = (lp && pc) ? ((lp - pc) / pc) * 100 : null;
 
-  let cagr = null;
-  if (h.earliestDate && lp) {
-    const yrs = (Date.now() - new Date(h.earliestDate)) / (1000*60*60*24*365);
-    if (yrs > 0.1) cagr = (Math.pow(lp / h.avgBuy, 1/yrs) - 1) * 100;
-  }
+  // Encode all the holding data we want the screener to show
+  const ctx = {
+    ticker,
+    fromHolding: true,
+    holding: h ? {
+      totalQty    : h.totalQty,
+      avgBuy      : h.avgBuy,
+      invested    : h.invested,
+      earliestDate: h.earliestDate || null,
+      upstoxTicker: h.upstoxTicker || null,
+    } : null,
+    livePrice  : lp || null,
+    prevClose  : pc || null,
+    // pass history if already fetched so screener doesn't re-fetch
+    history    : state.histories?.[ticker] || null,
+    dayHistory : state.dayHistories?.[ticker] || null,
+  };
 
-  document.getElementById('dd-ticker').textContent = ticker;
-  document.getElementById('dd-subtitle').textContent =
-    `${h.totalQty} shares · Avg ₹${h.avgBuy.toFixed(2)} · Invested ₹${h.invested.toLocaleString('en-IN',{maximumFractionDigits:0})}`;
+  try {
+    sessionStorage.setItem('drilldown_ctx', JSON.stringify(ctx));
+  } catch (_) {}
 
-  document.getElementById('dd-cards').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Current Price</div>
-      <div class="stat-value">${lp ? '₹'+lp.toFixed(2) : '—'}</div>
-      ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Day's Change</div>
-      <div class="stat-value" style="color:${todayAbs!=null?colorPnl(todayAbs):'var(--text2)'}">
-        ${todayAbs!=null?(todayAbs>=0?'+':'')+fmt(Math.abs(todayAbs)):'—'}</div>
-      <div class="stat-sub" style="color:${todayPct!=null?colorPnl(todayPct):'var(--text2)'}">
-        ${todayPct!=null?pct(todayPct)+' today':'Prev close unavailable'}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Overall P&amp;L</div>
-      <div class="stat-value" style="color:${pnl!=null?colorPnl(pnl):'inherit'}">
-        ${pnl!=null?(pnl>=0?'+':'')+fmt(Math.abs(pnl)):'—'}</div>
-      <div class="stat-sub" style="color:${pnlPct!=null?colorPnl(pnlPct):'inherit'}">
-        ${pnlPct!=null?pct(pnlPct):''}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Value${cagr!=null?' · CAGR':''}</div>
-      <div class="stat-value">${cv?fmt(cv):'—'}</div>
-      ${cagr!=null?`<div class="stat-sub" style="color:${colorPnl(cagr)}">CAGR ${pct(cagr)}</div>`:''}
-    </div>`;
-
-  // Sync date inputs & filter buttons
-  const fi = document.getElementById('dd-from'), ti = document.getElementById('dd-to');
-  if (fi) fi.value = DEFAULT_FROM; if (ti) ti.value = today;
-  const cw = document.getElementById('dd-custom-wrap');
-  if (cw) cw.style.display = 'flex';
-  document.querySelectorAll('.dd-tf-btn').forEach(b => b.classList.toggle('active', b.dataset.f === 'CUSTOM'));
-  document.querySelectorAll('.fund-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'ratios'));
-  // standalone is default
-  document.querySelectorAll('.fund-mode-btn').forEach(b => b.classList.toggle('active', b.id === 'fund-mode-stand'));
-
-  renderDDHistorySection(ticker);
-
-  // Fundamentals — Screener only, standalone default
-  const fundEl = document.getElementById('dd-fundamentals');
-  if (fundEl) fundEl.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:0.5rem 0;">Loading from Screener.in…</div>';
-  _fundData = await fetchScreenerFundamentals(ticker, 'standalone');
-  renderDDMeta(_fundData);
-  if (_fundData) renderFundTab(); else renderFundFallback(ticker);
-
-  // Intraday
-  if (!state.dayHistories[ticker]?.length)
-    state.dayHistories[ticker] = await fetchDayHistory(h.ticker, h.upstoxTicker);
-  renderDrilldownDayChart(ticker);
+  // Navigate to screener with ticker in URL
+  const base = window.location.pathname.replace(/\/[^/]*$/, '') || '';
+  window.location.href = base + '/screener.html?ticker=' + encodeURIComponent(ticker) + '&from=dashboard';
 }
-
-function renderDDHistorySection(ticker) {
-  const hist = state.histories?.[ticker];
-  if (!hist || !Object.keys(hist).length) return;
-  const allDates = Object.keys(hist).sort();
-  const today = new Date().toISOString().split('T')[0];
-  let from = allDates[0];
-  if (ddFilter.value === 'CUSTOM' && ddFilter.customFrom) {
-    renderDrilldownChart(ticker, filterHist(hist, ddFilter.customFrom, ddFilter.customTo || today));
-    updateDDFilterUI(ticker, hist, ddFilter.customFrom, ddFilter.customTo || today);
-    return;
-  }
-  const last = new Date(allDates[allDates.length-1]);
-  if      (ddFilter.value === '1M') { const d=new Date(last); d.setMonth(d.getMonth()-1); from=d.toISOString().split('T')[0]; }
-  else if (ddFilter.value === '3M') { const d=new Date(last); d.setMonth(d.getMonth()-3); from=d.toISOString().split('T')[0]; }
-  else if (ddFilter.value === '1Y') { const d=new Date(last); d.setFullYear(d.getFullYear()-1); from=d.toISOString().split('T')[0]; }
-  renderDrilldownChart(ticker, filterHist(hist, from, today));
-  updateDDFilterUI(ticker, hist, from, today);
-}
-
-function filterHist(hist, from, to) {
-  const out={};
-  Object.keys(hist).forEach(d=>{if(d>=from&&d<=to)out[d]=hist[d];});
-  return out;
-}
-
-function updateDDFilterUI(ticker, hist, from, to) {
-  document.querySelectorAll('.dd-tf-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===ddFilter.value));
-  const dates = Object.keys(filterHist(hist,from,to)).sort();
-  if (dates.length>=2) {
-    const startP = hist[dates[0]], endP = hist[dates[dates.length-1]];
-    const chg = ((endP - startP) / startP) * 100;
-    const maxP = Math.max(...Object.values(hist)); // ATH from all history
-    const athChg = ((endP - maxP) / maxP) * 100;
-    const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
-    const el=document.getElementById('dd-period-chg');
-    if(el){
-      el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% </span>`
-        + (Math.abs(athChg) > 0.01 ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">${athChg.toFixed(2)}% from ATH</span>` : '');
-      el.style.color = '';
-    }
-  }
-}
-
-window.setDDFilter = function(f, btn) {
-  ddFilter.value = f;
-  const ticker = document.getElementById('dd-ticker').textContent;
-  const cw = document.getElementById('dd-custom-wrap');
-  if (f!=='CUSTOM') { if(cw) cw.style.display='none'; renderDDHistorySection(ticker); }
-  else { if(cw) cw.style.display='flex'; }
-};
-
-window.applyDDCustom = function() {
-  const from=document.getElementById('dd-from').value, to=document.getElementById('dd-to').value;
-  if(!from||!to) return;
-  ddFilter.customFrom=from; ddFilter.customTo=to;
-  renderDDHistorySection(document.getElementById('dd-ticker').textContent);
-};

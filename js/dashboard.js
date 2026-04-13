@@ -4,7 +4,7 @@
 // auto-refresh, today's change, day charts.
 // ═══════════════════════════════════════════════
 
-import { state, resetCaches, resetAllCaches } from './state.js';
+import { state, resetCaches, resetAllCaches, isMarketOpen } from './state.js';
 import { fmt, pct, colorPnl, showScreen, showToast } from './utils.js';
 import { fetchPrice, fetchHistory, fetchDayHistory } from './api.js';
 import { forwardFill, buildTimeSeries, patchTodayTimeSeries } from './timeSeries.js';
@@ -153,7 +153,12 @@ export function startAutoRefresh() {
   stopAutoRefresh();
   if (!state.refreshPaused) {
     state.refreshIntervalId = setInterval(() => {
-      if (!state.refreshPaused) refreshPricesOnly();
+      if (state.refreshPaused) return;
+      if (!isMarketOpen()) {
+        updateRefreshUI(true); // show market closed indicator
+        return;
+      }
+      refreshPricesOnly();
     }, state.refreshIntervalMs);
   }
   updateRefreshUI();
@@ -180,14 +185,32 @@ export function setRefreshInterval(ms) {
   showToast(`Refresh every ${ms / 1000}s`);
 }
 
-function updateRefreshUI() {
-  const pauseBtn   = document.getElementById('refresh-pause-btn');
+function updateRefreshUI(marketClosed = false) {
+  const pauseBtn    = document.getElementById('refresh-pause-btn');
   const intervalSel = document.getElementById('refresh-interval-sel');
+  const marketTag   = document.getElementById('market-status-tag');
   if (pauseBtn) {
-    pauseBtn.textContent = state.refreshPaused ? '▶ Resume' : '⏸ Pause';
-    pauseBtn.style.color = state.refreshPaused ? 'var(--gold)' : '';
+    if (state.refreshPaused) {
+      pauseBtn.textContent = '▶ Resume';
+      pauseBtn.style.color = 'var(--gold)';
+    } else if (marketClosed) {
+      pauseBtn.textContent = '🔴 Market Closed';
+      pauseBtn.style.color = 'var(--text3)';
+    } else {
+      pauseBtn.textContent = '⏸ Pause';
+      pauseBtn.style.color = '';
+    }
   }
   if (intervalSel) intervalSel.value = state.refreshIntervalMs;
+  if (marketTag) {
+    if (!isMarketOpen()) {
+      marketTag.textContent = '🔴 Market Closed';
+      marketTag.style.display = '';
+    } else {
+      marketTag.textContent = '🟢 Market Open';
+      marketTag.style.display = '';
+    }
+  }
 }
 
 function updateRefreshTimestamp() {
