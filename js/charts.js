@@ -243,7 +243,7 @@ export function renderPortfolioDayChart() {
 
   wrap.innerHTML = '<canvas id="portfolioDayChart" style="width:100%;height:100%"></canvas>';
   const ctx  = document.getElementById('portfolioDayChart').getContext('2d');
-  const grad = makeGrad(ctx, 220, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
+  const grad = makeGrad(ctx, 250, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
 
   const datasets = [];
 
