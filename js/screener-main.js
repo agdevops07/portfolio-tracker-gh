@@ -156,6 +156,7 @@ window._ssTrigger = function(name) {
     inp.dispatchEvent(new Event('input'));
   }, 50);
 };
+
 // ── Init ──────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadDB();
