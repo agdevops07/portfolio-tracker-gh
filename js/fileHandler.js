@@ -16,6 +16,9 @@ function clearPortfolioState() {
   resetAllCaches();
   state.rawRows             = [];
   state.holdings            = {};
+  state.allHoldings         = {};
+  state.users               = [];
+  state.activeUser          = 'all';
   state.portfolioTimeSeries = [];
   state.fullTimeSeries      = [];
   state.histories           = {};
@@ -28,33 +31,45 @@ function clearPortfolioState() {
   }
 }
 
-export const SAMPLE_CSV = `ticker,quantity,average_buy_price,buy_date
-RELIANCE.NS,10,2400.50,2023-06-01
-TCS.NS,5,3800.00,2023-04-15
-INFY.NS,20,1500.00,2023-01-10
-HDFCBANK.NS,8,1650.00,2023-09-20
-WIPRO.NS,25,450.00,2023-07-15
-AAPL,15,175.00,2023-03-01`;
+export const SAMPLE_CSV = `ticker,quantity,average_buy_price,buy_date,user
+RELIANCE.NS,10,2400.50,2023-06-01,User 1
+TCS.NS,5,3800.00,2023-04-15,User 1
+INFY.NS,20,1500.00,2023-01-10,User 2
+HDFCBANK.NS,8,1650.00,2023-09-20,User 2
+WIPRO.NS,25,450.00,2023-07-15,User 1
+AAPL,15,175.00,2023-03-01,User 1`;
 
 // ── Wire up drag-drop & file input ───────────────
 export function initFileHandlers() {
+  if (!window._stocksDb) {
+    const base = document.location.pathname.replace(/\/[^/]*$/, '') || '';
+    fetch(base + '/data/stocks_db.json')
+      .then(r => r.json())
+      .then(db => { window._stocksDb = db; })
+      .catch(() => console.warn('Could not load stocks_db.json'));
+  }
+
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file-input');
 
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('drag-over');
-  });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('drag-over');
-    const f = e.dataTransfer.files[0];
-    if (f) handleFile(f);
-  });
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files[0]) handleFile(e.target.files[0]);
-  });
+  if (dropZone) {
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f);
+    });
+  }
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+  }
 }
 
 // ── Public entry points ──────────────────────────
@@ -100,71 +115,124 @@ export async function loadMyPortfolio() {
   }
 }
 
-// ── Date normalizer — converts any common format to YYYY-MM-DD ──────────────
+// ── Date normalizer ──────────────────────────────
 function normalizeDate(raw) {
   if (!raw) return '';
-  // Already YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-  // DD-MM-YYYY or DD/MM/YYYY
   const dmY = raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
   if (dmY) return `${dmY[3]}-${dmY[2].padStart(2,'0')}-${dmY[1].padStart(2,'0')}`;
-  // MM-DD-YYYY or MM/DD/YYYY (US format — less likely but handle it)
-  // Fallback: try native Date parse
   const d = new Date(raw);
   if (!isNaN(d)) return d.toISOString().split('T')[0];
   return raw;
 }
 
+// ── Helper to lookup ISIN from ticker ──
+async function lookupISIN(ticker) {
+  if (!window._stocksDb) {
+    await new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (window._stocksDb) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 50);
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve();
+      }, 5000);
+    });
+  }
+  
+  if (!window._stocksDb) return null;
+  
+  let entry = window._stocksDb.find(s => 
+    s.yahooTicker && s.yahooTicker.toUpperCase() === ticker.toUpperCase()
+  );
+  
+  if (!entry) {
+    let searchSymbol = ticker.replace(/\.(NS|BO)$/i, '').toUpperCase();
+    searchSymbol = searchSymbol.replace(/-SM$/i, '');
+    entry = window._stocksDb.find(s => 
+      s.symbol && s.symbol.toUpperCase() === searchSymbol
+    );
+  }
+  
+  if (!entry) {
+    const baseTicker = ticker.replace(/-SM\.NS$/i, '.NS');
+    entry = window._stocksDb.find(s => 
+      s.yahooTicker && s.yahooTicker.toUpperCase() === baseTicker.toUpperCase()
+    );
+  }
+  
+  return entry?.isin || null;
+}
+
 // ── CSV processing ───────────────────────────────
-export function processCSV(rows) {
+export async function processCSV(rows) {
   const errDiv = document.getElementById('preview-error');
   if (errDiv) errDiv.innerHTML = '';
   const errors = [];
   const clean = [];
 
-  rows.forEach((row, i) => {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     const ticker = (row.ticker || row.Ticker || row.TICKER || '').trim().toUpperCase();
     const qty = parseFloat(row.quantity || row.Quantity || row.qty || 0);
     const avg = parseFloat(
       row.average_buy_price || row.avg_buy_price || row.buyPrice || row.buy_price || 0
     );
     const date = row.buy_date || row.buyDate || row.date || '';
-    const upstoxTicker = (row.upstox_ticker || row.upstoxTicker || '').trim().toUpperCase();
+    
+    let upstoxTicker = (row.upstox_ticker || row.upstoxTicker || '').trim().toUpperCase();
+    
+    if (!upstoxTicker && ticker) {
+      upstoxTicker = await lookupISIN(ticker);
+    }
 
-    if (!ticker) { errors.push(`Row ${i + 1}: missing ticker`); return; }
-    if (!qty || qty <= 0) { errors.push(`Row ${i + 1}: invalid quantity`); return; }
+    const rawUser = (row.user || row.User || row.USER || '').trim();
+    const user = rawUser || 'User 1';
 
-    clean.push({ ticker, qty, avg, date: normalizeDate(date.trim()), upstoxTicker: upstoxTicker || null });
-  });
+    if (!ticker) { errors.push(`Row ${i + 1}: missing ticker`); continue; }
+    if (!qty || qty <= 0) { errors.push(`Row ${i + 1}: invalid quantity`); continue; }
+    
+    clean.push({ 
+      ticker, qty, avg, 
+      date: normalizeDate(date.trim()), 
+      upstoxTicker: upstoxTicker || null,
+      user 
+    });
+  }
 
-  if (errors.length) {
-    if (errDiv) errDiv.innerHTML = `<div class="error-box">${errors.join('<br>')}</div>`;
+  if (errors.length && errDiv) {
+    errDiv.innerHTML = `<div class="error-box">${errors.join('<br>')}</div>`;
   }
   if (!clean.length) {
     const detail = errors.length
       ? errors.join('\n')
       : 'Make sure your CSV has ticker, quantity and average_buy_price columns with at least one valid row.';
-    const msg = errors.length
-      ? `Your file has ${rows.length} row(s) but none passed validation:\n\n${detail}`
-      : detail;
     if (typeof window.showUploadError === 'function') {
-      window.showUploadError(msg, 'No valid holdings found');
+      window.showUploadError(detail, 'No valid holdings found');
     } else {
-      alert(msg);
+      alert(detail);
     }
     return;
   }
 
   state.rawRows = clean;
-  state.holdings = aggregateHoldings(clean);
 
-  // Ensure sessionStorage always has a valid CSV regardless of how holdings were added
-  // (file upload, sample, or stock-picker). dashboard-main.js reads from sessionStorage on boot.
+  const userSet = [];
+  clean.forEach(r => { if (!userSet.includes(r.user)) userSet.push(r.user); });
+  state.users = userSet;
+  state.activeUser = 'all';
+
+  state.allHoldings = aggregateHoldings(clean);
+  state.holdings = state.allHoldings;
+
   if (!sessionStorage.getItem('portfolio_csv')) {
     try {
       const reconstructed = [
-        'ticker,quantity,average_buy_price,buy_date,upstox_ticker',
-        ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''}`)
+        'ticker,quantity,average_buy_price,buy_date,upstox_ticker,user',
+        ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''},${r.user}`)
       ].join('\n');
       sessionStorage.setItem('portfolio_csv', reconstructed);
     } catch (_e) {}
@@ -178,18 +246,23 @@ export function aggregateHoldings(rows) {
   const map = {};
 
   rows.forEach((r) => {
-    if (!map[r.ticker]) {
-      map[r.ticker] = {
+    const key = r.ticker;
+    if (!map[key]) {
+      map[key] = {
         ticker: r.ticker,
         totalQty: 0,
         totalCost: 0,
         dates: [],
         upstoxTicker: r.upstoxTicker || null,
+        users: [],
       };
+    } else if (r.upstoxTicker && !map[key].upstoxTicker) {
+      map[key].upstoxTicker = r.upstoxTicker;
     }
-    map[r.ticker].totalQty += r.qty;
-    map[r.ticker].totalCost += r.qty * r.avg;
-    if (r.date) map[r.ticker].dates.push(r.date);
+    map[key].totalQty += r.qty;
+    map[key].totalCost += r.qty * r.avg;
+    if (r.date) map[key].dates.push(r.date);
+    if (r.user && !map[key].users.includes(r.user)) map[key].users.push(r.user);
   });
 
   Object.values(map).forEach((h) => {
@@ -199,4 +272,9 @@ export function aggregateHoldings(rows) {
   });
 
   return map;
+}
+
+export function getFilteredHoldings(rawRows, user) {
+  if (!user || user === 'all') return aggregateHoldings(rawRows);
+  return aggregateHoldings(rawRows.filter(r => r.user === user));
 }

@@ -9,7 +9,9 @@ import { sortPreview } from './preview.js';
 import { goBack } from './utils.js';
 import { exportHoldingsCSV } from './export.js';
 import { state } from './state.js';
+import { switchPreviewUser } from './preview.js';  // Add to imports
 
+window.switchPreviewUser = switchPreviewUser;
 window.openStockPicker   = openStockPicker;
 window.closeStockPicker  = closeStockPicker;
 window.loadSampleData    = loadSampleData;

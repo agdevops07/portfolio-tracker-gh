@@ -8,11 +8,10 @@ import { state } from './state.js';
 const PROXY = 'https://corsproxy.io/?url=';
 function proxyUrl(url) { return PROXY + encodeURIComponent(url); }
 
-// ── Helpers ──────────────────────────────────────
 function isWeekend(dateStr) {
   const d = new Date(dateStr + 'T12:00:00Z');
   const day = d.getUTCDay();
-  return day === 0 || day === 6; // 0=Sunday, 6=Saturday
+  return day === 0 || day === 6;
 }
 
 function getPreviousWeekday(dateStr) {
@@ -21,20 +20,14 @@ function getPreviousWeekday(dateStr) {
   return d.toISOString().split('T')[0];
 }
 
-// ── Live price + previous close ──────────────────
 export async function fetchPrice(ticker) {
   if (state.priceCache[ticker]) return state.priceCache[ticker];
 
-  // Add a cache-buster so corsproxy.io doesn't serve a stale CDN response.
-  // We use minute-level granularity so the same minute's requests still share cache.
-  const bust = Math.floor(Date.now() / 30000); // changes every 30 seconds
+  const bust = Math.floor(Date.now() / 30000);
 
-  // Use 2m interval + 1d range — this gives the actual live regularMarketPrice tick
-  // (1d interval only returns the completed EOD bar, which is why prices look stuck)
   const mirrors = [
     `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
     `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
-    // v7 quote endpoint — different rate-limit pool, good fallback
     `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}&_=${bust}`,
   ];
 
@@ -44,7 +37,6 @@ export async function fetchPrice(ticker) {
       if (!res.ok) continue;
       const data = await res.json();
 
-      // v7 quote response
       if (url.includes('/v7/finance/quote')) {
         const q = data?.quoteResponse?.result?.[0];
         if (q?.regularMarketPrice > 0) {
@@ -56,7 +48,6 @@ export async function fetchPrice(ticker) {
         continue;
       }
 
-      // v8 chart response
       const meta = data?.chart?.result?.[0]?.meta;
       const price = meta?.regularMarketPrice;
       const previousClose = meta?.chartPreviousClose ?? meta?.previousClose ?? null;
@@ -65,48 +56,66 @@ export async function fetchPrice(ticker) {
         if (previousClose && previousClose > 0) state.prevClosePrices[ticker] = previousClose;
         return price;
       }
-    } catch (e) { /* try next mirror */ }
+    } catch (e) { }
   }
   return null;
 }
 
-// ── Historical daily closes (weekdays only) ──────
 export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
   const key = `${ticker}_${upstoxTicker || ''}_${range}`;
   if (state.historyCache[key]) return state.historyCache[key];
 
   const todayStr = new Date().toISOString().split('T')[0];
+  
+  let effectiveUpstoxTicker = upstoxTicker;
+  if (!effectiveUpstoxTicker && window._stocksDb) {
+    const entry = window._stocksDb.find(s =>
+      s.yahooTicker && s.yahooTicker.toUpperCase() === ticker
+    );
+    if (entry && entry.isin) {
+      effectiveUpstoxTicker = entry.isin;
+    }
+  }
 
-  // 1. Try Upstox for SME/ISIN stocks
-  if (upstoxTicker) {
+  if (effectiveUpstoxTicker) {
     try {
       const fromDate = new Date();
       fromDate.setFullYear(fromDate.getFullYear() - 2);
       const from = fromDate.toISOString().split('T')[0];
-      const upstoxUrl = `https://api.upstox.com/v2/historical-candle/NSE_EQ|${upstoxTicker}/day/${todayStr}/${from}`;
-      const res = await fetch(proxyUrl(upstoxUrl));
-      if (res.ok) {
-        const data = await res.json();
-        const candles = data?.data?.candles || [];
-        if (candles.length > 0) {
-          const series = {};
-          candles.forEach(c => {
-            const date = c[0].split('T')[0];
-            if (!isWeekend(date) && c[4] != null) series[date] = c[4];
-          });
-          // Patch latest date with live price if available
-          if (Object.keys(series).length > 0) {
-            const livePrice = state.priceCache[ticker] || state.livePrices?.[ticker];
-            if (livePrice && !isWeekend(todayStr)) series[todayStr] = livePrice;
-            state.historyCache[key] = series;
-            return series;
+      
+      const upstoxUrls = [
+        `https://api.upstox.com/v2/historical-candle/NSE_EQ|${effectiveUpstoxTicker}/day/${todayStr}/${from}`,
+        `https://api.upstox.com/v2/historical-candle/NSE|${effectiveUpstoxTicker}/day/${todayStr}/${from}`,
+        `https://api.upstox.com/v2/historical-candle/BSE|${effectiveUpstoxTicker}/day/${todayStr}/${from}`,
+      ];
+      
+      for (const url of upstoxUrls) {
+        try {
+          const res = await fetch(proxyUrl(url));
+          if (res.ok) {
+            const data = await res.json();
+            const candles = data?.data?.candles || [];
+            if (candles.length > 0) {
+              const series = {};
+              candles.forEach(c => {
+                const date = c[0].split('T')[0];
+                if (!isWeekend(date) && c[4] != null) series[date] = c[4];
+              });
+              if (Object.keys(series).length > 0) {
+                const livePrice = state.priceCache[ticker] || state.livePrices?.[ticker];
+                if (livePrice && !isWeekend(todayStr)) series[todayStr] = livePrice;
+                state.historyCache[key] = series;
+                return series;
+              }
+            }
           }
+        } catch (e) {
+          continue;
         }
       }
-    } catch (e) { /* fall through */ }
+    } catch (e) { }
   }
 
-  // 2. Yahoo Finance
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=${range}`;
     const res = await fetch(proxyUrl(url));
@@ -123,36 +132,39 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
       if (!isWeekend(date) && closes[i] != null) series[date] = closes[i];
     });
 
-    // Patch latest weekday with live price for accuracy
     if (Object.keys(series).length > 0) {
       const livePrice = meta?.regularMarketPrice || state.priceCache[ticker];
       if (livePrice && !isWeekend(todayStr)) {
         series[todayStr] = livePrice;
       } else if (livePrice) {
-        // today is weekend — patch last known weekday
         const lastWD = getPreviousWeekday(todayStr);
         series[lastWD] = livePrice;
       }
       state.historyCache[key] = series;
       return series;
     }
-  } catch (e) {
-    console.warn('fetchHistory Yahoo failed:', ticker, e);
-  }
+  } catch (e) { }
 
   state.historyCache[key] = {};
   return {};
 }
 
-// ── Intraday (5-min) — with previous-day Upstox fallback ─────────────────────
 export async function fetchDayHistory(ticker, upstoxTicker) {
   const key = `intraday_${ticker}`;
   if (state.dayHistoryCache[key]) return state.dayHistoryCache[key];
 
-  // Cache-bust at 30-second granularity
   const bust = Math.floor(Date.now() / 30000);
 
-  // 1. Try Yahoo Finance for today's intraday
+  let effectiveUpstoxTicker = upstoxTicker;
+  if (!effectiveUpstoxTicker && window._stocksDb) {
+    const entry = window._stocksDb.find(s =>
+      s.yahooTicker && s.yahooTicker.toUpperCase() === ticker
+    );
+    if (entry && entry.isin) {
+      effectiveUpstoxTicker = entry.isin;
+    }
+  }
+
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=1d&_=${bust}`;
     const res = await fetch(proxyUrl(url));
@@ -177,8 +189,6 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       state.prevClosePrices[ticker] = previousClose;
     }
 
-    // Patch the last data point with the live regularMarketPrice so the chart
-    // tip matches the price card (Yahoo intraday last bar can lag by a few mins)
     const livePrice = meta?.regularMarketPrice;
     if (livePrice && livePrice > 0 && series.length > 0) {
       const now = new Date();
@@ -191,87 +201,55 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       state.dayHistoryCache[key] = series;
       return series;
     }
-  } catch (e) {
-    console.warn('fetchDayHistory Yahoo failed:', ticker, e);
-  }
+  } catch (e) { }
 
-  // 2. Fallback: Try Upstox for previous trading day (1-min candles)
-  //    Useful on weekends, holidays, or when Yahoo returns no intraday data
-  if (upstoxTicker) {
+  if (effectiveUpstoxTicker) {
     try {
       const prevDay = getPreviousWeekday(new Date().toISOString().split('T')[0]);
-      const upstoxUrl = `https://api.upstox.com/v2/historical-candle/NSE_EQ|${upstoxTicker}/1minute/${prevDay}/${prevDay}`;
-      const res = await fetch(proxyUrl(upstoxUrl));
-      if (res.ok) {
-        const data = await res.json();
-        const candles = data?.data?.candles || [];
-        if (candles.length > 2) {
-          // Upstox format: [datetime, open, high, low, close, volume, oi]
-          const series = candles
-            .map(c => {
-              const d = new Date(c[0]);
-              const hh = String(d.getHours()).padStart(2, '0');
-              const mm = String(d.getMinutes()).padStart(2, '0');
-              return { time: `${hh}:${mm}`, ts: d.getTime(), price: c[4] };
-            })
-            .filter(x => x.price != null)
-            .sort((a, b) => a.ts - b.ts);
-
-          if (series.length > 0) {
-            state.dayHistoryCache[key] = series;
-            // Set prevClose from first candle's open if not already set
-            if (!state.prevClosePrices[ticker] && candles[candles.length - 1]) {
-              state.prevClosePrices[ticker] = candles[candles.length - 1][4];
+      const upstoxUrls = [
+        `https://api.upstox.com/v2/historical-candle/NSE_EQ|${effectiveUpstoxTicker}/1minute/${prevDay}/${prevDay}`,
+        `https://api.upstox.com/v2/historical-candle/NSE|${effectiveUpstoxTicker}/1minute/${prevDay}/${prevDay}`,
+      ];
+      
+      for (const url of upstoxUrls) {
+        try {
+          const res = await fetch(proxyUrl(url));
+          if (res.ok) {
+            const data = await res.json();
+            const candles = data?.data?.candles || [];
+            if (candles.length > 2) {
+              const series = candles
+                .map(c => {
+                  const d = new Date(c[0]);
+                  const hh = String(d.getHours()).padStart(2, '0');
+                  const mm = String(d.getMinutes()).padStart(2, '0');
+                  return { time: `${hh}:${mm}`, ts: d.getTime(), price: c[4] };
+                })
+                .filter(x => x.price != null)
+                .sort((a, b) => a.ts - b.ts);
+              if (series.length > 0) {
+                state.dayHistoryCache[key] = series;
+                if (!state.prevClosePrices[ticker] && candles[candles.length - 1]) {
+                  state.prevClosePrices[ticker] = candles[candles.length - 1][4];
+                }
+                return series;
+              }
             }
-            return series;
           }
+        } catch (e) {
+          continue;
         }
       }
-    } catch (e) {
-      console.warn('fetchDayHistory Upstox fallback failed:', ticker, e);
-    }
+    } catch (e) { }
   }
-
-  // 3. Final fallback: try Yahoo previous day (5m range=2d, take yesterday's ticks)
-  try {
-    const bust2 = Math.floor(Date.now() / 30000);
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=2d&_=${bust2}`;
-    const res = await fetch(proxyUrl(url));
-    const data = await res.json();
-    const result = data?.chart?.result?.[0];
-    const timestamps = result?.timestamp || [];
-    const closes = result?.indicators?.quote?.[0]?.close || [];
-    const todayStr = new Date().toISOString().split('T')[0];
-
-    const series = timestamps
-      .map((ts, i) => {
-        const d = new Date(ts * 1000);
-        const dateStr = d.toISOString().split('T')[0];
-        const hh = String(d.getHours()).padStart(2, '0');
-        const mm = String(d.getMinutes()).padStart(2, '0');
-        return { time: `${hh}:${mm}`, date: dateStr, ts, price: closes[i] };
-      })
-      .filter(x => x.price != null && x.date !== todayStr); // take previous day only
-
-    if (series.length > 0) {
-      const result2 = series.map(({ time, ts, price }) => ({ time, ts, price }));
-      state.dayHistoryCache[key] = result2;
-      return result2;
-    }
-  } catch (e) { /* give up */ }
 
   state.dayHistoryCache[key] = [];
   return [];
 }
 
-// ── Screener.in fundamentals ─────────────────────
-// Scrapes Screener.in public company page for Indian stocks.
-// No auth needed. Returns structured fundamental data.
-// ── BSE Security Code lookup for .BO tickers ─────
-// Loaded lazily from data/bse_codes.json on first use
+// Screener.in fundamentals (unchanged, keep as is)
 let _bseCodes = null;
 async function getBSECode(ticker) {
-  // Only needed for .BO tickers
   if (!/\.BO$/i.test(ticker)) return null;
   const sym = ticker.replace(/\.BO$/i, '').toUpperCase();
   if (!_bseCodes) {
@@ -283,13 +261,11 @@ async function getBSECode(ticker) {
   return _bseCodes[sym] || null;
 }
 
-// ── Parse a Screener financial table into {headers, rows} ──
 function parseScreenerTable(doc, sectionId) {
   const section = doc.querySelector(`#${sectionId}, section[data-src*="${sectionId}"]`);
   if (!section) return null;
   const table = section.querySelector('table');
   if (!table) return null;
-  // Keep ALL headers (including blank first th) — slice(1) in render for year cols
   const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
   const rows = [...table.querySelectorAll('tbody tr')].map(tr => ({
     label: tr.querySelector('td')?.textContent?.trim() || '',
@@ -300,7 +276,6 @@ function parseScreenerTable(doc, sectionId) {
 
 export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
   const rawSym = ticker.replace(/\.(NS|BO|BSE|NSE)$/i, '').toUpperCase().replace('-SM', '');
-  // For .BO tickers, use BSE Security Code as the Screener identifier (more reliable)
   const bseCode = await getBSECode(ticker);
   const sym = bseCode || rawSym;
   const urls = mode === 'consolidated'
@@ -316,7 +291,6 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
 
       const fund = {};
 
-      // Key ratios
       doc.querySelectorAll('#top-ratios li, .company-ratios li').forEach(li => {
         const label = li.querySelector('.name, span:first-child')?.textContent?.trim().toLowerCase() || '';
         const val   = li.querySelector('.value, .number, span:last-child')?.textContent?.trim() || '';
@@ -334,12 +308,9 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
         if (label.includes('eps'))           fund.eps        = val;
       });
 
-      // About — full text, no truncation
       const about = doc.querySelector('.company-profile p, #company-info p, .about p');
       if (about) fund.about = about.textContent.trim();
 
-      // Sector: find <h2>Peer comparison</h2> then its next sibling <p class="sub">
-      // Screener markup: <a href="..." title="Broad Sector">Industrials</a>
       let peerPara = null;
       doc.querySelectorAll('h2').forEach(h2 => {
         if (h2.textContent.trim().includes('Peer comparison')) {
@@ -360,15 +331,11 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
         if (parts.length) fund.sectorBreadcrumb = parts.join(' › ');
       }
 
-      // Financial tables
       fund.pnl       = parseScreenerTable(doc, 'profit-loss');
       fund.balance   = parseScreenerTable(doc, 'balance-sheet');
       fund.cashflow  = parseScreenerTable(doc, 'cash-flow');
       fund.quarterly = parseScreenerTable(doc, 'quarters');
 
-      // Annual Reports + Concalls — parse from Screener HTML
-      // Screener loads these dynamically, but static HTML contains document links
-      // Pattern: /company/source/annual-report/ID/month/year/ or external PDF URLs
       fund.annualReports = [];
       fund.concalls = [];
 
@@ -378,15 +345,13 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
           const href = a.getAttribute('href') || '';
           const text = a.textContent.trim();
           if (!href || href === '#') return;
-          // Only keep actual document links — skip bare company page links like /company/SYM/
           const isDocLink = href.includes('source') || href.includes('annual-report') ||
                             href.includes('concall') || href.includes('transcript') ||
                             href.includes('.pdf') || href.includes('bseindia') ||
                             href.includes('nseindia') || href.includes('sebi') ||
-                            /\/company\/[^/]+\/[^/]+\/\d+\//.test(href); // /company/SYM/type/ID/...
+                            /\/company\/[^/]+\/[^/]+\/\d+\//.test(href);
           if (!isDocLink) return;
           const base = href.startsWith('http') ? href : 'https://www.screener.in/' + href.replace(/^\//, '');
-          // Extract month/year from href like /company/source/quarter/1298/3/2024/
           const hrefDate = href.match(/\/(\d{1,2})\/(20\d{2})\/?$/);
           const textDate = text.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[\s,]+20\d{2}/i);
           const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -403,13 +368,10 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
 
       parseDocLinks(doc.querySelector('#annual-reports'), true);
 
-      // Concalls: Screener uses class="concall-link" for transcript anchors
-      // These are external PDF links (e.g. company website, BSE)
       const concallSections = ['#concalls', '#investor-presentations'];
       concallSections.forEach(sel => {
         const sec = doc.querySelector(sel);
         if (!sec) return;
-        // First try class="concall-link" anchors (direct PDF links)
         const directLinks = sec.querySelectorAll('a.concall-link[href], a[href*=".pdf"], a[href*="transcript"], a[href*="concall"]');
         if (directLinks.length) {
           directLinks.forEach(a => {
@@ -426,12 +388,10 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
             fund.concalls.push({ label: text, date, url: base, isPdf: base.includes('.pdf') });
           });
         } else {
-          // Fallback to generic parseDocLinks
           parseDocLinks(sec, false);
         }
       });
 
-      // Quarterly result PDFs — from #quarters section attachment links
       if (!fund.quarterlyPdfs) fund.quarterlyPdfs = [];
       const qSec = doc.querySelector('#quarters');
       if (qSec) {
@@ -461,7 +421,6 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
   return null;
 }
 
-// ── Portfolio CSV ────────────────────────────────
 export async function fetchPortfolioCSV() {
   const res = await fetch('./data/my_portfolio.csv');
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -54,12 +54,13 @@ async function loadStocksDB() {
 function makeRow() {
   return {
     id: Date.now() + Math.random(),
-    stock: null,      // selected stock object or null
-    manualTicker: '', // typed ticker when no stock selected
-    exchange: 'NSE',  // NSE | BSE
+    stock: null,
+    manualTicker: '',
+    exchange: 'NSE',
     qty: '',
     avg: '',
     date: '',
+    owner: 'User 1',  // ADD THIS
   };
 }
 
@@ -141,6 +142,15 @@ function renderPickerRows() {
           <input type="date" class="sp-input" id="sp-date-${row.id}" name="sp-date-${row.id}"
             value="${row.date}"
             oninput="window._spUpdateField('${row.id}','date',this.value)" />
+        </div>
+        <div class="sp-field">
+          <label class="sp-label">Owner</label>
+          <select class="sp-input" id="sp-owner-${row.id}" onchange="window._spUpdateField('${row.id}','owner',this.value)">
+            <option value="User 1" ${row.owner === 'User 1' ? 'selected' : ''}>User 1</option>
+            <option value="User 2" ${row.owner === 'User 2' ? 'selected' : ''}>User 2</option>
+            <option value="User 3" ${row.owner === 'User 3' ? 'selected' : ''}>User 3</option>
+            <option value="User 4" ${row.owner === 'User 4' ? 'selected' : ''}>User 4</option>
+          </select>
         </div>
       </div>
 
@@ -321,6 +331,7 @@ window._spSubmit = function() {
       average_buy_price: row.avg,
       buy_date: row.date || '',
       upstox_ticker: row.stock?.isin || '',
+      user: row.owner || 'User 1',  // ADD THIS
     });
   });
 

@@ -1,11 +1,9 @@
 // ═══════════════════════════════════════════════
 // DASHBOARD-MAIN — Entry point for dashboard.html
-// Reads portfolio CSV from sessionStorage, processes
-// it, and boots the dashboard.
 // ═══════════════════════════════════════════════
 
 import { openStockPicker, closeStockPicker } from './stockPicker.js';
-import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval, stopAutoRefresh, renderDashboard } from './dashboard.js';
+import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser } from './dashboard.js';
 import { setTimeFilter } from './charts.js';
 import { showDashboard } from './utils.js';
 import { exportHoldingsCSV, exportPDF, toggleExportMenu } from './export.js';
@@ -34,6 +32,7 @@ window.closeHoldingsModal = closeHoldingsModal;
 window.sortHoldingsModal  = sortHoldingsModal;
 window._destroyAllCharts  = destroyAllCharts;
 window._stopAutoRefresh   = stopAutoRefresh;
+window.switchDashUser     = switchDashUser;  // ← ADD THIS
 
 window.switchDashTab = function(tab, btn) {
   document.querySelectorAll('.dash-tab').forEach(b => b.classList.toggle('active', b.dataset && b.dataset.tab === tab));
@@ -43,14 +42,29 @@ window.switchDashTab = function(tab, btn) {
   if (ho) ho.style.display = tab === 'holdings' ? '' : 'none';
 };
 
-// ── Boot ─────────────────────────────────────────
+async function loadStocksDB() {
+  return new Promise((resolve) => {
+    if (window._stocksDb) {
+      resolve();
+      return;
+    }
+    const base = document.location.pathname.replace(/\/[^/]*$/, '') || '';
+    fetch(base + '/data/stocks_db.json')
+      .then(r => r.json())
+      .then(db => {
+        window._stocksDb = db;
+        resolve();
+      })
+      .catch(() => resolve());
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  await loadStocksDB();
+  
   let csv = sessionStorage.getItem('portfolio_csv');
 
   if (!csv) {
-    // No CSV in session — but the stock-picker flow populates state.holdings
-    // directly without writing to sessionStorage.  Reconstruct a CSV from
-    // whatever holdings are already in state so we don't bounce back to upload.
     const holdingValues = Object.values(state.holdings);
     if (holdingValues.length > 0) {
       const rows = holdingValues.map(h =>
@@ -59,47 +73,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       csv = 'ticker,quantity,average_buy_price,buy_date,upstox_ticker\n' + rows.join('\n');
       try { sessionStorage.setItem('portfolio_csv', csv); } catch (_e) {}
     } else {
-      // Truly nothing loaded — redirect to upload
       window.location.href = 'index.html';
       return;
     }
   }
 
-  // Parse CSV and boot dashboard
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     Papa.parse(csv, {
       header: true,
       skipEmptyLines: true,
       complete: async (r) => {
-        processCSV(r.data);
+        await processCSV(r.data);
         resolve();
       },
     });
   });
-
+  
+  await new Promise(r => setTimeout(r, 100));
   await loadDashboard();
-
-  // Show market status on load
-  if (typeof window._stopAutoRefresh !== 'undefined') {
-    // updateRefreshUI called inside loadDashboard/startAutoRefresh
-  }
-
-  // Expose quick navigate-to-screener for holding cards (alt: Ctrl+click)
+  
   document.addEventListener('click', e => {
     const card = e.target.closest('.holding-card[data-ticker]');
     if (!card) return;
     if (e.ctrlKey || e.metaKey) {
-      // Ctrl/Cmd+click → open screener directly without dashboard context
       const ticker = card.dataset.ticker;
       const base = window.location.pathname.replace(/\/[^/]*$/, '') || '';
       window.open(base + '/screener.html?ticker=' + encodeURIComponent(ticker), '_blank');
       e.stopPropagation();
     }
-    // Normal click → openDrilldown (navigates to screener with holding context)
   });
 });
 
-// ── Holdings Modal ────────────────────────────────
 const modalSort = { key: 'currentVal', asc: false };
 
 export function sortHoldingsModal(key) {
@@ -111,7 +115,6 @@ export function openHoldingsModal() {
   const modal = document.getElementById('holdings-modal');
   modal.style.display = 'flex';
   renderHoldingsTable();
-  // Listen for in-place refresh events fired by renderDashboardInPlace
   modal.addEventListener('refreshTable', renderHoldingsTable, { passive: true });
 }
 
