@@ -262,15 +262,6 @@ function wireSearch(inputId, dropdownId) {
   });
 }
 
-function onInput(inp, dropdownId) {
-  clearTimeout(_searchTimeout);
-  const q = inp.value.trim().toUpperCase();
-  const clr = document.getElementById('ss-clear-btn');
-  if (clr) clr.style.display = inp.value ? 'block' : 'none';
-  if (!q || q.includes('—')) { closeDropdown(dropdownId); return; }
-  _searchTimeout = setTimeout(() => showDropdown(q, dropdownId, inp), 150);
-}
-
 function showDropdown(q, dropdownId, inp) {
   const dd = document.getElementById(dropdownId);
   if (!dd) return;
