@@ -818,6 +818,9 @@ tr:hover td { background: var(--bg3); }
 .dash-tabs {
   display: flex;
   gap: 4px;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.65rem;
   flex-wrap: wrap;
   justify-content: flex-start;
 }
@@ -846,8 +849,11 @@ tr:hover td { background: var(--bg3); }
 .dash-user-tabs {
   display: flex;
   gap: 8px;
+  padding: 0.5rem 0 1rem 0;
   flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
   background: var(--bg);
+  margin-bottom: 1rem;
   justify-content: flex-start;
 }
 
@@ -1870,22 +1876,3 @@ input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(
     --border: #ddd; --border2: #ccc;
   }
 }
-
-.dash-tabs-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);   /* ← THE ONE border, full width */
-  padding-bottom: 0.65rem;
-  margin-bottom: 1rem;
-}
-
-.dash-tabs-row .dash-user-tabs {
-  margin: 0;
-  padding: 0;
-  border: none;
-  flex-shrink: 0;
-}
-
