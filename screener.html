@@ -492,19 +492,22 @@
   <!-- RESULTS PANEL -->
   <div id="ss-result" class="ss-result">
 
+    <!-- LEFT: HOLDING | ABOUT | SECTOR-->
     <!-- Stock header -->
     <!-- <div class="dd-header-row" style="margin-bottom:0.75rem;"> -->
-    <div class="dd-header-row" style="margin-bottom:0.75rem; display:flex; gap:1.5rem; align-items:flex-start;">
-      <!-- LEFT: Company Info -->
+    <div class="dd-header-row" style="margin-bottom:0.75rem; display:flex; gap:1.5rem; align-items:stretch;">      <!-- LEFT: Company Info -->
       <div style="flex:1; min-width:0;">
-        <div class="dd-title" id="ss-ticker-el"></div>
-        <div class="dd-subtitle" id="ss-subtitle-el"></div>
-        <div class="dd-meta" id="ss-meta-el"></div>  
-        <div id="ss-holding-banner-wrap" style="margin-top:0.5rem;"></div>
-        <div class="dd-about" id="ss-about-el" style="display:none;margin-top:0.5rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:800px;"></div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+          
+          <!-- LEFT: Title -->
+          <div class="dd-title" id="ss-ticker-el"></div>
+          <!-- RIGHT: Exchange links -->
+          <div class="exchange-links" id="ss-exchange-links"></div>
+        </div>
 
-        <!-- Exchange links -->
-        <div class="exchange-links" id="ss-exchange-links" style="margin-top:0.75rem;"></div>
+        <div class="dd-meta" id="ss-meta-el"></div>  
+        <div class="dd-about" id="ss-about-el" style="display:none;margin-top:0.5rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:800px;"></div>
+        <div id="ss-holding-banner-wrap" style="margin-top:0.5rem;"></div>
       </div>
 
       <!-- RIGHT: Stat cards (2x2 grid) -->
@@ -513,23 +516,9 @@
           grid-template-columns: repeat(2, minmax(140px, 1fr));
           gap:10px;
           min-width:511px;
-          max-width:600px;
+          max-width:700px;
       "></div>
     </div>
-      <div style="flex:1;min-width:0;">
-        <div class="dd-title" id="ss-ticker-el"></div>
-        <div class="dd-subtitle" id="ss-subtitle-el"></div>
-        <div class="dd-meta" id="ss-meta-el"></div>
-        <div clas s="dd-about" id="ss-about-el" style="display:none;margin-top:0.5rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:800px;"></div>
-      </div>
-      <!-- Exchange links -->
-      <div style="flex-shrink:0;display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
-        <div class="exchange-links" id="ss-exchange-links"></div>
-      </div>
-    </div>
-
-    <!-- Stat cards -->
-    <!-- <div class="cards-grid" id="ss-cards" style="margin-bottom:1rem"></div> -->
 
     <!-- Charts row -->
     <div class="dd-charts-row">

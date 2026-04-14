@@ -471,35 +471,59 @@ function fillCards(ticker, fund) {
       const yrs = (Date.now() - new Date(h.earliestDate)) / (1000*60*60*24*365);
       if (yrs > 0.1) cagr = (Math.pow(lp / h.avgBuy, 1/yrs) - 1) * 100;
     }
-    cards.innerHTML = `
-      <div class="holding-banner">
-        <span class="holding-badge">📋 Your Holding</span>
-        <span>${h.totalQty} shares &nbsp;·&nbsp; Avg ₹${h.avgBuy.toFixed(2)} &nbsp;·&nbsp; Invested ₹${h.invested.toLocaleString('en-IN',{maximumFractionDigits:0})}</span>
+// ✅ 1. Render holding banner on LEFT
+const holdingWrap = document.getElementById('ss-holding-banner-wrap');
+
+if (holdingWrap) {
+  holdingWrap.innerHTML = `
+    <div class="holding-banner">
+      <span class="holding-badge">📋 Your Holding</span>
+      <span>
+        ${h.totalQty} shares &nbsp;·&nbsp; Avg ₹${h.avgBuy.toFixed(2)}
+        &nbsp;·&nbsp; Invested ₹${h.invested.toLocaleString('en-IN',{maximumFractionDigits:0})}
+      </span>
+    </div>
+  `;
+}
+
+// ✅ 2. Render ONLY stat cards on RIGHT
+const cards = document.getElementById('ss-cards');
+
+if (cards) {
+  cards.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Current Price</div>
+      <div class="stat-value">${lp ? '₹'+lp.toFixed(2) : '—'}</div>
+      ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Day's Change</div>
+      <div class="stat-value" style="color:${todayAbs!=null?colorPnl(todayAbs):'var(--text2)'}">
+        ${todayAbs!=null?(todayAbs>=0?'+':'')+' ₹'+Math.abs(todayAbs).toFixed(0):'—'}
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Current Price</div>
-        <div class="stat-value">${lp ? '₹'+lp.toFixed(2) : '—'}</div>
-        ${pc ? `<div class="stat-sub">Prev close ₹${pc.toFixed(2)}</div>` : ''}
+      <div class="stat-sub" style="color:${todayPct!=null?colorPnl(todayPct):'var(--text2)'}">
+        ${todayPct!=null?pct(todayPct)+' today':'Prev close unavailable'}
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Day's Change</div>
-        <div class="stat-value" style="color:${todayAbs!=null?colorPnl(todayAbs):'var(--text2)'}">
-          ${todayAbs!=null?(todayAbs>=0?'+':'')+' ₹'+Math.abs(todayAbs).toFixed(0):'—'}</div>
-        <div class="stat-sub" style="color:${todayPct!=null?colorPnl(todayPct):'var(--text2)'}">
-          ${todayPct!=null?pct(todayPct)+' today':'Prev close unavailable'}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Overall P&amp;L</div>
+      <div class="stat-value" style="color:${pnl!=null?colorPnl(pnl):'inherit'}">
+        ${pnl!=null?(pnl>=0?'+':'')+' ₹'+Math.abs(pnl).toLocaleString('en-IN',{maximumFractionDigits:0}):'—'}
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Overall P&amp;L</div>
-        <div class="stat-value" style="color:${pnl!=null?colorPnl(pnl):'inherit'}">
-          ${pnl!=null?(pnl>=0?'+':'')+' ₹'+Math.abs(pnl).toLocaleString('en-IN',{maximumFractionDigits:0}):'—'}</div>
-        <div class="stat-sub" style="color:${pnlPct!=null?colorPnl(pnlPct):'inherit'}">
-          ${pnlPct!=null?pct(pnlPct):''}</div>
+      <div class="stat-sub" style="color:${pnlPct!=null?colorPnl(pnlPct):'inherit'}">
+        ${pnlPct!=null?pct(pnlPct):''}
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Value${cagr!=null?' · CAGR':''}</div>
-        <div class="stat-value">${cv?'₹'+cv.toLocaleString('en-IN',{maximumFractionDigits:0}):'—'}</div>
-        ${cagr!=null?`<div class="stat-sub" style="color:${colorPnl(cagr)}">CAGR ${pct(cagr)}</div>`:''}
-      </div>`;
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Value${cagr!=null?' · CAGR':''}</div>
+      <div class="stat-value">${cv?'₹'+cv.toLocaleString('en-IN',{maximumFractionDigits:0}):'—'}</div>
+      ${cagr!=null?`<div class="stat-sub" style="color:${colorPnl(cagr)}">CAGR ${pct(cagr)}</div>`:''}
+    </div>
+  `;
+}
   } else {
     // ── Standard screener mode: market cap + P/E ──
     cards.innerHTML = `
