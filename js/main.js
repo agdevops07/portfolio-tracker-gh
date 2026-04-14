@@ -14,8 +14,11 @@ import { state } from './state.js';
 import { initStockSearch } from './stockSearch.js';
 import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS } from './charts.js';
+import { switchPreviewUser } from './preview.js';  // Add to imports
+
 
 // Expose globals immediately so inline onclick attrs work
+window.switchPreviewUser = switchPreviewUser;
 window.openStockPicker     = openStockPicker;
 window.closeStockPicker    = closeStockPicker;
 window.loadSampleData      = loadSampleData;

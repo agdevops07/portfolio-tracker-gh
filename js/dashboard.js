@@ -17,16 +17,15 @@ import {
   destroyAllCharts,
   COLORS,
 } from './charts.js';
+import { getFilteredHoldings } from './fileHandler.js';
 
-// ── Full load (history + prices + intraday) ──────
+
 export async function loadDashboard() {
-  // Show dashboard, hide drilldown
   const ds = document.getElementById('dashboard-screen');
   const dd = document.getElementById('drilldown-screen');
   if (ds) ds.style.display = 'block';
   if (dd) dd.style.display = 'none';
 
-  // Always land on Overview tab
   if (typeof window.switchDashTab === 'function') {
     window.switchDashTab('overview', document.querySelector('[data-tab="overview"]'));
   }
@@ -42,32 +41,26 @@ export async function loadDashboard() {
   loadMsg.textContent = `Fetching historic data for ${tickers.length} stocks…`;
 
   try {
-    // 1. Historical daily data (parallel)
     const historyResults = await Promise.all(
       tickers.map(async (ticker) => {
         const h = state.holdings[ticker];
         const hist = await fetchHistory(h.ticker, h.upstoxTicker, '2y');
-        // hist may be empty {} for SME stocks — forwardFill handles that gracefully
         const filled = (hist && Object.keys(hist).length > 0) ? forwardFill(hist) : {};
         return { ticker, data: filled };
       })
     );
     const histories = {};
-    // Always store, even if empty — buildTimeSeries uses avgBuy fallback for empty ones
     historyResults.forEach(({ ticker, data }) => { histories[ticker] = data; });
 
-    // 2. Live prices + prevClose (parallel) — must run BEFORE intraday so prevClose is set
     loadMsg.textContent = 'Fetching live prices…';
     const priceResults = await Promise.all(
       tickers.map(async (ticker) => {
         let price = await fetchPrice(ticker);
         if (!price && histories[ticker] && Object.keys(histories[ticker]).length > 0) {
-          // Use last known close from history
           const dates = Object.keys(histories[ticker]).sort();
           price = histories[ticker][dates[dates.length - 1]];
         }
         if (!price) {
-          // Final fallback for SME stocks with no data at all: use avgBuy
           price = state.holdings[ticker]?.avgBuy ?? null;
         }
         return { ticker, price };
@@ -75,7 +68,6 @@ export async function loadDashboard() {
     );
     priceResults.forEach(({ ticker, price }) => { state.livePrices[ticker] = price; });
 
-    // 3. Intraday 5-min data (parallel) — also backfills prevClose if price API missed it
     loadMsg.textContent = 'Fetching intraday data…';
     const dayResults = await Promise.all(
       tickers.map(async (ticker) => {
@@ -86,7 +78,6 @@ export async function loadDashboard() {
     );
     dayResults.forEach(({ ticker, dayData }) => { state.dayHistories[ticker] = dayData; });
 
-    // 4. Portfolio time series
     loadMsg.textContent = 'Building charts…';
     state.fullTimeSeries = await buildTimeSeries(histories);
     state.histories      = histories;
@@ -95,7 +86,7 @@ export async function loadDashboard() {
     contentDiv.style.display  = 'block';
     renderDashboard();
     startAutoRefresh();
-    updateRefreshUI(); // show market status immediately on page load
+    updateRefreshUI();
 
   } catch (err) {
     console.error(err);
@@ -103,14 +94,12 @@ export async function loadDashboard() {
   }
 }
 
-// ── Refresh prices + intraday only ──────────────
 export async function refreshPricesOnly() {
   showToast('Refreshing prices…');
-  resetCaches(); // clears priceCache, prevClosePrices, dayHistoryCache
+  resetCaches();
 
   const tickers = Object.keys(state.holdings);
 
-  // Prices first
   await Promise.all(
     tickers.map(async (ticker) => {
       let price = await fetchPrice(ticker);
@@ -125,7 +114,6 @@ export async function refreshPricesOnly() {
     })
   );
 
-  // Then intraday (also backfills prevClose)
   await Promise.all(
     tickers.map(async (ticker) => {
       const h = state.holdings[ticker];
@@ -133,9 +121,7 @@ export async function refreshPricesOnly() {
     })
   );
 
-  // Update today's point in the existing time series with fresh live prices
   patchTodayTimeSeries();
-
   renderDashboardInPlace();
   updateRefreshTimestamp();
   showToast('Prices updated ✓');
@@ -149,14 +135,13 @@ export async function refreshDashboard() {
   await loadDashboard();
 }
 
-// ── Auto-refresh ─────────────────────────────────
 export function startAutoRefresh() {
   stopAutoRefresh();
   if (!state.refreshPaused) {
     state.refreshIntervalId = setInterval(() => {
       if (state.refreshPaused) return;
       if (!isMarketOpen()) {
-        updateRefreshUI(true); // show market closed indicator
+        updateRefreshUI(true);
         return;
       }
       refreshPricesOnly();
@@ -217,8 +202,40 @@ function updateRefreshTimestamp() {
   if (el) el.textContent = `Updated ${new Date().toLocaleTimeString()}`;
 }
 
-// ── Render all dashboard sections ────────────────
+export function renderUserTabs() {
+  const users = state.users || [];
+  ['dash-user-tabs-overview', 'dash-user-tabs-holdings'].forEach(id => {
+    let wrap = document.getElementById(id);
+    if (!wrap) return;
+    if (users.length <= 1) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    const active = state.activeUser || 'all';
+    const tabs = ['all', ...users];
+    wrap.innerHTML = tabs.map(u => `
+      <button class="dash-user-tab${u === active ? ' active' : ''}" data-user="${u}"
+        onclick="switchDashUser('${u}')"
+        style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border2);
+               background:${u === active ? 'var(--accent)' : 'var(--bg3)'};
+               color:${u === active ? '#fff' : 'var(--text2)'};cursor:pointer;transition:all 0.2s;">
+        ${u === 'all' ? '👥 All' : u}
+      </button>`).join('');
+  });
+}
+
+export function switchDashUser(user) {
+  state.activeUser = user;
+  state.holdings = getFilteredHoldings(state.rawRows, user);
+  document.querySelectorAll('.dash-user-tab').forEach(t => {
+    const isActive = t.dataset.user === user;
+    t.classList.toggle('active', isActive);
+    t.style.background = isActive ? 'var(--accent)' : 'var(--bg3)';
+    t.style.color = isActive ? '#fff' : 'var(--text2)';
+  });
+  renderDashboard();
+}
+
 export function renderDashboard() {
+  renderUserTabs();
   const holdings = Object.values(state.holdings);
 
   let totalInvested = 0, totalCurrent = 0, totalPrevClose = 0;
@@ -254,9 +271,6 @@ export function renderDashboard() {
   updateRefreshTimestamp();
 }
 
-// ── In-place refresh (no flicker) — called on auto-refresh ───────────────
-// Updates numeric values in existing DOM nodes rather than rebuilding innerHTML.
-// Also refreshes the holdings modal if it's currently open.
 function renderDashboardInPlace() {
   const holdings = Object.values(state.holdings);
 
@@ -282,30 +296,22 @@ function renderDashboardInPlace() {
     if (!best || p > best.pct) best = { ticker: h.ticker, pct: p };
   });
 
-  // Stat cards: re-render (they are small, fast, no visible flicker)
   renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct, todayChange, todayChangePct, best, holdings });
-
-  // Charts: update data in-place instead of destroy+recreate
   renderPortfolioChart(state.currentFilter);
   renderPortfolioDayChart();
   renderTodayPnlChart(holdings);
   renderPieChart(holdings, totalCurrent);
   renderPnlChart(holdings);
-
-  // Holding cards: update only the numeric cells in-place
   updateHoldingCardsInPlace(holdings, totalCurrent);
 
-  // If holdings modal is open, refresh its table too
   const modal = document.getElementById('holdings-modal');
   if (modal && modal.style.display !== 'none') {
-    // Dispatch a custom event that dashboard-main.js listens to
     modal.dispatchEvent(new CustomEvent('refreshTable'));
   }
 
   updateRefreshTimestamp();
 }
 
-// ── Stat cards ───────────────────────────────────
 function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
                             todayChange, todayChangePct, best, holdings }) {
   const hasPrevClose = todayChange !== null;
@@ -350,7 +356,6 @@ function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
     </div>` : ''}`;
 }
 
-// ── Holding cards ────────────────────────────────
 function renderHoldingCards(holdings, totalCurrent) {
   const grid = document.getElementById('holdings-grid');
   grid.innerHTML = '';
@@ -364,7 +369,6 @@ function renderHoldingCards(holdings, totalCurrent) {
     const allocPct    = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
     const color       = COLORS[i % COLORS.length];
 
-    // Today's change
     const todayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
     const todayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
 
@@ -411,12 +415,10 @@ function renderHoldingCards(holdings, totalCurrent) {
   });
 }
 
-// ── In-place update of holding cards (no DOM rebuild = no flicker) ────────
 function updateHoldingCardsInPlace(holdings, totalCurrent) {
   const grid = document.getElementById('holdings-grid');
   if (!grid) return;
   const existingCards = [...grid.querySelectorAll('.holding-card[data-ticker]')];
-  // If card count changed (e.g. first render), fall back to full rebuild
   if (existingCards.length !== holdings.length) {
     renderHoldingCards(holdings, totalCurrent);
     return;
@@ -434,7 +436,6 @@ function updateHoldingCardsInPlace(holdings, totalCurrent) {
     const todayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
     const todayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
 
-    // Update only the changing cells
     const pnlValEl  = card.querySelector('.hc-pnl-val');
     const pnlPctEl  = card.querySelector('.hc-pnl-pct');
     const currEl    = card.querySelector('.hc-d-current');

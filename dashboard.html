@@ -46,11 +46,14 @@
   </div>
 
   <div id="dash-content" style="display:none">
+  <div class="dash-tabs-row">
     <div class="dash-tabs">
       <button class="dash-tab active" data-tab="overview" onclick="switchDashTab('overview',this)">📊 Overview</button>
       <button class="dash-tab" data-tab="holdings" onclick="switchDashTab('holdings',this)">📋 Holdings</button>
       <a href="screener.html" class="dash-tab" style="text-decoration:none">🔍 Stock Search</a>
     </div>
+    <div id="dash-user-tabs-overview" class="dash-user-tabs" style="display:none;"></div>
+  </div>
 
     <!-- OVERVIEW TAB -->
     <div id="dash-tab-overview">
@@ -253,81 +256,186 @@ function maximizeSection(bodyId, canvasId) {
 function maximizeChart(cardId, bodyId, canvasId) {
   const existing = document.getElementById('chart-maximized-overlay');
   if (existing) { existing.remove(); return; }
+  
   const overlay = document.createElement('div');
   overlay.id = 'chart-maximized-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;';
+  
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✕ Close';
-  closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;z-index:1;';
+  closeBtn.style.cssText = 'position:absolute;top:20px;right:20px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:8px 20px;border-radius:8px;font-size:13px;cursor:pointer;z-index:1;transition:all 0.2s;';
+  closeBtn.onmouseenter = () => { closeBtn.style.background = 'var(--bg5)'; closeBtn.style.color = 'var(--text)'; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background = 'var(--bg4)'; closeBtn.style.color = 'var(--text2)'; };
   closeBtn.onclick = () => overlay.remove();
 
   const canvasWrap = document.createElement('div');
-  canvasWrap.style.cssText = 'position:relative;width:min(960px,92vw);height:min(600px,84vh);background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.5rem 1.5rem 1rem;box-sizing:border-box;display:flex;flex-direction:column;gap:0.5rem;';
-
-  // Period change badge (copy from live DOM)
-  const periodChgEl = document.getElementById('port-period-chg');
-  if (periodChgEl && periodChgEl.innerHTML) {
-    const badge = document.createElement('div');
-    badge.style.cssText = 'font-size:14px;font-weight:700;';
-    badge.innerHTML = 'Portfolio Value &nbsp;' + periodChgEl.innerHTML;
-    canvasWrap.appendChild(badge);
-  }
-
-  const bigCanvas = document.createElement('canvas');
-  bigCanvas.style.cssText = 'flex:1;width:100%;display:block;';
-  canvasWrap.appendChild(bigCanvas);
-  overlay.appendChild(closeBtn);
-  overlay.appendChild(canvasWrap);
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(() => {
-    const srcChart = window._chartInstances[canvasId];
-    if (srcChart) {
+  canvasWrap.style.cssText = 'position:relative;width:min(1000px,90vw);height:min(650px,85vh);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:1.5rem 1.5rem 2.5rem 1.5rem;box-sizing:border-box;display:flex;flex-direction:column;gap:0.75rem;';
+  
+  // Get the original chart instance
+  const srcChart = window._chartInstances?.[canvasId];
+  const srcCanvas = document.getElementById(canvasId);
+  
+  if (srcChart && srcCanvas) {
+    // Create title if it's the portfolio day chart
+    if (canvasId === 'portfolioDayChart') {
+      const title = document.createElement('div');
+      title.style.cssText = 'font-size:14px;font-weight:700;color:var(--text);padding-bottom:0.5rem;border-bottom:1px solid var(--border);';
+      title.textContent = 'Today\'s Performance (Intraday)';
+      canvasWrap.appendChild(title);
+    }
+    
+    const bigCanvas = document.createElement('canvas');
+    bigCanvas.style.cssText = 'flex:1;width:100%;display:block;';
+    canvasWrap.appendChild(bigCanvas);
+    
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(canvasWrap);
+    document.body.appendChild(overlay);
+    
+    // Wait for overlay to be visible, then create new chart with SAME options
+    requestAnimationFrame(() => {
       try {
+        // Get the exact data from original chart
         const labels = srcChart.data.labels.slice();
-        const cleanDatasets = srcChart.data.datasets.map(ds => ({
-          data: ds.data.slice(), borderColor: ds.borderColor, borderWidth: ds.borderWidth || 2,
-          backgroundColor: 'rgba(0,0,0,0)', fill: false, pointRadius: 0,
-          pointHoverRadius: ds.pointHoverRadius || 5, tension: ds.tension || 0.3,
+        const datasets = srcChart.data.datasets.map(ds => ({
+          label: ds.label,
+          data: ds.data.slice(),
+          borderColor: ds.borderColor,
+          borderWidth: ds.borderWidth || 2,
+          backgroundColor: ds.backgroundColor || 'rgba(0,0,0,0)',
+          fill: ds.fill || false,
+          pointRadius: ds.pointRadius || 0,
+          pointHoverRadius: ds.pointHoverRadius || 5,
+          tension: ds.tension || 0.3,
+          borderDash: ds.borderDash || undefined,
+          order: ds.order || 0,
         }));
-        const axisStyle = { color: '#7777a0', font: { size: 11 } };
+        
+        // Get the original options
+        const originalOptions = srcChart.options;
+        
+        // Create new chart with preserved styling and extra bottom padding
         new Chart(bigCanvas, {
           type: srcChart.config.type,
-          data: { labels, datasets: cleanDatasets },
-          options: { animation: false, responsive: true, maintainAspectRatio: false,
-            layout: { padding: { bottom: 8 } },
-            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false,
-              backgroundColor: '#1a1a1f', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-              titleColor: '#8a8a9a', bodyColor: '#f0f0f5', padding: 10,
-              callbacks: { label: (c) => '  ₹' + c.parsed.y.toLocaleString('en-IN') },
-            }},
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            layout: {
+              padding: {
+                bottom: 35,
+                left: 10,
+                right: 10,
+                top: 10
+              }
+            },
+            plugins: {
+              legend: { 
+                display: originalOptions?.plugins?.legend?.display !== false,
+                labels: { color: '#a0a0b0', font: { size: 12 } }
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: '#1a1a1f',
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                titleColor: '#8a8a9a',
+                bodyColor: '#f0f0f5',
+                padding: 10,
+                // IMPORTANT: Filter out the prev close dataset (order: 1)
+                filter: function(tooltipItem) {
+                  // Only show the portfolio line (order: 0), hide prev close (order: 1)
+                  return tooltipItem.datasetIndex === datasets.length - 1;
+                },
+                callbacks: {
+                  label: function(context) {
+                    // Only show the portfolio value and change
+                    const val = context.parsed.y;
+                    // Find base value from the prev close dataset
+                    let baseVal = 0;
+                    if (datasets.length > 1 && datasets[0].data && datasets[0].data[context.dataIndex]) {
+                      baseVal = datasets[0].data[context.dataIndex];
+                    }
+                    const chgAbs = val - baseVal;
+                    const chgPct = baseVal > 0 ? (chgAbs / baseVal) * 100 : 0;
+                    return [
+                      '  ₹' + val.toLocaleString('en-IN'),
+                      `  ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%) today`
+                    ];
+                  }
+                }
+              }
+            },
             scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
-                   ticks: { ...axisStyle, maxTicksLimit: 10, maxRotation: 0, autoSkip: true } },
-              y: { grid: { color: 'rgba(255,255,255,0.03)' }, border: { color: 'rgba(255,255,255,0.1)' },
-                   ticks: { ...axisStyle,
-                     callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 1 }) } },
-            }, interaction: { mode: 'index', intersect: false },
-          },
+              x: {
+                grid: { color: 'rgba(255,255,255,0.04)' },
+                border: { color: 'rgba(255,255,255,0.1)' },
+                ticks: { 
+                  color: '#7777a0', 
+                  font: { size: 10 }, 
+                  maxRotation: 45,
+                  minRotation: 45,
+                  autoSkip: true,
+                  maxTicksLimit: 10
+                }
+              },
+              y: {
+                grid: { color: 'rgba(255,255,255,0.04)' },
+                border: { color: 'rgba(255,255,255,0.1)' },
+                ticks: { 
+                  color: '#7777a0', 
+                  font: { size: 11 },
+                  callback: function(v) {
+                    if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
+                    if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+                    return '₹' + v.toLocaleString('en-IN');
+                  }
+                }
+              }
+            },
+            interaction: { mode: 'index', intersect: false }
+          }
         });
-        return;
-      } catch(e) { console.warn('Chart re-render failed', e); }
-    }
-    // Fallback: copy canvas as image
-    const src = document.getElementById(canvasId);
-    if (!src) return;
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvasWrap.offsetWidth - 48, h = canvasWrap.offsetHeight - 80;
-    bigCanvas.width = w * dpr; bigCanvas.height = h * dpr;
-    bigCanvas.style.width = w + 'px'; bigCanvas.style.height = h + 'px';
-    const ctx = bigCanvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.drawImage(src, 0, 0, w, h);
+      } catch(e) {
+        console.warn('Chart re-render failed, falling back to image copy', e);
+        // Fallback: copy canvas as image
+        const dpr = window.devicePixelRatio || 1;
+        const w = canvasWrap.offsetWidth - 48;
+        const h = canvasWrap.offsetHeight - 100;
+        bigCanvas.width = w * dpr;
+        bigCanvas.height = h * dpr;
+        bigCanvas.style.width = w + 'px';
+        bigCanvas.style.height = h + 'px';
+        const ctx = bigCanvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        ctx.drawImage(srcCanvas, 0, 0, w, h);
+      }
+    });
+  } else {
+    // Fallback: just show a message
+    canvasWrap.innerHTML = '<div style="color:var(--text3);text-align:center;padding:2rem;">Chart data not available</div>';
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(canvasWrap);
+    document.body.appendChild(overlay);
+  }
+  
+  // Close on ESC key
+  const escHandler = (e) => { 
+    if (e.key === 'Escape') { 
+      overlay.remove(); 
+      document.removeEventListener('keydown', escHandler); 
+    } 
+  };
+  document.addEventListener('keydown', escHandler);
+  
+  // Close on overlay click (but not on the chart wrap)
+  overlay.addEventListener('click', (e) => { 
+    if (e.target === overlay) overlay.remove(); 
   });
-  const esc = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); } };
-  document.addEventListener('keydown', esc);
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
+
 </script>
 
 <script src="config.js" onerror="void 0"></script>

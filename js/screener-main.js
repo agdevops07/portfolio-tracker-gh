@@ -22,6 +22,23 @@ const SS_DEFAULT_FROM = '2026-03-31';
 let _filter = { value: 'CUSTOM', customFrom: SS_DEFAULT_FROM, customTo: new Date().toISOString().split('T')[0] };
 let _ssRefreshId = null;   // auto-refresh interval id for screener price updates
 
+
+function onInput(inp, dropdownId) {
+  clearTimeout(_searchTimeout);
+  const q = inp.value.trim().toUpperCase();
+  
+  // Toggle search icon visibility
+  const searchIcon = inp.closest('.ss-search-bar')?.querySelector('.ss-search-icon');
+  if (searchIcon) {
+    searchIcon.style.opacity = inp.value ? '0' : '1';
+  }
+  
+  const clr = document.getElementById('ss-clear-btn');
+  if (clr) clr.style.display = inp.value ? 'block' : 'none';
+  if (!q || q.includes('—')) { closeDropdown(dropdownId); return; }
+  _searchTimeout = setTimeout(() => showDropdown(q, dropdownId, inp), 150);
+}
+
 // ── Screener price auto-refresh (shared interval + market hours guard) ───
 function startScreenerRefresh() {
   stopScreenerRefresh();
@@ -243,15 +260,6 @@ function wireSearch(inputId, dropdownId) {
   inp.addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); submitSearch(inp.value.trim().toUpperCase(), dropdownId); }
   });
-}
-
-function onInput(inp, dropdownId) {
-  clearTimeout(_searchTimeout);
-  const q = inp.value.trim().toUpperCase();
-  const clr = document.getElementById('ss-clear-btn');
-  if (clr) clr.style.display = inp.value ? 'block' : 'none';
-  if (!q || q.includes('—')) { closeDropdown(dropdownId); return; }
-  _searchTimeout = setTimeout(() => showDropdown(q, dropdownId, inp), 150);
 }
 
 function showDropdown(q, dropdownId, inp) {
@@ -1115,11 +1123,19 @@ async function loadFilings(ticker, meta) {
   }
 
   // 3. Quarterly result PDFs scraped from Screener quarters section
+  // 3. Quarterly result PDFs scraped from Screener quarters section
   if (_fundData?.quarterlyPdfs?.length) {
-    _fundData.quarterlyPdfs.slice(0, 6).forEach(q => {
-      filings.push({ exchange: bseCode ? 'BSE' : 'NSE',
-        title: (q.label || 'Quarterly Result') + (q.date ? '  ·  ' + q.date : ''),
-        date: q.date, type: 'Results', link: q.url, isPdf: true });
+    _fundData.quarterlyPdfs.slice(0, 12).forEach(q => {
+      // Use the period field if available
+      const displayPeriod = q.period || q.date;
+      filings.push({ 
+        exchange: bseCode ? 'BSE' : 'NSE',
+        title: (q.label || 'Quarterly Result') + (displayPeriod ? `  ·  ${displayPeriod}` : ''),
+        date: displayPeriod || q.date, 
+        type: 'Results', 
+        link: q.url, 
+        isPdf: true 
+      });
     });
   } else if (_fundData?.quarterly?.rows?.length) {
     // Fallback: show figures from data even if no PDF link
@@ -1272,12 +1288,16 @@ async function loadFilings(ticker, meta) {
     const label = buildFilingLabel(f);
     const isNavLink = !f.isPdf;
     const linkContent = isNavLink ? 'View ↗' : `<span style="display:flex;align-items:center;gap:4px;">${pdfIcon} PDF</span>`;
+    
+    // Show additional info if available (like revenue/PAT)
+    const extraInfo = f.subtitle ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">${f.subtitle}</div>` : '';
 
     return (
       '<div class="filing-item" id="filing-' + idx + '">' +
       '<span class="filing-exchange" style="background:' + (badgeColor[f.exchange] || '#374151') + ';color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;">' + f.exchange + '</span>' +
       '<div class="filing-body">' +
       '<div class="filing-title" title="' + label + '">' + label + '</div>' +
+      extraInfo +
       (f.type && f.isPdf && !f.date ? '<div class="filing-meta">' + f.type + '</div>' : '') +
       '</div>' +
       '<a class="filing-link" href="' + f.link + '" target="_blank" rel="noopener">' + linkContent + '</a>' +
