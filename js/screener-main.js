@@ -184,7 +184,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ctx && ctx.ticker === incomingTicker) {
       if (ctx.livePrice)  state.livePrices[incomingTicker]      = ctx.livePrice;
       if (ctx.prevClose)  state.prevClosePrices[incomingTicker] = ctx.prevClose;
-      if (ctx.history)    { _histFull = ctx.history; state.histories = state.histories || {}; state.histories[incomingTicker] = ctx.history; }
+      if (ctx.history) {
+        state.histories = state.histories || {};
+        state.histories[incomingTicker] = ctx.history;
+        // Pre-seed historyCache with all likely key variants so fetchHistory()
+        // returns this Upstox data from cache instead of falling back to Yahoo
+        const upstox = ctx.holding?.upstoxTicker || '';
+        [`${incomingTicker}__2y`, `${incomingTicker}_${upstox}_2y`].forEach(k => {
+          state.historyCache[k] = ctx.history;
+        });
+      }
+
       if (ctx.dayHistory) state.dayHistories[incomingTicker]    = ctx.dayHistory;
     }
     // Always derive holding context from portfolio CSV (more accurate than snapshot)
@@ -354,6 +364,8 @@ async function loadStock(ticker, meta) {
   _meta = meta;
   _fundData = null; _fundTab = 'ratios'; _fundMode = 'standalone';
   _aiCache = {};
+  _histFull = {}; // always clear — drilldown path pre-seeds historyCache so fetchHistory returns it
+
   // _holdingCtx is set by the caller (resolveHoldingCtx / URL param flow)
   // Don't clear it here — caller manages it.
   const today = new Date().toISOString().split('T')[0];
@@ -1134,55 +1146,100 @@ async function loadFilings(ticker, meta) {
     isPdf: false
   });
 
-  // limit
-  filings = filings.slice(0, 15);
+  // limit after sort (moved below)
+								 
 
   // Badge color map
   const badgeColor = { 'AR': '#7c3aed', 'CC': '#0891b2', 'BSE': '#b45309', 'NSE': '#1d4ed8' };
 
+  // ── Month "Mar 2024" → Indian FY quarter "Q4 FY2024" ─────────────────────
+  function periodToQtr(period) {
+    if (!period) return '';
+    const qm = period.match(/[Qq]([1-4])\s*[Ff][Yy][-_]?(\d{2,4})/);
+    if (qm) { const yr = qm[2].length===2?'20'+qm[2]:qm[2]; return `Q${qm[1]} FY${yr}`; }
+    const monMap = {jan:4,feb:4,mar:4,apr:1,may:1,jun:1,jul:2,aug:2,sep:2,oct:3,nov:3,dec:3};
+    const mm = period.match(/([A-Za-z]{3})[a-z]*[\s,]+(\d{4})/i);
+    if (mm) {
+      const mon = mm[1].toLowerCase(), cal = parseInt(mm[2]);
+      const q = monMap[mon]; if (!q) return period;
+      const fy = (mon==='jan'||mon==='feb'||mon==='mar') ? cal : cal+1;
+      return `Q${q} FY${fy}`;
+    }
+    const fy = period.match(/[Ff][Yy][-_]?(\d{2,4})/);
+    if (fy) { const yr = fy[1].length===2?'20'+fy[1]:fy[1]; return `FY${yr}`; }
+    return period;
+  }
+
   // ── Extract quarter identifier from a PDF URL ──────────────────────────
   function extractQtrFromUrl(url) {
     if (!url) return '';
-    // Match patterns like Q1FY25, Q2FY2024, Q3-FY24, FY2024, FY24
+    // Explicit Q1FY25 style in URL
     const m = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\d{2,4})/);
-    if (m) {
-      const fy = m[2].length === 2 ? '20' + m[2] : m[2];
-      return `Q${m[1]} FY${fy}`;
+    if (m) { const fy = m[2].length===2?'20'+m[2]:m[2]; return `Q${m[1]} FY${fy}`; }
+    // Screener path: /company/SYM/quarter/1234/3/2024/ → month=3, year=2024
+    const pd = url.match(/\/(\d{1,2})\/(20\d{2})\/?$/) || url.match(/\/(\d{1,2})\/(20\d{2})\//);
+    if (pd) {
+      const mon = parseInt(pd[1]);
+      const mn = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      if (mon >= 1 && mon <= 12) return periodToQtr(mn[mon] + ' ' + pd[2]);
     }
     // FY only
     const fy = url.match(/[Ff][Yy][-_]?(\d{2,4})/);
-    if (fy) {
-      const yr = fy[1].length === 2 ? '20' + fy[1] : fy[1];
-      return `FY${yr}`;
-    }
-    // Try to grab year from filename
-    const yr = url.match(/20(2[0-9])/);
-    if (yr) return `FY20${yr[1]}`;
+			 
+    if (fy) { const yr = fy[1].length===2?'20'+fy[1]:fy[1]; return `FY${yr}`; }
+					   
+	 
+									 
+									   
+								  
     return '';
   }
 
-  // Build a human-readable label — Screener often gives "Result Raw PDF - Raw PDF"
+  // Build a human-readable label
   function buildFilingLabel(f) {
-    // Exchange page links — already have good titles
+													   
     if (!f.isPdf) return f.title || 'View Filings';
 
-    // Try to extract quarter from PDF URL — most reliable source
-    const qtrFromUrl = extractQtrFromUrl(f.link);
+																   
+    const period = extractQtrFromUrl(f.link) || periodToQtr(f.date) || '';
 
-    // For PDFs: use type + quarter (from URL or date field)
-    const period = qtrFromUrl || f.date || '';
+															
+											  
     if (f.type && period) return `${f.type} · ${period}`;
-    if (f.type && !period) return f.type;
+    if (f.type) return f.type;
     if (period) return period;
 
-    // Clean up raw Screener title as last resort
+												 
     const cleaned = (f.title || '')
-      .replace(/\\bRaw PDF\\b\\s*[-–·]\\s*/gi, '')
-      .replace(/\\bRaw PDF\\b/gi, '')
-      .replace(/^\\s*[-–·\\s]+|[-–·\\s]+\\s*$/g, '')
-      .trim();
+      .replace(/\bRaw PDF\b\s*[-–·]\s*/gi, '').replace(/\bRaw PDF\b/gi, '')
+									 
+      .replace(/^\s*[-–·\s]+|[-–·\s]+\s*$/g, '').trim();
+			  
     return cleaned || 'Filing';
   }
+
+  // Sort: PDFs newest-first by quarter score, exchange page links pinned last
+  function filingScore(f) {
+    const lbl = buildFilingLabel(f);
+    const qm = lbl.match(/[Qq]([1-4])\s*FY(\d{4})/);
+    if (qm) return parseInt(qm[2])*10 + parseInt(qm[1]);
+    const fy = lbl.match(/FY(\d{4})/);
+    if (fy) return parseInt(fy[1])*10;
+    const yr = (f.date||f.title||'').match(/20\d{2}/);
+    if (yr) return parseInt(yr[0])*10;
+    return 0;
+  }
+  filings.sort((a,b) => {
+    const pageA = !a.isPdf && a.title?.includes('Page');
+    const pageB = !b.isPdf && b.title?.includes('Page');
+    if (pageA && !pageB) return 1;
+    if (!pageA && pageB) return -1;
+    if (pageA && pageB) return 0;
+    return filingScore(b) - filingScore(a);
+  });
+
+  // limit
+  filings = filings.slice(0, 15);
 
   const pdfIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
 
