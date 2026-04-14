@@ -63,7 +63,7 @@ function updatePortPeriodChg(series) {
     const athChg = ((endVal - allMax) / allMax) * 100;
     const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
     const athTxt = Math.abs(athChg) > 0.01
-      ? ` <span style="color:${athColor};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH</span>` : '';
+      ? ` <span style="color:${athColor};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH Closing</span>` : '';
     el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% </span>${athTxt}`;
     el.style.color = '';
   } else {
@@ -540,7 +540,7 @@ export function renderDrilldownChart(ticker, hist, buyDate) {
     periodEl.innerHTML =
       `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>` +
       (Math.abs(athChg) > 0.01
-        ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH</span>`
+        ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH Closing</span>`
         : '');
   }
 

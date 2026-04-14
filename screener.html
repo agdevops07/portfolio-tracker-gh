@@ -98,7 +98,7 @@
               radial-gradient(ellipse 40% 40% at 80% 90%, rgba(168,85,247,0.05) 0%, transparent 60%);
 }
 
-.ss-hero-full { text-align: center; padding: 4rem 1rem 2.5rem; position: relative; z-index: 1; }
+.ss-hero-full { text-align: center; padding: 2.5rem 1rem 2.5rem; position: relative; z-index: 1; }
 
 /* Badge pill above heading */
 .ss-hero-badge {
@@ -106,7 +106,7 @@
   background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25);
   color: var(--accent2); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
   padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
-  margin-bottom: 1.25rem;
+  margin-bottom: .75rem;
 }
 .ss-hero-badge-dot {
   width: 6px; height: 6px; border-radius: 50%; background: var(--accent2);
@@ -119,13 +119,13 @@
 
 .ss-hero-full h1 {
   font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 800;
-  letter-spacing: -0.04em; margin-bottom: 0.75rem; line-height: 1.1;
+  letter-spacing: -0.04em; margin-bottom: 0.5rem; line-height: 1.1;
 }
 .ss-hero-full h1 .hero-grad {
   background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #34d399 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.ss-hero-full p { color: var(--text2); font-size: 15px; margin-bottom: 2.25rem; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+.ss-hero-full p { color: var(--text2); font-size: 15px; margin-bottom: 1.5rem; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
 /* Search bar — bigger, glowier */
 .ss-search-bar {
@@ -397,10 +397,11 @@
         <button class="ss-clear-btn" id="ss-clear-btn" onclick="window._ssClear()" title="Clear">✕</button>
         <div id="ss-dropdown" class="sp-dropdown" style="display:none;top:60px;left:0;right:0;text-align:left;"></div>
       </div>
-      <!-- <div id="ss-db-status" style="display:none;font-size:12px;color:var(--text2);margin-top:0.5rem;"></div> -->
 
+      <!-- <div id="ss-db-status" style="display:none;font-size:12px;color:var(--text2);margin-top:0.5rem;"></div> -->
+      
       <!-- Quick-pick chips -->
-      <div class="ss-hint-chips" id="ss-hints">
+      <!-- <div class="ss-hint-chips" id="ss-hints">
         <span class="ss-hint-label">Popular:</span>
         <button class="ss-hint-chip" onclick="_ssTrigger('Reliance')"><span class="ss-hint-chip-icon">⚡</span>Reliance</button>
         <button class="ss-hint-chip" onclick="_ssTrigger('TCS')"><span class="ss-hint-chip-icon">💻</span>TCS</button>
@@ -408,62 +409,43 @@
         <button class="ss-hint-chip" onclick="_ssTrigger('Infosys')"><span class="ss-hint-chip-icon">🌐</span>Infosys</button>
         <button class="ss-hint-chip" onclick="_ssTrigger('Eternal')"><span class="ss-hint-chip-icon">🍕</span>Eternal</button>
         <button class="ss-hint-chip" onclick="_ssTrigger('Tata Motors')"><span class="ss-hint-chip-icon">🚗</span>Tata Motors</button>
-      </div>
+      </div> -->
 
-      <!-- Stats bar -->
-      <div class="ss-hero-stats">
-        <div class="ss-hero-stat">
-          <div class="ss-hero-stat-val">5,000+</div>
-          <div class="ss-hero-stat-lbl">Stocks listed</div>
-        </div>
-        <div class="ss-hero-stat">
-          <div class="ss-hero-stat-val">NSE &amp; BSE</div>
-          <div class="ss-hero-stat-lbl">Both exchanges</div>
-        </div>
-        <div class="ss-hero-stat">
-          <div class="ss-hero-stat-val">15-min</div>
-          <div class="ss-hero-stat-lbl">Delayed prices</div>
-        </div>
-        <div class="ss-hero-stat">
-          <div class="ss-hero-stat-val">AI ✦</div>
-          <div class="ss-hero-stat-lbl">Insights</div>
-        </div>
-      </div>
     </div>
 
-    <!-- Trending / featured cards -->
+   <!-- Trending / featured cards -->
     <div class="ss-trending-section">
       <div class="ss-trending-heading">Featured stocks</div>
       <div class="ss-trending-grid">
         <div class="ss-trending-card" onclick="_ssTrigger('Reliance')">
-          <div class="ss-tc-sym">RELIANCE</div>
+          <div class="ss-tc-sym"><span class="ss-hint-chip-icon">⚡</span>RELIANCE</div>
           <div class="ss-tc-name">Reliance Industries</div>
           <div class="ss-tc-sector">Energy</div>
         </div>
         <div class="ss-trending-card" onclick="_ssTrigger('TCS')">
-          <div class="ss-tc-sym">TCS</div>
+          <div class="ss-tc-sym"><span class="ss-hint-chip-icon">💻</span>TCS</div>
           <div class="ss-tc-name">Tata Consultancy Services</div>
           <div class="ss-tc-sector">IT</div>
         </div>
         <div class="ss-trending-card" onclick="_ssTrigger('HDFC Bank')">
-          <div class="ss-tc-sym">HDFCBANK</div>
+          <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🏦</span>HDFCBANK</div>
           <div class="ss-tc-name">HDFC Bank Limited</div>
           <div class="ss-tc-sector">Banking</div>
         </div>
         <div class="ss-trending-card" onclick="_ssTrigger('Infosys')">
-          <div class="ss-tc-sym">INFY</div>
+          <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🌐</span>INFY</div>
           <div class="ss-tc-name">Infosys Limited</div>
           <div class="ss-tc-sector">IT</div>
         </div>
         <div class="ss-trending-card" onclick="_ssTrigger('Tata Motors')">
-          <div class="ss-tc-sym">TATAMOTORS</div>
+          <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🚗</span>TATAMOTORS</div>
           <div class="ss-tc-name">Tata Motors Limited</div>
           <div class="ss-tc-sector">Auto</div>
         </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('Bajaj Finance')">
-          <div class="ss-tc-sym">BAJFINANCE</div>
-          <div class="ss-tc-name">Bajaj Finance</div>
-          <div class="ss-tc-sector">NBFC</div>
+        <div class="ss-trending-card" onclick="_ssTrigger('Eternal')">
+          <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🍕</span>ETERNAL</div>
+          <div class="ss-tc-name">Eternal Limited</div>
+          <div class="ss-tc-sector">Quick Commerce</div>
         </div>
         <!-- <div class="ss-trending-card" onclick="_ssTrigger('Wipro')">
           <div class="ss-tc-sym">WIPRO</div>
@@ -477,6 +459,27 @@
         </div> -->
       </div>
     </div>
+
+    <!-- Stats bar -->
+    <div class="ss-hero-stats">
+      <div class="ss-hero-stat">
+        <div class="ss-hero-stat-val">5,000+</div>
+        <div class="ss-hero-stat-lbl">Stocks listed</div>
+      </div>
+      <div class="ss-hero-stat">
+        <div class="ss-hero-stat-val">NSE &amp; BSE</div>
+        <div class="ss-hero-stat-lbl">Both exchanges</div>
+      </div>
+      <div class="ss-hero-stat">
+        <div class="ss-hero-stat-val">15-min</div>
+        <div class="ss-hero-stat-lbl">Delayed prices</div>
+      </div>
+      <div class="ss-hero-stat">
+        <div class="ss-hero-stat-val">AI ✦</div>
+        <div class="ss-hero-stat-lbl">Insights</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- COMPACT SEARCH (shown after first search) -->
@@ -502,12 +505,10 @@
           flex-direction:column;
           justify-content:center;   /* 🔥 vertical center */
       ">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
-          <!-- LEFT: Title -->
-          <div class="dd-title" id="ss-ticker-el"></div>
-          <!-- RIGHT: Exchange links -->
-          <div class="exchange-links" id="ss-exchange-links"></div>
-        </div>
+<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+  <div class="dd-title" id="ss-ticker-el"></div>
+  <div class="exchange-links" id="ss-exchange-links"></div>
+</div>
 
         <div class="dd-meta" id="ss-meta-el"></div>  
         <div class="dd-about" id="ss-about-el" style="display:none;margin-top:0.5rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:800px;text-align:justify;"></div>
@@ -519,7 +520,7 @@
           display:grid;
           grid-template-columns: repeat(2, minmax(140px, 1fr));
           gap:10px;
-          min-width:250px;
+          min-width:280px;
           max-width:700px;
       ">
       </div>
