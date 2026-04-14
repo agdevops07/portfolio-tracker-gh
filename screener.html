@@ -398,18 +398,18 @@
         <div id="ss-dropdown" class="sp-dropdown" style="display:none;top:60px;left:0;right:0;text-align:left;"></div>
       </div>
       <!-- <div id="ss-db-status" style="display:none;font-size:12px;color:var(--text2);margin-top:0.5rem;"></div> -->
-
+      
       <!-- Quick-pick chips -->
       <div class="ss-hint-chips" id="ss-hints">
         <span class="ss-hint-label">Popular:</span>
         <button class="ss-hint-chip" onclick="_ssTrigger('Reliance')"><span class="ss-hint-chip-icon">⚡</span>Reliance</button>
         <button class="ss-hint-chip" onclick="_ssTrigger('TCS')"><span class="ss-hint-chip-icon">💻</span>TCS</button>
         <button class="ss-hint-chip" onclick="_ssTrigger('HDFC Bank')"><span class="ss-hint-chip-icon">🏦</span>HDFC Bank</button>
-        <button class="ss-hint-chip" onclick="_ssTrigger('Infosys')"><span class="ss-hint-chip-icon">🌐</span>Infosys</button>
+        <!-- <button class="ss-hint-chip" onclick="_ssTrigger('Infosys')"><span class="ss-hint-chip-icon">🌐</span>Infosys</button> -->
         <button class="ss-hint-chip" onclick="_ssTrigger('Eternal')"><span class="ss-hint-chip-icon">🍕</span>Eternal</button>
         <button class="ss-hint-chip" onclick="_ssTrigger('Tata Motors')"><span class="ss-hint-chip-icon">🚗</span>Tata Motors</button>
       </div>
-
+      
       <!-- Stats bar -->
       <div class="ss-hero-stats">
         <div class="ss-hero-stat">
@@ -429,54 +429,50 @@
           <div class="ss-hero-stat-lbl">Insights</div>
         </div>
       </div>
+      <br>
+      <br>
     </div>
 
-    <!-- Trending / featured cards -->
-    <div class="ss-trending-section">
+
+   <!-- Trending / featured cards -->
+    <!-- <div class="ss-trending-section">
       <div class="ss-trending-heading">Featured stocks</div>
-      <div class="ss-trending-grid">
-        <div class="ss-trending-card" onclick="_ssTrigger('Reliance')">
-          <div class="ss-tc-sym">RELIANCE</div>
-          <div class="ss-tc-name">Reliance Industries</div>
-          <div class="ss-tc-sector">Energy</div>
+        <div class="ss-trending-grid">
+          <div class="ss-trending-card" onclick="_ssTrigger('Reliance')">
+            <div class="ss-tc-sym"><span class="ss-hint-chip-icon">⚡</span>RELIANCE</div>
+            <div class="ss-tc-name">Reliance Industries</div>
+            <div class="ss-tc-sector">Energy</div>
+          </div>
+          <div class="ss-trending-card" onclick="_ssTrigger('TCS')">
+            <div class="ss-tc-sym"><span class="ss-hint-chip-icon">💻</span>TCS</div>
+            <div class="ss-tc-name">Tata Consultancy Services</div>
+            <div class="ss-tc-sector">IT</div>
+          </div>
+          <div class="ss-trending-card" onclick="_ssTrigger('HDFC Bank')">
+            <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🏦</span>HDFCBANK</div>
+            <div class="ss-tc-name">HDFC Bank Limited</div>
+            <div class="ss-tc-sector">Banking</div>
+          </div>
+          <div class="ss-trending-card" onclick="_ssTrigger('Infosys')">
+            <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🌐</span>INFY</div>
+            <div class="ss-tc-name">Infosys Limited</div>
+            <div class="ss-tc-sector">IT</div>
+          </div>
+          <div class="ss-trending-card" onclick="_ssTrigger('Tata Motors')">
+            <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🚗</span>TATAMOTORS</div>
+            <div class="ss-tc-name">Tata Motors Limited</div>
+            <div class="ss-tc-sector">Auto</div>
+          </div>
+          <div class="ss-trending-card" onclick="_ssTrigger('Eternal')">
+            <div class="ss-tc-sym"><span class="ss-hint-chip-icon">🍕</span>ETERNAL</div>
+            <div class="ss-tc-name">Eternal Limited</div>
+            <div class="ss-tc-sector">Quick Commerce</div>
+          </div>
+          
         </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('TCS')">
-          <div class="ss-tc-sym">TCS</div>
-          <div class="ss-tc-name">Tata Consultancy Services</div>
-          <div class="ss-tc-sector">IT</div>
-        </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('HDFC Bank')">
-          <div class="ss-tc-sym">HDFCBANK</div>
-          <div class="ss-tc-name">HDFC Bank Limited</div>
-          <div class="ss-tc-sector">Banking</div>
-        </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('Infosys')">
-          <div class="ss-tc-sym">INFY</div>
-          <div class="ss-tc-name">Infosys Limited</div>
-          <div class="ss-tc-sector">IT</div>
-        </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('Tata Motors')">
-          <div class="ss-tc-sym">TATAMOTORS</div>
-          <div class="ss-tc-name">Tata Motors Limited</div>
-          <div class="ss-tc-sector">Auto</div>
-        </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('Bajaj Finance')">
-          <div class="ss-tc-sym">BAJFINANCE</div>
-          <div class="ss-tc-name">Bajaj Finance</div>
-          <div class="ss-tc-sector">NBFC</div>
-        </div>
-        <!-- <div class="ss-trending-card" onclick="_ssTrigger('Wipro')">
-          <div class="ss-tc-sym">WIPRO</div>
-          <div class="ss-tc-name">Wipro Limited</div>
-          <div class="ss-tc-sector">IT</div>
-        </div>
-        <div class="ss-trending-card" onclick="_ssTrigger('Adani Ports')">
-          <div class="ss-tc-sym">ADANIPORTS</div>
-          <div class="ss-tc-name">Adani Ports &amp; SEZ</div>
-          <div class="ss-tc-sector">Infra</div>
-        </div> -->
       </div>
-    </div>
+    </div> -->
+
   </div>
 
   <!-- COMPACT SEARCH (shown after first search) -->
@@ -502,12 +498,10 @@
           flex-direction:column;
           justify-content:center;   /* 🔥 vertical center */
       ">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
-          <!-- LEFT: Title -->
-          <div class="dd-title" id="ss-ticker-el"></div>
-          <!-- RIGHT: Exchange links -->
-          <div class="exchange-links" id="ss-exchange-links"></div>
-        </div>
+<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+  <div class="dd-title" id="ss-ticker-el"></div>
+  <div class="exchange-links" id="ss-exchange-links"></div>
+</div>
 
         <div class="dd-meta" id="ss-meta-el"></div>  
         <div class="dd-about" id="ss-about-el" style="display:none;margin-top:0.5rem;font-size:13px;color:var(--text2);line-height:1.6;max-width:800px;text-align:justify;"></div>
@@ -519,7 +513,7 @@
           display:grid;
           grid-template-columns: repeat(2, minmax(140px, 1fr));
           gap:10px;
-          min-width:250px;
+          min-width:280px;
           max-width:700px;
       ">
       </div>
