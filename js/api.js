@@ -392,22 +392,94 @@ export async function fetchScreenerFundamentals(ticker, mode = 'consolidated') {
         }
       });
 
+      // Quarterly result PDFs — from #quarters section attachment links
       if (!fund.quarterlyPdfs) fund.quarterlyPdfs = [];
       const qSec = doc.querySelector('#quarters');
       if (qSec) {
-        qSec.querySelectorAll('a[href]').forEach(a => {
-          const href = a.getAttribute('href') || '';
-          const text = a.textContent.trim();
+        // Get all rows from the quarters table
+        const rows = qSec.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+          if (cells.length < 2) return;
+          
+          // First cell contains the period (e.g., "Dec 2024", "Sep 2024", "Mar 2025")
+          const periodText = cells[0]?.textContent?.trim() || '';
+          if (!periodText) return;
+          
+          // Look for result links in this row
+          const resultLink = row.querySelector('a[href*="result"], a[href*="quarter"], a[href*="source"], a[href*=".pdf"]');
+          if (!resultLink) return;
+          
+          const href = resultLink.getAttribute('href') || '';
           if (!href || href === '#') return;
-          const isDoc = href.includes('.pdf') || href.includes('bseindia') ||
-                        href.includes('nseindia') || href.includes('source') ||
-                        /\/company\/[^/]+\/[^/]+\/\d+\//.test(href);
-          if (!isDoc) return;
+          
           const base = href.startsWith('http') ? href : 'https://www.screener.in/' + href.replace(/^\//, '');
-          const row = a.closest('tr');
-          const period = row ? row.querySelector('td:first-child')?.textContent?.trim() : '';
-          fund.quarterlyPdfs.push({ label: text || ('Result ' + period), date: period, url: base, isPdf: true });
+          
+          // Parse period to get quarter and financial year
+          let quarter = '';
+          let quarterNum = 0;
+          let finYear = '';
+          let sortKey = 0;
+          
+          // Parse "Mar 2025", "Sep 2024", "Dec 2024", "Jun 2024"
+          const monthMatch = periodText.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{4})/i);
+          if (monthMatch) {
+            const month = monthMatch[1].toLowerCase();
+            const calYear = parseInt(monthMatch[2]);
+            
+            // Convert month to financial year quarter (Indian financial year: Apr-Mar)
+            if (['jan', 'feb', 'mar'].includes(month)) {
+              quarter = 'Q4';
+              quarterNum = 4;
+              // For Jan-Mar, financial year is the same calendar year (e.g., Mar 2025 = FY2025)
+              finYear = calYear.toString();
+              sortKey = calYear * 10 + 4;
+            } else if (['apr', 'may', 'jun'].includes(month)) {
+              quarter = 'Q1';
+              quarterNum = 1;
+              // For Apr-Jun, financial year is next year (e.g., Jun 2024 = FY2025)
+              finYear = (calYear + 1).toString();
+              sortKey = (calYear + 1) * 10 + 1;
+            } else if (['jul', 'aug', 'sep'].includes(month)) {
+              quarter = 'Q2';
+              quarterNum = 2;
+              // For Jul-Sep, financial year is next year (e.g., Sep 2024 = FY2025)
+              finYear = (calYear + 1).toString();
+              sortKey = (calYear + 1) * 10 + 2;
+            } else if (['oct', 'nov', 'dec'].includes(month)) {
+              quarter = 'Q3';
+              quarterNum = 3;
+              // For Oct-Dec, financial year is next year (e.g., Dec 2024 = FY2025)
+              finYear = (calYear + 1).toString();
+              sortKey = (calYear + 1) * 10 + 3;
+            }
+            
+            const displayPeriod = `${quarter} FY${finYear}`;
+            
+            // Avoid duplicates
+            const existing = fund.quarterlyPdfs.find(p => p.period === displayPeriod);
+            if (!existing) {
+              fund.quarterlyPdfs.push({ 
+                label: 'Quarterly Result',
+                period: displayPeriod,
+                rawPeriod: periodText,
+                quarter: quarter,
+                quarterNum: quarterNum,
+                finYear: parseInt(finYear),
+                sortKey: sortKey,
+                url: base, 
+                isPdf: true
+              });
+            }
+          }
         });
+        
+        // Sort by sortKey (higher = newer) - Q1 FY2026 (sortKey=20261) > Q4 FY2025 (sortKey=20254)
+        fund.quarterlyPdfs.sort((a, b) => b.sortKey - a.sortKey);
+        
+        // Debug: log what we found
+        console.log(`📊 Quarterly PDFs for ${rawSym}:`, fund.quarterlyPdfs.map(p => `${p.period} (sortKey: ${p.sortKey})`));
       }
 
       if (Object.keys(fund).length > 2) {
