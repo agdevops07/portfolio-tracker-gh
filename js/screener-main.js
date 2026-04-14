@@ -184,7 +184,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ctx && ctx.ticker === incomingTicker) {
       if (ctx.livePrice)  state.livePrices[incomingTicker]      = ctx.livePrice;
       if (ctx.prevClose)  state.prevClosePrices[incomingTicker] = ctx.prevClose;
-      if (ctx.history)    { _histFull = ctx.history; state.histories = state.histories || {}; state.histories[incomingTicker] = ctx.history; }
+      if (ctx.history) {
+        state.histories = state.histories || {};
+        state.histories[incomingTicker] = ctx.history;
+        // Pre-seed historyCache with all likely key variants so fetchHistory()
+        // returns this Upstox data from cache instead of falling back to Yahoo
+        const upstox = ctx.holding?.upstoxTicker || '';
+        [`${incomingTicker}__2y`, `${incomingTicker}_${upstox}_2y`].forEach(k => {
+          state.historyCache[k] = ctx.history;
+        });
+      }
+
       if (ctx.dayHistory) state.dayHistories[incomingTicker]    = ctx.dayHistory;
     }
     // Always derive holding context from portfolio CSV (more accurate than snapshot)
@@ -354,6 +364,8 @@ async function loadStock(ticker, meta) {
   _meta = meta;
   _fundData = null; _fundTab = 'ratios'; _fundMode = 'standalone';
   _aiCache = {};
+  _histFull = {}; // always clear — drilldown path pre-seeds historyCache so fetchHistory returns it
+
   // _holdingCtx is set by the caller (resolveHoldingCtx / URL param flow)
   // Don't clear it here — caller manages it.
   const today = new Date().toISOString().split('T')[0];
@@ -1048,25 +1060,6 @@ window._setGroqKey = function(key) {
   if (tag) tag.textContent = 'Groq · Llama 3 · Key active ✓';
 };
 
-// ── Convert "Mar 2024" / "Sep 2023" style period → "Q4 FY2024" (module scope) ──
-function periodToQtrLabel(period) {
-  if (!period) return '';
-  const qm = period.match(/[Qq]([1-4])\s*[Ff][Yy][-_]?(\d{2,4})/);
-  if (qm) { const yr = qm[2].length===2?'20'+qm[2]:qm[2]; return `Q${qm[1]} FY${yr}`; }
-  const months = { jan:4,feb:4,mar:4,apr:1,may:1,jun:1,jul:2,aug:2,sep:2,oct:3,nov:3,dec:3 };
-  const m = period.match(/([A-Za-z]{3})[a-z]*[\s,]+(\d{4})/i);
-  if (m) {
-    const mon = m[1].toLowerCase(), calYear = parseInt(m[2]);
-    const qtr = months[mon];
-    if (!qtr) return period;
-    const fyYear = (mon==='jan'||mon==='feb'||mon==='mar') ? calYear : calYear+1;
-    return `Q${qtr} FY${fyYear}`;
-  }
-  const fy = period.match(/[Ff][Yy][-_]?(\d{2,4})/);
-  if (fy) { const yr = fy[1].length===2?'20'+fy[1]:fy[1]; return `FY${yr}`; }
-  return period;
-}
-
 async function loadFilings(ticker, meta) {
   const grid = document.getElementById('ss-filings-grid');
   if (!grid) return;
@@ -1153,70 +1146,100 @@ async function loadFilings(ticker, meta) {
     isPdf: false
   });
 
-  // Sort: PDF filings newest-first (by date), exchange page links pinned last
-  filings.sort((a, b) => {
-    const isPageA = !a.isPdf && (a.title?.includes('Page') || a.exchange === 'BSE' || a.exchange === 'NSE');
-    const isPageB = !b.isPdf && (b.title?.includes('Page') || b.exchange === 'BSE' || b.exchange === 'NSE');
-    if (isPageA && !isPageB) return 1;
-    if (!isPageA && isPageB) return -1;
-    if (isPageA && isPageB) return 0;
-    // Both PDFs: sort by date descending
-    const da = a.date ? new Date(a.date) : null;
-    const db = b.date ? new Date(b.date) : null;
-    if (!da && !db) return 0;
-    if (!da) return 1;
-    if (!db) return -1;
-    return db - da;
-  });
-
-  // limit
-  filings = filings.slice(0, 15);
+  // limit after sort (moved below)
+								 
 
   // Badge color map
   const badgeColor = { 'AR': '#7c3aed', 'CC': '#0891b2', 'BSE': '#b45309', 'NSE': '#1d4ed8' };
 
+  // ── Month "Mar 2024" → Indian FY quarter "Q4 FY2024" ─────────────────────
+  function periodToQtr(period) {
+    if (!period) return '';
+    const qm = period.match(/[Qq]([1-4])\s*[Ff][Yy][-_]?(\d{2,4})/);
+    if (qm) { const yr = qm[2].length===2?'20'+qm[2]:qm[2]; return `Q${qm[1]} FY${yr}`; }
+    const monMap = {jan:4,feb:4,mar:4,apr:1,may:1,jun:1,jul:2,aug:2,sep:2,oct:3,nov:3,dec:3};
+    const mm = period.match(/([A-Za-z]{3})[a-z]*[\s,]+(\d{4})/i);
+    if (mm) {
+      const mon = mm[1].toLowerCase(), cal = parseInt(mm[2]);
+      const q = monMap[mon]; if (!q) return period;
+      const fy = (mon==='jan'||mon==='feb'||mon==='mar') ? cal : cal+1;
+      return `Q${q} FY${fy}`;
+    }
+    const fy = period.match(/[Ff][Yy][-_]?(\d{2,4})/);
+    if (fy) { const yr = fy[1].length===2?'20'+fy[1]:fy[1]; return `FY${yr}`; }
+    return period;
+  }
+
   // ── Extract quarter identifier from a PDF URL ──────────────────────────
   function extractQtrFromUrl(url) {
     if (!url) return '';
-    // Match patterns like Q1FY25, Q2FY2024, Q3-FY24
+    // Explicit Q1FY25 style in URL
     const m = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\d{2,4})/);
     if (m) { const fy = m[2].length===2?'20'+m[2]:m[2]; return `Q${m[1]} FY${fy}`; }
-    // Screener URL pattern: /month/year/ e.g. /3/2024/ → Mar 2024 → Q4 FY2024
-    const pathDate = url.match(/\/(\d{1,2})\/(20\d{2})\/?(?:\?|$|#|\/)/);
-    if (pathDate) {
-      const monthNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const mon = parseInt(pathDate[1]);
-      if (mon >= 1 && mon <= 12) return periodToQtrLabel(monthNames[mon] + ' ' + pathDate[2]);
+    // Screener path: /company/SYM/quarter/1234/3/2024/ → month=3, year=2024
+    const pd = url.match(/\/(\d{1,2})\/(20\d{2})\/?$/) || url.match(/\/(\d{1,2})\/(20\d{2})\//);
+    if (pd) {
+      const mon = parseInt(pd[1]);
+      const mn = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      if (mon >= 1 && mon <= 12) return periodToQtr(mn[mon] + ' ' + pd[2]);
     }
     // FY only
     const fy = url.match(/[Ff][Yy][-_]?(\d{2,4})/);
+			 
     if (fy) { const yr = fy[1].length===2?'20'+fy[1]:fy[1]; return `FY${yr}`; }
+					   
+	 
+									 
+									   
+								  
     return '';
   }
 
-  // Build a human-readable label — Screener often gives "Result Raw PDF - Raw PDF"
+  // Build a human-readable label
   function buildFilingLabel(f) {
-    // Exchange page links — already have good titles
+													   
     if (!f.isPdf) return f.title || 'View Filings';
 
-    // Try to extract quarter from PDF URL — most reliable
-    const qtrFromUrl = extractQtrFromUrl(f.link);
-    // Convert the date field (e.g. "Mar 2024") to quarter label
-    const qtrFromDate = periodToQtrLabel(f.date);
-    const period = qtrFromUrl || qtrFromDate || '';
+																   
+    const period = extractQtrFromUrl(f.link) || periodToQtr(f.date) || '';
 
+															
+											  
     if (f.type && period) return `${f.type} · ${period}`;
-    if (f.type && !period) return f.type;
+    if (f.type) return f.type;
     if (period) return period;
 
-    // Clean up raw Screener title as last resort
+												 
     const cleaned = (f.title || '')
-      .replace(/\bRaw PDF\b\s*[-–·]\s*/gi, '')
-      .replace(/\bRaw PDF\b/gi, '')
-      .replace(/^\s*[-–·\s]+|[-–·\s]+\s*$/g, '')
-      .trim();
+      .replace(/\bRaw PDF\b\s*[-–·]\s*/gi, '').replace(/\bRaw PDF\b/gi, '')
+									 
+      .replace(/^\s*[-–·\s]+|[-–·\s]+\s*$/g, '').trim();
+			  
     return cleaned || 'Filing';
   }
+
+  // Sort: PDFs newest-first by quarter score, exchange page links pinned last
+  function filingScore(f) {
+    const lbl = buildFilingLabel(f);
+    const qm = lbl.match(/[Qq]([1-4])\s*FY(\d{4})/);
+    if (qm) return parseInt(qm[2])*10 + parseInt(qm[1]);
+    const fy = lbl.match(/FY(\d{4})/);
+    if (fy) return parseInt(fy[1])*10;
+    const yr = (f.date||f.title||'').match(/20\d{2}/);
+    if (yr) return parseInt(yr[0])*10;
+    return 0;
+  }
+  filings.sort((a,b) => {
+    const pageA = !a.isPdf && a.title?.includes('Page');
+    const pageB = !b.isPdf && b.title?.includes('Page');
+    if (pageA && !pageB) return 1;
+    if (!pageA && pageB) return -1;
+    if (pageA && pageB) return 0;
+    return filingScore(b) - filingScore(a);
+  });
+
+  // limit
+  filings = filings.slice(0, 15);
 
   const pdfIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
 
@@ -1257,42 +1280,29 @@ async function loadConcalls(ticker, meta, fundData) {
     concalls = source.concalls.map(cc => {
       let label = (cc.label || '').trim();
       const url  = cc.url || '';
-
       // PPT → Investor Presentation
-      label = label.replace(/\bPPT\b/gi, 'Investor Presentation');
+      label = label.replace(/\\bPPT\\b/gi, 'Investor Presentation');
       const isPpt = url.toLowerCase().includes('ppt') || label.toLowerCase().includes('investor presentation');
 
-      // Determine document type
-      let docType = isPpt ? 'Investor Presentation' : 'Earnings Call';
-      if (/\bREC\b/i.test(label) || url.toLowerCase().includes('recording')) docType = 'Recording';
-      if (/transcript/i.test(label)) docType = 'Transcript';
-
-      // Extract quarter from URL path (Screener: /month/year/ pattern)
-      const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const pathDate = url.match(/\/(\d{1,2})\/(20\d{2})\/?(?:\?|$|#|\/)/);
-      let qtrLabel = '';
-      if (pathDate) {
-        const mon = parseInt(pathDate[1]);
-        if (mon >= 1 && mon <= 12) {
-          const monStr = months[mon] + ' ' + pathDate[2];
-          qtrLabel = periodToQtrLabel(monStr);
-        }
+      // If label is a bare generic word, derive from URL
+      if (/^(transcript|concall|raw transcript|earnings call)$/i.test(label) || !label) {
+        label = isPpt ? 'Investor Presentation' : 'Earnings Call Transcript';
       }
 
-      // Also try Q1FY25 style from URL
-      if (!qtrLabel) {
-        const qm = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\d{2,4})/);
-        if (qm) { const yr = qm[2].length===2?'20'+qm[2]:qm[2]; qtrLabel = `Q${qm[1]} FY${yr}`; }
+      // Prefer date from label text, else from cc.date, else try to parse from URL
+      const dateFromLabel = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\\s,]+20\\d{2}/i);
+      // Also try Q1FY25 style from URL or label
+      const qtrFromUrl   = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\\d{2,4})/);
+      const qtrLabel     = qtrFromUrl ? `Q${qtrFromUrl[1]} FY${qtrFromUrl[2].length===2?'20'+qtrFromUrl[2]:qtrFromUrl[2]}` : '';
+
+      const dateStr = cc.date || (dateFromLabel ? dateFromLabel[0] : '') || qtrLabel;
+
+      // Remove the date from the label if it's embedded in it to avoid duplication
+      if (dateStr && label.includes(dateStr)) {
+        label = label.replace(dateStr, '').replace(/[-–·\\s]+$/, '').trim() || label;
       }
 
-      // Date from label text (e.g. "Feb 2026")
-      const dateFromLabel = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]+20\d{2}/i);
-      if (!qtrLabel && dateFromLabel) qtrLabel = periodToQtrLabel(dateFromLabel[0]);
-
-      // Use cc.date if still nothing
-      const dateStr = qtrLabel || cc.date || (dateFromLabel ? dateFromLabel[0] : '');
-
-      return { label: docType, date: dateStr, url, isPdf: cc.isPdf };
+      return { label, date: dateStr, url, isPdf: cc.isPdf };
     });
   }
 
@@ -1335,30 +1345,16 @@ async function loadConcalls(ticker, meta, fundData) {
   const micSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;flex-shrink:0"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>`;
   const docSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.65"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 
-  // Group by quarter so each row shows: Quarter | [Transcript] [PPT] [REC] buttons
-  const byQtr = {};
-  const orderedQtrs = [];
-  concalls.slice(0, 12).forEach(c => {
-    const key = c.date || 'Undated';
-    if (!byQtr[key]) { byQtr[key] = []; orderedQtrs.push(key); }
-    byQtr[key].push(c);
-  });
-
-  grid.innerHTML = orderedQtrs.map(qtr => {
-    const items = byQtr[qtr];
-    const chips = items.map(c => {
-      const typeLabel = c.label === 'Investor Presentation' ? 'PPT'
-        : c.label === 'Recording' ? 'REC' : 'Transcript';
-      return `<a href="${c.url}" target="_blank" rel="noopener"
-        style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent2);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;transition:all 0.15s;"
-        onmouseover="this.style.background='rgba(99,102,241,0.18)'" onmouseout="this.style.background='rgba(99,102,241,0.08)'"
-        >${docSvg} ${typeLabel}</a>`;
-    }).join('');
-    return `<div class="filing-item" style="align-items:center;gap:1rem;flex-wrap:wrap;">
-      <div style="min-width:90px;font-size:13px;font-weight:700;color:var(--text);">${qtr}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;flex:1;">${chips}</div>
-    </div>`;
-  }).join('');
+  grid.innerHTML = concalls.slice(0, 8).map(c =>
+    '<div class="filing-item">' +
+    micSvg +
+    '<div class="filing-body">' +
+    '<div class="filing-title">' + c.label + '</div>' +
+    (c.date ? '<div class="filing-meta">' + c.date + '</div>' : '') +
+    '</div>' +
+    '<a class="filing-link" href="' + c.url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:4px;">' + docSvg + ' Transcript</a>' +
+    '</div>'
+  ).join('');
 }
 
 // ── AI Insights ───────────────────────────────────
