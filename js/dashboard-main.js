@@ -3,7 +3,14 @@
 // ═══════════════════════════════════════════════
 
 import { openStockPicker, closeStockPicker } from './stockPicker.js';
-import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, sortHoldingsTable, setHoldingsView } from './dashboard.js';
+
+import { 
+  loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
+  setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, 
+  sortHoldingsTable, setHoldingsView, toggleChartSection, restoreChartSection,
+  toggleMainView , setPortfolioView
+} from './dashboard.js';
+
 import { setTimeFilter } from './charts.js';
 import { showDashboard } from './utils.js';
 import { exportHoldingsCSV, exportPDF, toggleExportMenu } from './export.js';
@@ -14,6 +21,10 @@ import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS, destroyAllCharts } from './charts.js';
 
 // Expose globals
+window.toggleMainView = toggleMainView;
+window.toggleChartSection = toggleChartSection;
+window.restoreChartSection = restoreChartSection;
+window.setPortfolioView = setPortfolioView;
 window.sortHoldingsTable = sortHoldingsTable;
 window.setHoldingsView = setHoldingsView;
 window.openStockPicker    = openStockPicker;
@@ -39,6 +50,7 @@ window.switchDashTab = function(tab, btn) {
     sessionStorage.setItem('dashboard_current_tab', tab);
   } catch(e) {}
   
+  // Update tab buttons - only one tab now (portfolio)
   document.querySelectorAll('.dash-tab').forEach(b => {
     if (b.dataset && b.dataset.tab === tab) {
       b.classList.add('active');
@@ -47,13 +59,12 @@ window.switchDashTab = function(tab, btn) {
     }
   });
   
-  const ov = document.getElementById('dash-tab-overview');
-  const ho = document.getElementById('dash-tab-holdings');
-  if (ov) ov.style.display = tab === 'overview' ? '' : 'none';
-  if (ho) ho.style.display = tab === 'holdings' ? '' : 'none';
+  // Show/hide the portfolio tab content (only one tab now)
+  const portfolio = document.getElementById('dash-tab-portfolio');
+  if (portfolio) portfolio.style.display = tab === 'portfolio' ? '' : 'none';
   
-  // Re-render holdings table when switching to holdings tab
-  if (tab === 'holdings') {
+  // Re-render holdings table if table view is selected
+  if (tab === 'portfolio' && typeof portfolioView !== 'undefined' && portfolioView === 'table') {
     setTimeout(() => {
       if (typeof renderHoldingsTable === 'function') {
         renderHoldingsTable();

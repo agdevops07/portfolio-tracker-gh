@@ -46,57 +46,97 @@
   </div>
 
   <div id="dash-content" style="display:none">
-  <div class="dash-tabs-row">
-    <div class="dash-tabs">
-      <button class="dash-tab active" data-tab="overview" onclick="switchDashTab('overview',this)">📊 Overview</button>
-      <button class="dash-tab" data-tab="holdings" onclick="switchDashTab('holdings',this)">📋 Holdings</button>
-      <a href="screener.html" class="dash-tab" style="text-decoration:none">🔍 Stock Search</a>
+    <div class="dash-tabs-row">
+      <div class="dash-tabs">
+        <button class="dash-tab active" data-tab="portfolio" onclick="switchDashTab('portfolio',this)">📊 Portfolio</button>
+        <a href="screener.html" class="dash-tab" style="text-decoration:none">🔍 Stock Search</a>
+      </div>
+      <div id="dash-user-tabs-portfolio" class="dash-user-tabs" style="display:none;"></div>
     </div>
-    <div id="dash-user-tabs-overview" class="dash-user-tabs" style="display:none;"></div>
-  </div>
 
-    <!-- OVERVIEW TAB -->
-    <div id="dash-tab-overview">
+    <!-- PORTFOLIO TAB -->
+    <div id="dash-tab-portfolio">
+      <!-- Stat Cards (always visible) -->
       <div class="cards-grid" id="stat-cards"></div>
 
-      <div class="two-col">
-
-        <div class="chart-card collapsible-card">
-          <div class="chart-header collapsible-header" onclick="toggleSection('day-chart-body','day-chart-toggle')">
-            <div class="chart-title">Today's Performance <span class="chart-subtitle">(Intraday 15-min delay)</span></div>
-            <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
-              <button class="icon-btn" title="Maximize" onclick="maximizeSection('day-chart-body','portfolioDayChart')">⤢</button>
-              <button class="collapse-btn" id="day-chart-toggle" onclick="toggleSection('day-chart-body','day-chart-toggle')">▲ Collapse</button>
-            </div>
-          </div>
-          <div id="day-chart-body" class="collapsible-body">
-            <div id="portfolio-day-wrap" class="chart-wrap" style="height:400px;">
-              <canvas id="portfolioDayChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="chart-card collapsible-card">
-          <div class="chart-header collapsible-header" onclick="toggleSection('today-pnl-body','today-pnl-toggle')">
-            <div class="chart-title">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
-            <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
-              <button class="icon-btn" title="Maximize" onclick="maximizeSection('today-pnl-body','todayPnlChart')">⤢</button>
-              <button class="collapse-btn" id="today-pnl-toggle" onclick="toggleSection('today-pnl-body','today-pnl-toggle')">▲ Collapse</button>
-            </div>
-          </div>
-          <div id="today-pnl-body" class="collapsible-body">
-            <div id="today-pnl-wrap" style="position:relative;width:100%;height:400px;"><canvas id="todayPnlChart"></canvas></div>
-          </div>
-        </div>
-
+      <!-- Main Toggle: Holdings vs Charts & Analytics -->
+      <div class="main-toggle-wrapper" style="display:flex; justify-content:center; gap:12px; margin:1.5rem 0 1.5rem 0;">
+        <button id="main-toggle-holdings-btn" class="main-toggle-btn active" onclick="toggleMainView('holdings')" style="background:var(--accent); color:white; border:none; padding:10px 32px; border-radius:40px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(91,94,244,0.3);">📋 Holdings</button>
+        <button id="main-toggle-charts-btn" class="main-toggle-btn" onclick="toggleMainView('charts')" style="background:var(--bg4); color:var(--text2); border:1px solid var(--border2); padding:10px 32px; border-radius:40px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s;">📈 Charts & Analytics</button>
       </div>
 
-      <div class="two-col">
+      <!-- HOLDINGS VIEW -->
+      <div id="holdings-main-view" style="display:block;">
+        <div class="holdings-section">
+          <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+            <div class="section-title" style="font-size:14px; font-weight:600; color:var(--text3);">View Options</div>
+            <div class="view-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:var(--r-sm); padding:2px;">
+              <button id="holdings-table-view-btn" class="holdings-view-toggle active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📋 Table View</button>
+              <button id="holdings-card-view-btn" class="holdings-view-toggle" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">🃏 Card View</button>
+            </div>
+          </div>
 
-        <div class="chart-card collapsible-card">
-          <div class="chart-header collapsible-header" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">
-            <div class="chart-title">Current Holding Value Over Selected Period <span id="port-period-chg" style="font-size:15px;font-weight:700;"></span></div>
-            <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+          <!-- Holdings Table View -->
+          <div id="holdings-table-view" style="display:block;">
+            <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
+              <table class="holdings-table" style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead>
+                  <tr style="background:var(--bg3);">
+                    <th onclick="sortHoldingsTable('ticker')" style="padding:12px 16px; text-align:left; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Ticker</th>
+                    <th onclick="sortHoldingsTable('totalQty')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Qty</th>
+                    <th onclick="sortHoldingsTable('avgBuy')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Avg Buy</th>
+                    <th onclick="sortHoldingsTable('livePrice')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Live Price</th>
+                    <th onclick="sortHoldingsTable('prevClose')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Prev Close</th>
+                    <th onclick="sortHoldingsTable('invested')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Invested</th>
+                    <th onclick="sortHoldingsTable('currentVal')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Current Value</th>
+                    <th onclick="sortHoldingsTable('pnlAbs')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (₹)</th>
+                    <th onclick="sortHoldingsTable('pnlPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (%)</th>
+                    <th onclick="sortHoldingsTable('dayChgAbs')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day Change</th>
+                    <th onclick="sortHoldingsTable('dayChgPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day %</th>
+                    <th onclick="sortHoldingsTable('allocPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Allocation</th>
+                  </tr>
+                </thead>
+                <tbody id="holdings-table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Holdings Card View -->
+          <div id="holdings-card-view" style="display:none;">
+            <div class="holdings-grid" id="holdings-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS & ANALYTICS VIEW -->
+      <div id="charts-main-view" style="display:none;">
+        <div class="charts-section">
+          <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+            <div class="section-title" style="font-size:14px; font-weight:600; color:var(--text3);">Select Chart Type</div>
+            <div class="charts-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:var(--r-sm); padding:2px;">
+              <button id="toggle-intraday-btn" class="chart-toggle-btn active" onclick="toggleChartSection('intraday')" style="background:var(--accent); color:white; border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📊 Intraday</button>
+              <button id="toggle-historical-btn" class="chart-toggle-btn" onclick="toggleChartSection('historical')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📈 Historical</button>
+              <button id="toggle-pnl-btn" class="chart-toggle-btn" onclick="toggleChartSection('pnl')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">💰 P&L</button>
+            </div>
+          </div>
+          
+          <!-- Intraday Performance -->
+          <div id="intraday-section" class="chart-card" style="margin-bottom:1rem;">
+            <div class="chart-header">
+              <div class="chart-title">Intraday Performance <span class="chart-subtitle">(15-min delay)</span></div>
+              <button class="icon-btn" title="Maximize" onclick="maximizeSection('day-chart-body','portfolioDayChart')">⤢</button>
+            </div>
+            <div id="day-chart-body">
+              <div id="portfolio-day-wrap" class="chart-wrap" style="height:400px;">
+                <canvas id="portfolioDayChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historical Performance -->
+          <div id="historical-section" class="chart-card" style="margin-bottom:1rem; display:none;">
+            <div class="chart-header">
+              <div class="chart-title">Historical Performance <span id="port-period-chg" style="font-size:13px;font-weight:700;"></span></div>
               <div class="time-filters">
                 <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
                 <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
@@ -104,115 +144,42 @@
                 <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
                 <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)">Custom</button>
               </div>
-              <button class="icon-btn" title="Maximize" onclick="maximizeChart(null,'portfolio-chart-body','portfolioChart')" style="margin-left:2px;">⤢</button>
-              <button class="collapse-btn" id="portfolio-chart-toggle" onclick="toggleSection('portfolio-chart-body','portfolio-chart-toggle')">▲ Collapse</button>
+              <button class="icon-btn" title="Maximize" onclick="maximizeChart(null,'portfolio-chart-body','portfolioChart')">⤢</button>
+            </div>
+            <div id="portfolio-chart-body">
+              <div id="port-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
+                <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+                <span style="color:var(--text3)">to</span>
+                <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
+                <button class="tf-btn active" onclick="applyPortCustom()">Apply</button>
+              </div>
+              <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
             </div>
           </div>
-          <div id="portfolio-chart-body" class="collapsible-body">
-            <div id="port-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
-              <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-              <span style="color:var(--text3)">to</span>
-              <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-              <button class="tf-btn active" onclick="applyPortCustom()">Apply</button>
+
+          <!-- P&L Analysis -->
+          <div id="pnl-section" class="two-col" style="margin-bottom:0; display:none;">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
+                <button class="icon-btn" title="Maximize" onclick="maximizeSection('today-pnl-body','todayPnlChart')">⤢</button>
+              </div>
+              <div id="today-pnl-body">
+                <div id="today-pnl-wrap" style="position:relative;width:100%;height:400px;"><canvas id="todayPnlChart"></canvas></div>
+              </div>
             </div>
-            <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">Overall P&amp;L by Stock</div>
+                <button class="icon-btn" title="Maximize" onclick="maximizeSection('pnl-body','pnlChart')">⤢</button>
+              </div>
+              <div id="pnl-body">
+                <div style="position:relative;width:100%;height:400px;"><canvas id="pnlChart"></canvas></div>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div class="chart-card collapsible-card">
-          <div class="chart-header collapsible-header" onclick="toggleSection('pnl-body','pnl-toggle')">
-            <div class="chart-title">P&amp;L by Stock (Overall)</div>
-            <button class="collapse-btn" id="pnl-toggle">▲ Collapse</button>
-          </div>
-          <div id="pnl-body" class="collapsible-body">
-            <div style="position:relative;width:100%;height:400px;"><canvas id="pnlChart"></canvas></div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="chart-card collapsible-card" style="margin-bottom:1rem">
-        <div class="chart-header collapsible-header" onclick="toggleSection('alloc-body','alloc-toggle')">
-          <div class="chart-title">Allocation</div>
-          <button class="collapse-btn" id="alloc-toggle">▲ Collapse</button>
-        </div>
-        <div id="alloc-body" class="collapsible-body">
-          <div class="pie-wrap"><canvas id="pieChart"></canvas></div>
-        </div>
-      </div>
-
-
-
-    </div><!-- /overview -->
-
-    <!-- HOLDINGS TAB -->
-<!-- Add this to dashboard.html inside the HOLDINGS TAB section, replacing the existing holdings-grid -->
-<div class="holdings-view-controls" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-  <div class="view-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:var(--r-sm); padding:2px;">
-    <button id="holdings-table-view-btn" class="view-toggle-btn active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📋 Table View</button>
-    <button id="holdings-card-view-btn" class="view-toggle-btn" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">🃏 Card View</button>
-  </div>
-  <div class="holdings-actions" style="display:flex; gap:8px;">
-    <button class="holdings-detail-btn" onclick="exportHoldingsCSV()" style="background:var(--bg4); border:1px solid var(--border2); color:var(--text2); padding:6px 14px; border-radius:var(--r-sm); font-size:12px; font-weight:600; cursor:pointer;">📥 Export CSV</button>
-  </div>
-</div>
-
-<div id="holdings-table-container" style="display:block; overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
-  <table class="holdings-table" style="width:100%; border-collapse:collapse; font-size:12px;">
-    <thead>
-      <tr style="background:var(--bg3);">
-        <th onclick="sortHoldingsTable('ticker')" style="padding:12px 16px; text-align:left; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Ticker</th>
-        <th onclick="sortHoldingsTable('totalQty')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Qty</th>
-        <th onclick="sortHoldingsTable('avgBuy')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Avg Buy</th>
-        <th onclick="sortHoldingsTable('livePrice')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Live Price</th>
-        <th onclick="sortHoldingsTable('prevClose')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Prev Close</th>
-        <th onclick="sortHoldingsTable('invested')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Invested</th>
-        <th onclick="sortHoldingsTable('currentVal')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Current Value</th>
-        <th onclick="sortHoldingsTable('pnlAbs')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (₹)</th>
-        <th onclick="sortHoldingsTable('pnlPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (%)</th>
-        <th onclick="sortHoldingsTable('dayChgAbs')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day Change</th>
-        <th onclick="sortHoldingsTable('dayChgPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day %</th>
-        <th onclick="sortHoldingsTable('allocPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Allocation</th>
-      </tr>
-    </thead>
-    <tbody id="holdings-table-tbody"></tbody>
-  </table>
-</div>
-
-<div id="holdings-card-container" style="display:none;">
-  <div class="holdings-grid" id="holdings-grid"></div>
-</div>
-
-  </div>
-</div>
-
-
-<!-- HOLDINGS MODAL -->
-<div id="holdings-modal" class="modal-overlay" onclick="if(event.target===this)closeHoldingsModal()">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title">📋 All Holdings</div>
-      <button class="modal-close" onclick="closeHoldingsModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-table-wrap">
-        <table class="modal-table">
-          <thead><tr>
-            <th onclick="sortHoldingsModal('ticker')" class="sortable-th" id="mth-ticker">Ticker</th>
-            <th onclick="sortHoldingsModal('totalQty')" class="sortable-th" id="mth-totalQty">Qty</th>
-            <th onclick="sortHoldingsModal('avgBuy')" class="sortable-th" id="mth-avgBuy">Avg Buy</th>
-            <th onclick="sortHoldingsModal('livePrice')" class="sortable-th" id="mth-livePrice">Live Price</th>
-            <th onclick="sortHoldingsModal('prevClose')" class="sortable-th" id="mth-prevClose">Prev Close</th>
-            <th onclick="sortHoldingsModal('invested')" class="sortable-th" id="mth-invested">Invested</th>
-            <th onclick="sortHoldingsModal('currentVal')" class="sortable-th" id="mth-currentVal">Current Value</th>
-            <th onclick="sortHoldingsModal('pnlAbs')" class="sortable-th" id="mth-pnlAbs">P&amp;L (₹)</th>
-            <th onclick="sortHoldingsModal('pnlPct')" class="sortable-th" id="mth-pnlPct">P&amp;L (%)</th>
-            <th onclick="sortHoldingsModal('dayChgAbs')" class="sortable-th" id="mth-dayChgAbs">Day Change</th>
-            <th onclick="sortHoldingsModal('dayChgPct')" class="sortable-th" id="mth-dayChgPct">Day Change %</th>
-            <th onclick="sortHoldingsModal('allocPct')" class="sortable-th" id="mth-allocPct">Allocation</th>
-          </tr></thead>
-          <tbody id="holdings-modal-tbody"></tbody>
-        </table>
       </div>
     </div>
   </div>
@@ -224,11 +191,13 @@
 function toggleSection(bodyId, btnId) {
   const body = document.getElementById(bodyId);
   const btn  = document.getElementById(btnId);
+  if (!body) return;
   const collapsed = body.classList.toggle('collapsed');
-  btn.textContent = collapsed ? '▼' : '▲';
+  if (btn) btn.textContent = collapsed ? '▼' : '▲';
 }
+
 window._chartInstances = window._chartInstances || {};
-// ── Maximize any section (non-chart panels like Today's Performance) ──
+
 function maximizeSection(bodyId, canvasId) {
   const existing = document.getElementById('chart-maximized-overlay');
   if (existing) { existing.remove(); return; }
@@ -236,13 +205,11 @@ function maximizeSection(bodyId, canvasId) {
   const body = document.getElementById(bodyId);
   if (!body) return;
 
-  // Try chart maximize first
   if (canvasId && window._chartInstances && window._chartInstances[canvasId]) {
     maximizeChart(null, bodyId, canvasId);
     return;
   }
 
-  // Generic section maximize: clone the body content
   const overlay = document.createElement('div');
   overlay.id = 'chart-maximized-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:2rem;';
@@ -257,7 +224,6 @@ function maximizeSection(bodyId, canvasId) {
   overlay.appendChild(wrap);
   document.body.appendChild(overlay);
 
-  // Re-draw charts inside the maximized view
   requestAnimationFrame(() => {
     if (canvasId) {
       const srcChart = window._chartInstances?.[canvasId];
@@ -301,16 +267,14 @@ function maximizeChart(cardId, bodyId, canvasId) {
   const canvasWrap = document.createElement('div');
   canvasWrap.style.cssText = 'position:relative;width:min(1000px,90vw);height:min(650px,85vh);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:1.5rem 1.5rem 2.5rem 1.5rem;box-sizing:border-box;display:flex;flex-direction:column;gap:0.75rem;';
   
-  // Get the original chart instance
   const srcChart = window._chartInstances?.[canvasId];
   const srcCanvas = document.getElementById(canvasId);
   
   if (srcChart && srcCanvas) {
-    // Create title if it's the portfolio day chart
     if (canvasId === 'portfolioDayChart') {
       const title = document.createElement('div');
       title.style.cssText = 'font-size:14px;font-weight:700;color:var(--text);padding-bottom:0.5rem;border-bottom:1px solid var(--border);';
-      title.textContent = 'Today\'s Performance (Intraday)';
+      title.textContent = 'Intraday Performance';
       canvasWrap.appendChild(title);
     }
     
@@ -322,10 +286,8 @@ function maximizeChart(cardId, bodyId, canvasId) {
     overlay.appendChild(canvasWrap);
     document.body.appendChild(overlay);
     
-    // Wait for overlay to be visible, then create new chart with SAME options
     requestAnimationFrame(() => {
       try {
-        // Get the exact data from original chart
         const labels = srcChart.data.labels.slice();
         const datasets = srcChart.data.datasets.map(ds => ({
           label: ds.label,
@@ -341,10 +303,8 @@ function maximizeChart(cardId, bodyId, canvasId) {
           order: ds.order || 0,
         }));
         
-        // Get the original options
         const originalOptions = srcChart.options;
         
-        // Create new chart with preserved styling and extra bottom padding
         new Chart(bigCanvas, {
           type: srcChart.config.type,
           data: { labels, datasets },
@@ -352,14 +312,7 @@ function maximizeChart(cardId, bodyId, canvasId) {
             responsive: true,
             maintainAspectRatio: false,
             animation: false,
-            layout: {
-              padding: {
-                bottom: 35,
-                left: 10,
-                right: 10,
-                top: 10
-              }
-            },
+            layout: { padding: { bottom: 35, left: 10, right: 10, top: 10 } },
             plugins: {
               legend: { 
                 display: originalOptions?.plugins?.legend?.display !== false,
@@ -374,16 +327,12 @@ function maximizeChart(cardId, bodyId, canvasId) {
                 titleColor: '#8a8a9a',
                 bodyColor: '#f0f0f5',
                 padding: 10,
-                // IMPORTANT: Filter out the prev close dataset (order: 1)
                 filter: function(tooltipItem) {
-                  // Only show the portfolio line (order: 0), hide prev close (order: 1)
                   return tooltipItem.datasetIndex === datasets.length - 1;
                 },
                 callbacks: {
                   label: function(context) {
-                    // Only show the portfolio value and change
                     const val = context.parsed.y;
-                    // Find base value from the prev close dataset
                     let baseVal = 0;
                     if (datasets.length > 1 && datasets[0].data && datasets[0].data[context.dataIndex]) {
                       baseVal = datasets[0].data[context.dataIndex];
@@ -402,27 +351,16 @@ function maximizeChart(cardId, bodyId, canvasId) {
               x: {
                 grid: { color: 'rgba(255,255,255,0.04)' },
                 border: { color: 'rgba(255,255,255,0.1)' },
-                ticks: { 
-                  color: '#7777a0', 
-                  font: { size: 10 }, 
-                  maxRotation: 45,
-                  minRotation: 45,
-                  autoSkip: true,
-                  maxTicksLimit: 10
-                }
+                ticks: { color: '#7777a0', font: { size: 10 }, maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 10 }
               },
               y: {
                 grid: { color: 'rgba(255,255,255,0.04)' },
                 border: { color: 'rgba(255,255,255,0.1)' },
-                ticks: { 
-                  color: '#7777a0', 
-                  font: { size: 11 },
-                  callback: function(v) {
-                    if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
-                    if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
-                    return '₹' + v.toLocaleString('en-IN');
-                  }
-                }
+                ticks: { color: '#7777a0', font: { size: 11 }, callback: function(v) {
+                  if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
+                  if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+                  return '₹' + v.toLocaleString('en-IN');
+                } }
               }
             },
             interaction: { mode: 'index', intersect: false }
@@ -430,7 +368,6 @@ function maximizeChart(cardId, bodyId, canvasId) {
         });
       } catch(e) {
         console.warn('Chart re-render failed, falling back to image copy', e);
-        // Fallback: copy canvas as image
         const dpr = window.devicePixelRatio || 1;
         const w = canvasWrap.offsetWidth - 48;
         const h = canvasWrap.offsetHeight - 100;
@@ -444,28 +381,16 @@ function maximizeChart(cardId, bodyId, canvasId) {
       }
     });
   } else {
-    // Fallback: just show a message
     canvasWrap.innerHTML = '<div style="color:var(--text3);text-align:center;padding:2rem;">Chart data not available</div>';
     overlay.appendChild(closeBtn);
     overlay.appendChild(canvasWrap);
     document.body.appendChild(overlay);
   }
   
-  // Close on ESC key
-  const escHandler = (e) => { 
-    if (e.key === 'Escape') { 
-      overlay.remove(); 
-      document.removeEventListener('keydown', escHandler); 
-    } 
-  };
+  const escHandler = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); } };
   document.addEventListener('keydown', escHandler);
-  
-  // Close on overlay click (but not on the chart wrap)
-  overlay.addEventListener('click', (e) => { 
-    if (e.target === overlay) overlay.remove(); 
-  });
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 }
-
 </script>
 
 <script src="config.js" onerror="void 0"></script>

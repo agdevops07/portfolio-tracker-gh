@@ -26,6 +26,235 @@ function saveCurrentUser(user) {
   } catch(e) {}
 }
 
+// Main view state ('holdings' or 'charts')
+let mainView = 'holdings';
+
+// Toggle between Holdings and Charts & Analytics
+export function toggleMainView(view) {
+  mainView = view;
+  const holdingsView = document.getElementById('holdings-main-view');
+  const chartsView = document.getElementById('charts-main-view');
+  const holdingsBtn = document.getElementById('main-toggle-holdings-btn');
+  const chartsBtn = document.getElementById('main-toggle-charts-btn');
+  
+  // Save to sessionStorage
+  try {
+    sessionStorage.setItem('main_view', view);
+  } catch(e) {}
+  
+  if (view === 'holdings') {
+    if (holdingsView) holdingsView.style.display = 'block';
+    if (chartsView) chartsView.style.display = 'none';
+    if (holdingsBtn) {
+      holdingsBtn.style.background = 'var(--accent)';
+      holdingsBtn.style.color = 'white';
+      holdingsBtn.style.border = 'none';
+      holdingsBtn.style.boxShadow = '0 2px 8px rgba(91,94,244,0.3)';
+    }
+    if (chartsBtn) {
+      chartsBtn.style.background = 'var(--bg4)';
+      chartsBtn.style.color = 'var(--text2)';
+      chartsBtn.style.border = '1px solid var(--border2)';
+      chartsBtn.style.boxShadow = 'none';
+    }
+    // Refresh holdings table if needed
+    if (holdingsView === 'table') {
+      renderHoldingsTable();
+    } else {
+      const holdings = Object.values(state.holdings);
+      const totalCurrent = getTotalCurrent();
+      renderHoldingCards(holdings, totalCurrent);
+    }
+  } else {
+    if (holdingsView) holdingsView.style.display = 'none';
+    if (chartsView) chartsView.style.display = 'block';
+    if (chartsBtn) {
+      chartsBtn.style.background = 'var(--accent)';
+      chartsBtn.style.color = 'white';
+      chartsBtn.style.border = 'none';
+      chartsBtn.style.boxShadow = '0 2px 8px rgba(91,94,244,0.3)';
+    }
+    if (holdingsBtn) {
+      holdingsBtn.style.background = 'var(--bg4)';
+      holdingsBtn.style.color = 'var(--text2)';
+      holdingsBtn.style.border = '1px solid var(--border2)';
+      holdingsBtn.style.boxShadow = 'none';
+    }
+    // Restore chart section preference
+    restoreChartSection();
+  }
+}
+
+// Restore main view preference
+function restoreMainView() {
+  try {
+    const saved = sessionStorage.getItem('main_view');
+    if (saved && (saved === 'holdings' || saved === 'charts')) {
+      mainView = saved;
+      toggleMainView(saved);
+      return;
+    }
+  } catch(e) {}
+  toggleMainView('holdings');
+}
+
+// Chart section toggle state
+let activeChartSection = 'intraday'; // 'intraday', 'historical', or 'pnl'
+
+// Toggle between chart sections (Intraday, Historical, P&L)
+export function toggleChartSection(section) {
+  activeChartSection = section;
+  
+  const intradaySection = document.getElementById('intraday-section');
+  const historicalSection = document.getElementById('historical-section');
+  const pnlSection = document.getElementById('pnl-section');
+  const intradayBtn = document.getElementById('toggle-intraday-btn');
+  const historicalBtn = document.getElementById('toggle-historical-btn');
+  const pnlBtn = document.getElementById('toggle-pnl-btn');
+  
+  // Reset all button styles
+  const btns = [intradayBtn, historicalBtn, pnlBtn];
+  btns.forEach(btn => {
+    if (btn) {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--text2)';
+    }
+  });
+  
+  // Hide all sections
+  if (intradaySection) intradaySection.style.display = 'none';
+  if (historicalSection) historicalSection.style.display = 'none';
+  if (pnlSection) pnlSection.style.display = 'none';
+  
+  // Show selected section and highlight button
+  if (section === 'intraday') {
+    if (intradaySection) intradaySection.style.display = 'block';
+    if (intradayBtn) {
+      intradayBtn.style.background = 'var(--accent)';
+      intradayBtn.style.color = 'white';
+    }
+    // Refresh intraday chart
+    renderPortfolioDayChart();
+  } else if (section === 'historical') {
+    if (historicalSection) historicalSection.style.display = 'block';
+    if (historicalBtn) {
+      historicalBtn.style.background = 'var(--accent)';
+      historicalBtn.style.color = 'white';
+    }
+    // Refresh historical chart
+    renderPortfolioChart(state.currentFilter);
+  } else if (section === 'pnl') {
+    if (pnlSection) pnlSection.style.display = 'flex';
+    if (pnlBtn) {
+      pnlBtn.style.background = 'var(--accent)';
+      pnlBtn.style.color = 'white';
+    }
+    // Refresh P&L charts
+    const holdings = Object.values(state.holdings);
+    renderTodayPnlChart(holdings);
+    renderPnlChart(holdings);
+  }
+  
+  // Save preference
+  try {
+    sessionStorage.setItem('active_chart_section', section);
+  } catch(e) {}
+}
+
+// Restore chart section preference
+export function restoreChartSection() {
+  try {
+    const saved = sessionStorage.getItem('active_chart_section');
+    if (saved && (saved === 'intraday' || saved === 'historical' || saved === 'pnl')) {
+      activeChartSection = saved;
+      toggleChartSection(saved);
+      return;
+    }
+  } catch(e) {}
+  toggleChartSection('intraday');
+}
+
+// Portfolio view state ('table', 'card', or 'charts')
+let portfolioView = 'table'; // default to table view
+
+// Set portfolio view (table, card, or charts)
+export function setPortfolioView(view) {
+  portfolioView = view;
+  const tableView = document.getElementById('portfolio-table-view');
+  const cardView = document.getElementById('portfolio-card-view');
+  const chartsView = document.getElementById('portfolio-charts-view');
+  const tableViewBtn = document.getElementById('portfolio-table-view-btn');
+  const cardViewBtn = document.getElementById('portfolio-card-view-btn');
+  const chartsViewBtn = document.getElementById('portfolio-charts-view-btn');
+  
+  // Save to sessionStorage
+  try {
+    sessionStorage.setItem('portfolio_view', view);
+  } catch(e) {}
+  
+  // Reset all button styles
+  if (tableViewBtn) {
+    tableViewBtn.style.background = 'transparent';
+    tableViewBtn.style.color = 'var(--text2)';
+  }
+  if (cardViewBtn) {
+    cardViewBtn.style.background = 'transparent';
+    cardViewBtn.style.color = 'var(--text2)';
+  }
+  if (chartsViewBtn) {
+    chartsViewBtn.style.background = 'transparent';
+    chartsViewBtn.style.color = 'var(--text2)';
+  }
+  
+  if (view === 'table') {
+    if (tableView) tableView.style.display = 'block';
+    if (cardView) cardView.style.display = 'none';
+    if (chartsView) chartsView.style.display = 'none';
+    if (tableViewBtn) {
+      tableViewBtn.style.background = 'var(--accent)';
+      tableViewBtn.style.color = 'white';
+    }
+    renderHoldingsTable();
+  } else if (view === 'card') {
+    if (tableView) tableView.style.display = 'none';
+    if (cardView) cardView.style.display = 'block';
+    if (chartsView) chartsView.style.display = 'none';
+    if (cardViewBtn) {
+      cardViewBtn.style.background = 'var(--accent)';
+      cardViewBtn.style.color = 'white';
+    }
+    const holdings = Object.values(state.holdings);
+    const totalCurrent = getTotalCurrent();
+    renderHoldingCards(holdings, totalCurrent);
+  } else {
+    if (tableView) tableView.style.display = 'none';
+    if (cardView) cardView.style.display = 'none';
+    if (chartsView) chartsView.style.display = 'block';
+    if (chartsViewBtn) {
+      chartsViewBtn.style.background = 'var(--accent)';
+      chartsViewBtn.style.color = 'white';
+    }
+    // Refresh all charts (excluding allocation chart)
+    const holdings = Object.values(state.holdings);
+    const totalCurrent = getTotalCurrent();
+    renderPortfolioChart(state.currentFilter);
+    renderPortfolioDayChart();
+    renderTodayPnlChart(holdings);
+    renderPnlChart(holdings);
+  }
+}
+
+function restorePortfolioView() {
+  try {
+    const savedView = sessionStorage.getItem('portfolio_view');
+    if (savedView && (savedView === 'table' || savedView === 'card' || savedView === 'charts')) {
+      portfolioView = savedView;
+      return portfolioView;
+    }
+  } catch(e) {}
+  return 'table';
+}
+
 // Rebuild time series based on current filtered holdings
 async function rebuildTimeSeriesForCurrentUser() {
   const holdings = Object.values(state.holdings);
@@ -69,11 +298,11 @@ export async function loadDashboard() {
   if (ds) ds.style.display = 'block';
   if (dd) dd.style.display = 'none';
 
-  // Get saved tab from sessionStorage, default to 'overview'
-  let savedTab = 'overview';
+  // Get saved tab from sessionStorage, default to 'portfolio' (not 'overview')
+  let savedTab = 'portfolio';
   try {
     const stored = sessionStorage.getItem('dashboard_current_tab');
-    if (stored && (stored === 'overview' || stored === 'holdings')) {
+    if (stored && (stored === 'portfolio')) {
       savedTab = stored;
     }
   } catch(e) {}
@@ -155,6 +384,7 @@ export async function loadDashboard() {
     loadingDiv.innerHTML = `<div class="error-box">Failed to load portfolio data: ${err.message}</div>`;
   }
 }
+
 export async function refreshPricesOnly() {
   showToast('Refreshing prices…');
   resetCaches();
@@ -265,29 +495,31 @@ function updateRefreshTimestamp() {
 
 export function renderUserTabs() {
   const users = state.users || [];
-  ['dash-user-tabs-overview', 'dash-user-tabs-holdings'].forEach(id => {
-    let wrap = document.getElementById(id);
-    if (!wrap) return;
-    if (users.length <= 1) { wrap.style.display = 'none'; return; }
-    wrap.style.display = 'flex';
-    
-    // Restore saved user, default to 'all' if none saved
-    let active = state.activeUser || restoreCurrentUser();
-    if (active !== 'all' && !users.includes(active)) {
-      active = 'all';
-    }
-    state.activeUser = active;
-    
-    const tabs = ['all', ...users];
-    wrap.innerHTML = tabs.map(u => `
-      <button class="dash-user-tab${u === active ? ' active' : ''}" data-user="${u}"
-        onclick="switchDashUser('${u}')"
-        style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border2);
-               background:${u === active ? 'var(--accent)' : 'var(--bg3)'};
-               color:${u === active ? '#fff' : 'var(--text2)'};cursor:pointer;transition:all 0.2s;">
-        ${u === 'all' ? '👥 All' : u}
-      </button>`).join('');
-  });
+  const wrap = document.getElementById('dash-user-tabs-portfolio');
+  if (!wrap) return;
+  
+  if (users.length <= 1) { 
+    wrap.style.display = 'none'; 
+    return; 
+  }
+  wrap.style.display = 'flex';
+  
+  // Restore saved user, default to 'all' if none saved
+  let active = state.activeUser || restoreCurrentUser();
+  if (active !== 'all' && !users.includes(active)) {
+    active = 'all';
+  }
+  state.activeUser = active;
+  
+  const tabs = ['all', ...users];
+  wrap.innerHTML = tabs.map(u => `
+    <button class="dash-user-tab${u === active ? ' active' : ''}" data-user="${u}"
+      onclick="switchDashUser('${u}')"
+      style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border2);
+             background:${u === active ? 'var(--accent)' : 'var(--bg3)'};
+             color:${u === active ? '#fff' : 'var(--text2)'};cursor:pointer;transition:all 0.2s;">
+      ${u === 'all' ? '👥 All' : u}
+    </button>`).join('');
 }
 
 export async function switchDashUser(user) {
@@ -309,6 +541,7 @@ export async function switchDashUser(user) {
   // Re-render dashboard with new data
   renderDashboard();
 }
+
 export function renderDashboard() {
   renderUserTabs();
   const holdings = Object.values(state.holdings);
@@ -337,19 +570,18 @@ export function renderDashboard() {
   });
 
   renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct, todayChange, todayChangePct, best, holdings });
+  
+  // Always update charts data (even if not visible, they'll be ready when switched)
   renderPortfolioChart(state.currentFilter);
   renderPortfolioDayChart();
   renderTodayPnlChart(holdings);
-  renderPieChart(holdings, totalCurrent);
   renderPnlChart(holdings);
-  if (holdingsView === 'table') {
-    renderHoldingsTable();
-  } else {
-    renderHoldingCards(holdings, totalCurrent);
+    
+  // Show the appropriate view based on saved preference
+    const savedHoldingsView = restoreHoldingsView();
+    setHoldingsView(savedHoldingsView);
+    updateRefreshTimestamp();
   }
-
-  updateRefreshTimestamp();
-}
 
 function renderDashboardInPlace() {
   const holdings = Object.values(state.holdings);
@@ -377,32 +609,23 @@ function renderDashboardInPlace() {
   });
 
   renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct, todayChange, todayChangePct, best, holdings });
+  
+  // Update charts
   renderPortfolioChart(state.currentFilter);
   renderPortfolioDayChart();
   renderTodayPnlChart(holdings);
-  renderPieChart(holdings, totalCurrent);
   renderPnlChart(holdings);
   
-  // Update based on current view
-  if (holdingsView === 'table') {
+  // Update table if visible
+  if (portfolioView === 'table') {
     renderHoldingsTable();
-  } else {
-    // Update card view in place if cards exist
-    const grid = document.getElementById('holdings-grid');
-    if (grid && grid.children.length === holdings.length) {
-      updateHoldingCardsInPlace(holdings, totalCurrent);
-    } else {
-      renderHoldingCards(holdings, totalCurrent);
-    }
-  }
-
-  const modal = document.getElementById('holdings-modal');
-  if (modal && modal.style.display !== 'none') {
-    modal.dispatchEvent(new CustomEvent('refreshTable'));
   }
 
   updateRefreshTimestamp();
+  restoreChartSection();
+  restoreMainView();
 }
+
 function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
                             todayChange, todayChangePct, best, holdings }) {
   const hasPrevClose = todayChange !== null;
@@ -573,28 +796,55 @@ export function sortHoldingsTable(key) {
 // Set holdings view (table or card)
 export function setHoldingsView(view) {
   holdingsView = view;
-  const tableContainer = document.getElementById('holdings-table-container');
-  const cardContainer = document.getElementById('holdings-card-container');
+  const tableView = document.getElementById('holdings-table-view');
+  const cardView = document.getElementById('holdings-card-view');
   const tableViewBtn = document.getElementById('holdings-table-view-btn');
   const cardViewBtn = document.getElementById('holdings-card-view-btn');
   
+  // Save to sessionStorage
+  try {
+    sessionStorage.setItem('holdings_view', view);
+  } catch(e) {}
+  
   if (view === 'table') {
-    tableContainer.style.display = 'block';
-    cardContainer.style.display = 'none';
-    tableViewBtn.style.background = 'var(--accent)';
-    tableViewBtn.style.color = 'white';
-    cardViewBtn.style.background = 'transparent';
-    cardViewBtn.style.color = 'var(--text2)';
+    if (tableView) tableView.style.display = 'block';
+    if (cardView) cardView.style.display = 'none';
+    if (tableViewBtn) {
+      tableViewBtn.style.background = 'var(--accent)';
+      tableViewBtn.style.color = 'white';
+    }
+    if (cardViewBtn) {
+      cardViewBtn.style.background = 'transparent';
+      cardViewBtn.style.color = 'var(--text2)';
+    }
     renderHoldingsTable();
   } else {
-    tableContainer.style.display = 'none';
-    cardContainer.style.display = 'block';
-    cardViewBtn.style.background = 'var(--accent)';
-    cardViewBtn.style.color = 'white';
-    tableViewBtn.style.background = 'transparent';
-    tableViewBtn.style.color = 'var(--text2)';
-    renderHoldingCards(Object.values(state.holdings), getTotalCurrent());
+    if (tableView) tableView.style.display = 'none';
+    if (cardView) cardView.style.display = 'block';
+    if (cardViewBtn) {
+      cardViewBtn.style.background = 'var(--accent)';
+      cardViewBtn.style.color = 'white';
+    }
+    if (tableViewBtn) {
+      tableViewBtn.style.background = 'transparent';
+      tableViewBtn.style.color = 'var(--text2)';
+    }
+    const holdings = Object.values(state.holdings);
+    const totalCurrent = getTotalCurrent();
+    renderHoldingCards(holdings, totalCurrent);
   }
+}
+
+// Restore holdings view from sessionStorage
+function restoreHoldingsView() {
+  try {
+    const savedView = sessionStorage.getItem('holdings_view');
+    if (savedView && (savedView === 'table' || savedView === 'card')) {
+      holdingsView = savedView;
+      return holdingsView;
+    }
+  } catch(e) {}
+  return 'table';
 }
 
 // Helper to calculate total current value
