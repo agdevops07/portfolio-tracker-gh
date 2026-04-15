@@ -259,6 +259,8 @@ export function toggleMainView(view) {
   const chartsView = document.getElementById('charts-main-view');
   const holdingsBtn = document.getElementById('main-toggle-holdings-btn');
   const chartsBtn = document.getElementById('main-toggle-charts-btn');
+  const holdingsSubtoggles = document.getElementById('holdings-subtoggles');
+  const chartsSubtoggles = document.getElementById('charts-subtoggles');
   
   // Save to sessionStorage
   try {
@@ -268,6 +270,8 @@ export function toggleMainView(view) {
   if (view === 'holdings') {
     if (holdingsView) holdingsView.style.display = 'block';
     if (chartsView) chartsView.style.display = 'none';
+    if (holdingsSubtoggles) holdingsSubtoggles.style.display = 'flex';
+    if (chartsSubtoggles) chartsSubtoggles.style.display = 'none';
     if (holdingsBtn) {
       holdingsBtn.style.background = 'var(--accent)';
       holdingsBtn.style.color = 'white';
@@ -275,9 +279,9 @@ export function toggleMainView(view) {
       holdingsBtn.style.boxShadow = '0 2px 8px rgba(91,94,244,0.3)';
     }
     if (chartsBtn) {
-      chartsBtn.style.background = 'var(--bg4)';
+      chartsBtn.style.background = 'transparent';
       chartsBtn.style.color = 'var(--text2)';
-      chartsBtn.style.border = '1px solid var(--border2)';
+      chartsBtn.style.border = 'none';
       chartsBtn.style.boxShadow = 'none';
     }
     // Refresh holdings table if needed
@@ -291,6 +295,8 @@ export function toggleMainView(view) {
   } else {
     if (holdingsView) holdingsView.style.display = 'none';
     if (chartsView) chartsView.style.display = 'block';
+    if (holdingsSubtoggles) holdingsSubtoggles.style.display = 'none';
+    if (chartsSubtoggles) chartsSubtoggles.style.display = 'flex';
     if (chartsBtn) {
       chartsBtn.style.background = 'var(--accent)';
       chartsBtn.style.color = 'white';
@@ -298,9 +304,9 @@ export function toggleMainView(view) {
       chartsBtn.style.boxShadow = '0 2px 8px rgba(91,94,244,0.3)';
     }
     if (holdingsBtn) {
-      holdingsBtn.style.background = 'var(--bg4)';
+      holdingsBtn.style.background = 'transparent';
       holdingsBtn.style.color = 'var(--text2)';
-      holdingsBtn.style.border = '1px solid var(--border2)';
+      holdingsBtn.style.border = 'none';
       holdingsBtn.style.boxShadow = 'none';
     }
     // Restore chart section preference
@@ -880,6 +886,20 @@ function restoreTimeFilterUI() {
 function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
                             todayChange, todayChangePct, best, holdings }) {
   const hasPrevClose = todayChange !== null;
+
+  // Find the intraday best performer (highest day change percentage)
+  let intradayBest = null;
+  holdings.forEach((h) => {
+    const lp = state.livePrices[h.ticker];
+    const pc = state.prevClosePrices[h.ticker];
+    if (lp && pc && pc > 0) {
+      const dayPct = ((lp - pc) / pc) * 100;
+      if (!intradayBest || dayPct > intradayBest.pct) {
+        intradayBest = { ticker: h.ticker, pct: dayPct };
+      }
+    }
+  });
+
   document.getElementById('stat-cards').innerHTML = `
     <div class="stat-card">
       <div class="stat-label">Total Invested</div>
@@ -913,9 +933,15 @@ function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
         ${hasPrevClose ? pct(todayChangePct) + ' today' : 'Prev close unavailable'}
       </div>
     </div>
+    ${intradayBest ? `
+      <div class="stat-card">
+        <div class="stat-label">Best Performer (Intraday)</div>
+        <div class="stat-value" style="color:var(--green);font-size:1.3rem">${intradayBest.ticker}</div>
+        <div class="stat-sub" style="color:var(--green)">+${intradayBest.pct.toFixed(2)}% today</div>
+      </div>` : ''}
     ${best ? `
     <div class="stat-card">
-      <div class="stat-label">Best Performer</div>
+      <div class="stat-label">Best Performer (Overall)</div>
       <div class="stat-value" style="color:var(--green);font-size:1.3rem">${best.ticker}</div>
       <div class="stat-sub" style="color:var(--green)">${pct(best.pct)}</div>
     </div>` : ''}`;

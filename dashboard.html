@@ -59,23 +59,30 @@
       <!-- Stat Cards (always visible) -->
       <div class="cards-grid" id="stat-cards"></div>
 
-      <!-- Main Toggle: Holdings vs Charts & Analytics -->
-      <div class="main-toggle-wrapper" style="display:flex; justify-content:center; gap:12px; margin:1.5rem 0 1.5rem 0;">
-        <button id="main-toggle-holdings-btn" class="main-toggle-btn active" onclick="toggleMainView('holdings')" style="background:var(--accent); color:white; border:none; padding:10px 32px; border-radius:40px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(91,94,244,0.3);">📋 Holdings</button>
-        <button id="main-toggle-charts-btn" class="main-toggle-btn" onclick="toggleMainView('charts')" style="background:var(--bg4); color:var(--text2); border:1px solid var(--border2); padding:10px 32px; border-radius:40px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s;">📈 Charts & Analytics</button>
+      <!-- Main Toggle Row: Holdings | Charts & Analytics (left) + Sub-toggles (right) -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin:1rem 0 1.5rem 0; flex-wrap:wrap; gap:0.75rem;">
+        <!-- Left: Main toggles -->
+        <div class="main-toggle-wrapper" style="display:flex; gap:8px; background:var(--bg3); border-radius:60px; padding:4px;">
+          <button id="main-toggle-holdings-btn" class="main-toggle-btn active" onclick="toggleMainView('holdings')" style="background:var(--accent); color:white; border:none; padding:10px 28px; border-radius:40px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s;">📋 Holdings</button>
+          <button id="main-toggle-charts-btn" class="main-toggle-btn" onclick="toggleMainView('charts')" style="background:transparent; color:var(--text2); border:none; padding:10px 28px; border-radius:40px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s;">📈 Charts & Analytics</button>
+        </div>
+
+        <!-- Right: Sub-toggles (only visible when in respective view) -->
+        <div id="holdings-subtoggles" style="display:flex; gap:6px; background:var(--bg3); border-radius:40px; padding:4px;">
+          <button id="holdings-table-view-btn" class="holdings-view-toggle active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:7px 20px; border-radius:40px; font-size:12px; font-weight:600; cursor:pointer;">📋 Table</button>
+          <button id="holdings-card-view-btn" class="holdings-view-toggle" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:7px 20px; border-radius:40px; font-size:12px; font-weight:600; cursor:pointer;">🃏 Cards</button>
+        </div>
+
+        <div id="charts-subtoggles" style="display:none; gap:6px; background:var(--bg3); border-radius:40px; padding:4px;">
+          <button id="toggle-intraday-btn" class="chart-toggle-btn active" onclick="toggleChartSection('intraday')" style="background:var(--accent); color:white; border:none; padding:7px 20px; border-radius:40px; font-size:12px; font-weight:600; cursor:pointer;">📊 Intraday</button>
+          <button id="toggle-historical-btn" class="chart-toggle-btn" onclick="toggleChartSection('historical')" style="background:transparent; color:var(--text2); border:none; padding:7px 20px; border-radius:40px; font-size:12px; font-weight:600; cursor:pointer;">📈 Historical</button>
+          <button id="toggle-pnl-btn" class="chart-toggle-btn" onclick="toggleChartSection('pnl')" style="background:transparent; color:var(--text2); border:none; padding:7px 20px; border-radius:40px; font-size:12px; font-weight:600; cursor:pointer;">💰 P&L</button>
+        </div>
       </div>
 
       <!-- HOLDINGS VIEW -->
       <div id="holdings-main-view" style="display:block;">
         <div class="holdings-section">
-          <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-            <div class="section-title" style="font-size:14px; font-weight:600; color:var(--text3);">View Options</div>
-            <div class="view-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:var(--r-sm); padding:2px;">
-              <button id="holdings-table-view-btn" class="holdings-view-toggle active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📋 Table View</button>
-              <button id="holdings-card-view-btn" class="holdings-view-toggle" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">🃏 Card View</button>
-            </div>
-          </div>
-
           <!-- Holdings Table View -->
           <div id="holdings-table-view" style="display:block;">
             <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
@@ -111,71 +118,62 @@
       <!-- CHARTS & ANALYTICS VIEW -->
       <div id="charts-main-view" style="display:none;">
         <div class="charts-section">
-          <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-            <div class="section-title" style="font-size:14px; font-weight:600; color:var(--text3);">Select Chart Type</div>
-            <div class="charts-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:var(--r-sm); padding:2px;">
-              <button id="toggle-intraday-btn" class="chart-toggle-btn active" onclick="toggleChartSection('intraday')" style="background:var(--accent); color:white; border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📊 Intraday</button>
-              <button id="toggle-historical-btn" class="chart-toggle-btn" onclick="toggleChartSection('historical')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📈 Historical</button>
-              <button id="toggle-pnl-btn" class="chart-toggle-btn" onclick="toggleChartSection('pnl')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">💰 P&L</button>
-            </div>
-          </div>
           
-      <!-- Intraday Performance -->
-      <div id="intraday-section" class="chart-card" style="margin-bottom:1rem;">
-        <div class="chart-header">
-          <div class="chart-title">Intraday Performance <span class="chart-subtitle">(15-min delay)</span></div>
-          <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
-            <button id="intraday-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
-            <button id="intraday-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
+          <!-- Intraday Performance -->
+          <div id="intraday-section" class="chart-card" style="margin-bottom:1rem;">
+            <div class="chart-header">
+              <div class="chart-title">Intraday Performance <span class="chart-subtitle">(15-min delay)</span></div>
+              <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
+                <button id="intraday-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
+                <button id="intraday-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
+              </div>
+            </div>
+            <div id="day-chart-body">
+              <div id="portfolio-day-wrap" class="chart-wrap" style="height:400px;">
+                <canvas id="portfolioDayChart"></canvas>
+              </div>
+            </div>
           </div>
-        </div>
-        <div id="day-chart-body">
-          <div id="portfolio-day-wrap" class="chart-wrap" style="height:400px;">
-            <canvas id="portfolioDayChart"></canvas>
-          </div>
-        </div>
-      </div>
 
-      <!-- Historical Performance -->
-      <div id="historical-section" class="chart-card" style="margin-bottom:1rem; display:none;">
-        <div class="chart-header">
-          <div class="chart-title">Historical Performance <span id="port-period-chg" style="font-size:13px;font-weight:700;"></span></div>
-          <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
-            <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
-              <button id="historical-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
-              <button id="historical-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
+          <!-- Historical Performance -->
+          <div id="historical-section" class="chart-card" style="margin-bottom:1rem; display:none;">
+            <div class="chart-header">
+              <div class="chart-title">Historical Performance <span id="port-period-chg" style="font-size:13px;font-weight:700;"></span></div>
+              <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+                <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
+                  <button id="historical-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
+                  <button id="historical-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
+                </div>
+                <div class="benchmark-toggle" style="display:flex; gap:6px; background:var(--bg3); padding:4px 12px; border-radius:40px; flex-wrap:wrap;">
+                  <span style="font-size:11px; color:var(--text3);">Compare:</span>
+                  <button class="benchmark-btn" data-benchmark="nifty50" onclick="toggleBenchmark('nifty50')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty 50</button>
+                  <button class="benchmark-btn" data-benchmark="niftyBank" onclick="toggleBenchmark('niftyBank')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty Bank</button>
+                  <button class="benchmark-btn" data-benchmark="niftyMidcap" onclick="toggleBenchmark('niftyMidcap')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty Midcap 50</button>
+                </div>
+                <div class="time-filters" style="display:flex; gap:4px; background:var(--bg3); padding:4px 12px; border-radius:40px;">
+                  <button class="tf-btn" onclick="setTimeFilter('1M',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">1M</button>
+                  <button class="tf-btn" onclick="setTimeFilter('3M',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">3M</button>
+                  <button class="tf-btn active" onclick="setTimeFilter('1Y',this)" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">1Y</button>
+                  <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">Custom</button>
+                </div>
+              </div>
             </div>
-            <div class="benchmark-toggle" style="display:flex; gap:6px; background:var(--bg3); padding:4px 12px; border-radius:40px; flex-wrap:wrap;">
-              <span style="font-size:11px; color:var(--text3);">Compare:</span>
-              <button class="benchmark-btn" data-benchmark="nifty50" onclick="toggleBenchmark('nifty50')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty 50</button>
-              <button class="benchmark-btn" data-benchmark="niftyBank" onclick="toggleBenchmark('niftyBank')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty Bank</button>
-              <button class="benchmark-btn" data-benchmark="niftyMidcap" onclick="toggleBenchmark('niftyMidcap')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty Midcap 50</button>
-            </div>
-            <div class="time-filters" style="display:flex; gap:4px; background:var(--bg3); padding:4px 12px; border-radius:40px;">
-              <button class="tf-btn" onclick="setTimeFilter('1M',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">1M</button>
-              <button class="tf-btn" onclick="setTimeFilter('3M',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">3M</button>
-              <button class="tf-btn active" onclick="setTimeFilter('1Y',this)" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">1Y</button>
-              <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">Custom</button>
+            <div id="portfolio-chart-body">
+              <div id="port-custom-wrap" style="display:none; align-items:center; gap:12px; padding:1rem 0; flex-wrap:wrap; justify-content:flex-end;">
+                <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;">
+                <span style="color:var(--text3)">→</span>
+                <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;">
+                <button class="tf-btn active" onclick="applyPortCustom()" style="background:var(--accent);color:white;border:none;padding:6px 16px;border-radius:8px;">Apply</button>
+              </div>
+              <div class="chart-wrap" style="height:420px;"><canvas id="portfolioChart"></canvas></div>
             </div>
           </div>
-        </div>
-        <div id="portfolio-chart-body">
-          <div id="port-custom-wrap" style="display:none; align-items:center; gap:12px; padding:1rem 0; flex-wrap:wrap; justify-content:flex-end;">
-            <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;">
-            <span style="color:var(--text3)">→</span>
-            <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;">
-            <button class="tf-btn active" onclick="applyPortCustom()" style="background:var(--accent);color:white;border:none;padding:6px 16px;border-radius:8px;">Apply</button>
-          </div>
-          <div class="chart-wrap" style="height:420px;"><canvas id="portfolioChart"></canvas></div>
-        </div>
-      </div>
 
           <!-- P&L Analysis -->
           <div id="pnl-section" class="two-col" style="margin-bottom:0; display:none;">
             <div class="chart-card">
               <div class="chart-header">
                 <div class="chart-title">Today's P&amp;L by Stock <span class="chart-subtitle">(vs Prev Close)</span></div>
-                <button class="icon-btn" title="Maximize" onclick="maximizeSection('today-pnl-body','todayPnlChart')">⤢</button>
               </div>
               <div id="today-pnl-body">
                 <div id="today-pnl-wrap" style="position:relative;width:100%;height:400px;"><canvas id="todayPnlChart"></canvas></div>
@@ -185,7 +183,6 @@
             <div class="chart-card">
               <div class="chart-header">
                 <div class="chart-title">Overall P&amp;L by Stock</div>
-                <button class="icon-btn" title="Maximize" onclick="maximizeSection('pnl-body','pnlChart')">⤢</button>
               </div>
               <div id="pnl-body">
                 <div style="position:relative;width:100%;height:400px;"><canvas id="pnlChart"></canvas></div>
