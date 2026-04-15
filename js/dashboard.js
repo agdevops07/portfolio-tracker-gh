@@ -724,10 +724,10 @@ function updateRefreshTimestamp() {
 
 export function renderUserTabs() {
   const users = state.users || [];
-  const wrap = document.getElementById('dash-user-tabs-portfolio');
+  const wrap = document.getElementById('dash-user-tabs');
   if (!wrap) return;
   
-  if (users.length <= 1) { 
+  if (!users || users.length <= 1) { 
     wrap.style.display = 'none'; 
     return; 
   }
@@ -743,10 +743,7 @@ export function renderUserTabs() {
   const tabs = ['all', ...users];
   wrap.innerHTML = tabs.map(u => `
     <button class="dash-user-tab${u === active ? ' active' : ''}" data-user="${u}"
-      onclick="switchDashUser('${u}')"
-      style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border2);
-             background:${u === active ? 'var(--accent)' : 'var(--bg3)'};
-             color:${u === active ? '#fff' : 'var(--text2)'};cursor:pointer;transition:all 0.2s;">
+      onclick="switchDashUser('${u}')">
       ${u === 'all' ? '👥 All' : u}
     </button>`).join('');
 }
