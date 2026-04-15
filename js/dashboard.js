@@ -10,7 +10,6 @@ import { fetchPrice, fetchHistory, fetchDayHistory } from './api.js';
 import { forwardFill, buildTimeSeries, patchTodayTimeSeries } from './timeSeries.js';
 import {
   renderPortfolioChart,
-  renderPieChart,
   renderPnlChart,
   renderPortfolioDayChart,
   renderTodayPnlChart,
@@ -23,6 +22,230 @@ import { getFilteredHoldings } from './fileHandler.js';
 function saveCurrentUser(user) {
   try {
     sessionStorage.setItem('dashboard_active_user', user);
+  } catch(e) {}
+}
+
+// Benchmark comparison state
+let activeBenchmark = 'none'; // 'none', 'nifty50', 'nifty200', 'smallcap'
+
+// Toggle benchmark comparison on historical chart
+export async function toggleBenchmark(benchmark) {
+  activeBenchmark = benchmark;
+  
+  // Update button styles
+  document.querySelectorAll('.benchmark-btn').forEach(btn => {
+    const btnBenchmark = btn.getAttribute('data-benchmark');
+    if (btnBenchmark === benchmark) {
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--text2)';
+    }
+  });
+  
+  // Save preference
+  try {
+    sessionStorage.setItem('active_benchmark', benchmark);
+  } catch(e) {}
+  
+  // Refresh historical chart with benchmark
+  await renderPortfolioChartWithBenchmark(state.currentFilter, benchmark);
+}
+
+// Render portfolio chart with benchmark comparison
+async function renderPortfolioChartWithBenchmark(filter, benchmark) {
+  // First get the portfolio series
+  let series;
+  if (filter === 'CUSTOM') {
+    const from = document.getElementById('port-from')?.value;
+    const to = document.getElementById('port-to')?.value;
+    if (from && to) {
+      series = state.fullTimeSeries.filter(p => p.date >= from && p.date <= to);
+    } else {
+      series = state.fullTimeSeries;
+    }
+  } else {
+    series = filterTimeSeries(filter);
+  }
+  
+  if (!series.length) return;
+  
+  const rawDates = series.map(p => p.date);
+  const labels = rawDates.map(d => formatDateLabel(d));
+  const portfolioValues = series.map(p => p.value);
+  
+  // Normalize portfolio values to percentage (starting at 100)
+  const startValue = portfolioValues[0];
+  const portfolioNormalized = portfolioValues.map(v => (v / startValue) * 100);
+  
+  // Prepare datasets
+  const datasets = [{
+    label: 'Portfolio',
+    data: portfolioNormalized,
+    borderColor: '#6366f1',
+    borderWidth: 2,
+    backgroundColor: 'rgba(99,102,241,0.05)',
+    fill: true,
+    pointRadius: 0,
+    pointHoverRadius: 5,
+    tension: 0.3,
+    order: 0
+  }];
+  
+  // Add benchmark if selected
+  if (benchmark !== 'none') {
+    let benchmarkData = await fetchBenchmarkData(benchmark, rawDates);
+    if (benchmarkData && benchmarkData.length) {
+      datasets.push({
+        label: getBenchmarkLabel(benchmark),
+        data: benchmarkData,
+        borderColor: '#f59e0b',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        backgroundColor: 'transparent',
+        fill: false,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.3,
+        order: 1
+      });
+    }
+  }
+  
+  // Calculate period change
+  const endValue = portfolioValues[portfolioValues.length - 1];
+  const chg = ((endValue - startValue) / startValue) * 100;
+  const periodChgEl = document.getElementById('port-period-chg');
+  if (periodChgEl) {
+    periodChgEl.innerHTML = `<span style="color:${chg >= 0 ? 'var(--green)' : 'var(--red)'}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</span>`;
+  }
+  
+  // Destroy existing chart
+  if (state.portfolioChartInstance) state.portfolioChartInstance.destroy();
+  
+  const ctx = document.getElementById('portfolioChart').getContext('2d');
+  
+  state.portfolioChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { color: '#a0a0b0', usePointStyle: true, boxWidth: 10 } },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: '#1a1a1f',
+          titleColor: '#8a8a9a',
+          bodyColor: '#f0f0f5',
+          callbacks: {
+            label: (context) => {
+              const value = context.parsed.y;
+              return `${context.dataset.label}: ${value.toFixed(2)}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7777a0', maxRotation: 0 } },
+        y: { 
+          grid: { color: 'rgba(255,255,255,0.04)' }, 
+          ticks: { color: '#7777a0', callback: (v) => v.toFixed(0) + '%' },
+          title: { display: true, text: 'Normalized Value (%)', color: '#7777a0' }
+        }
+      },
+      interaction: { mode: 'index', intersect: false }
+    }
+  });
+  
+  if (!window._chartInstances) window._chartInstances = {};
+  window._chartInstances['portfolioChart'] = state.portfolioChartInstance;
+}
+
+// Fetch benchmark data (Nifty, etc.)
+async function fetchBenchmarkData(benchmark, dates) {
+  // Map benchmark to Yahoo Finance symbol
+  const symbolMap = {
+    nifty50: '^NSEI',
+    nifty200: 'NIFTY200.NS',
+    smallcap: 'NIFTYSMALLCAP250.NS'
+  };
+  
+  const symbol = symbolMap[benchmark];
+  if (!symbol) return null;
+  
+  const startDate = dates[0];
+  const endDate = dates[dates.length - 1];
+  
+  try {
+    const hist = await fetchHistory(symbol, null, '2y');
+    if (!hist || Object.keys(hist).length === 0) return null;
+    
+    // Filter to date range and get values
+    const filtered = [];
+    let firstValue = null;
+    
+    for (const date of dates) {
+      let price = hist[date];
+      if (!price) {
+        // Find nearest previous price
+        const prevDates = Object.keys(hist).filter(d => d <= date).sort();
+        if (prevDates.length) price = hist[prevDates[prevDates.length - 1]];
+      }
+      if (price && !firstValue) firstValue = price;
+      if (price && firstValue) {
+        filtered.push((price / firstValue) * 100);
+      } else {
+        filtered.push(null);
+      }
+    }
+    
+    // Forward fill nulls
+    let lastVal = null;
+    for (let i = 0; i < filtered.length; i++) {
+      if (filtered[i] !== null) lastVal = filtered[i];
+      else if (lastVal !== null) filtered[i] = lastVal;
+    }
+    
+    return filtered;
+  } catch(e) {
+    console.warn('Failed to fetch benchmark data:', e);
+    return null;
+  }
+}
+
+function getBenchmarkLabel(benchmark) {
+  const labels = {
+    nifty50: 'Nifty 50',
+    nifty200: 'Nifty 200',
+    smallcap: 'Nifty Small Cap 100'
+  };
+  return labels[benchmark] || benchmark;
+}
+
+
+
+// Restore benchmark preference
+function restoreBenchmark() {
+  try {
+    const saved = sessionStorage.getItem('active_benchmark');
+    if (saved && (saved === 'none' || saved === 'nifty50' || saved === 'nifty200' || saved === 'smallcap')) {
+      activeBenchmark = saved;
+      // Update UI after charts render
+      setTimeout(() => {
+        const btn = document.querySelector(`.benchmark-btn[data-benchmark="${saved}"]`);
+        if (btn) {
+          document.querySelectorAll('.benchmark-btn').forEach(b => {
+            b.style.background = 'transparent';
+            b.style.color = 'var(--text2)';
+          });
+          btn.style.background = 'var(--accent)';
+          btn.style.color = 'white';
+        }
+      }, 100);
+    }
   } catch(e) {}
 }
 
@@ -621,9 +844,37 @@ function renderDashboardInPlace() {
     renderHoldingsTable();
   }
 
+  restoreChartDisplayMode();
   updateRefreshTimestamp();
+  restoreBenchmarks();
   restoreChartSection();
   restoreMainView();
+  restoreBenchmark();
+}
+
+// Restore time filter button state
+function restoreTimeFilterUI() {
+  const savedFilter = state.currentFilter || '1M';
+  const timeFilters = document.querySelectorAll('.time-filters .tf-btn');
+  
+  timeFilters.forEach(btn => {
+    const btnFilter = btn.getAttribute('onclick');
+    let filterValue = null;
+    if (btnFilter) {
+      const match = btnFilter.match(/setTimeFilter\('([^']+)'/);
+      if (match) filterValue = match[1];
+    }
+    
+    if (filterValue === savedFilter) {
+      btn.classList.add('active');
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+    } else {
+      btn.classList.remove('active');
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--text2)';
+    }
+  });
 }
 
 function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,

@@ -8,7 +8,7 @@ import {
   loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
   setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, 
   sortHoldingsTable, setHoldingsView, toggleChartSection, restoreChartSection,
-  toggleMainView , setPortfolioView
+  toggleMainView , setPortfolioView 
 } from './dashboard.js';
 
 import { setTimeFilter } from './charts.js';
@@ -19,8 +19,21 @@ import { state } from './state.js';
 import { processCSV } from './fileHandler.js';
 import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS, destroyAllCharts } from './charts.js';
+import { toggleBenchmark } from './charts.js';
+
+import { toggleChartDisplayMode, restoreChartDisplayMode } from './charts.js';
+
+import { restoreBenchmarks } from './charts.js';
+
+// Add to window exports
+window.toggleBenchmark = toggleBenchmark;
+window.restoreBenchmarks = restoreBenchmarks;
+
 
 // Expose globals
+window.toggleChartDisplayMode = toggleChartDisplayMode;
+window.restoreChartDisplayMode = restoreChartDisplayMode;
+window.toggleBenchmark = toggleBenchmark;
 window.toggleMainView = toggleMainView;
 window.toggleChartSection = toggleChartSection;
 window.restoreChartSection = restoreChartSection;

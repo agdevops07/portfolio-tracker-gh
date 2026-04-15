@@ -120,42 +120,55 @@
             </div>
           </div>
           
-          <!-- Intraday Performance -->
-          <div id="intraday-section" class="chart-card" style="margin-bottom:1rem;">
-            <div class="chart-header">
-              <div class="chart-title">Intraday Performance <span class="chart-subtitle">(15-min delay)</span></div>
-              <button class="icon-btn" title="Maximize" onclick="maximizeSection('day-chart-body','portfolioDayChart')">⤢</button>
-            </div>
-            <div id="day-chart-body">
-              <div id="portfolio-day-wrap" class="chart-wrap" style="height:400px;">
-                <canvas id="portfolioDayChart"></canvas>
-              </div>
-            </div>
+      <!-- Intraday Performance -->
+      <div id="intraday-section" class="chart-card" style="margin-bottom:1rem;">
+        <div class="chart-header">
+          <div class="chart-title">Intraday Performance <span class="chart-subtitle">(15-min delay)</span></div>
+          <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
+            <button id="intraday-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
+            <button id="intraday-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
           </div>
+        </div>
+        <div id="day-chart-body">
+          <div id="portfolio-day-wrap" class="chart-wrap" style="height:400px;">
+            <canvas id="portfolioDayChart"></canvas>
+          </div>
+        </div>
+      </div>
 
-          <!-- Historical Performance -->
-          <div id="historical-section" class="chart-card" style="margin-bottom:1rem; display:none;">
-            <div class="chart-header">
-              <div class="chart-title">Historical Performance <span id="port-period-chg" style="font-size:13px;font-weight:700;"></span></div>
-              <div class="time-filters">
-                <button class="tf-btn" onclick="setTimeFilter('1M',this)">1M</button>
-                <button class="tf-btn" onclick="setTimeFilter('3M',this)">3M</button>
-                <button class="tf-btn active" onclick="setTimeFilter('1Y',this)">1Y</button>
-                <button class="tf-btn" onclick="setTimeFilter('ALL',this)">ALL</button>
-                <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)">Custom</button>
-              </div>
-              <button class="icon-btn" title="Maximize" onclick="maximizeChart(null,'portfolio-chart-body','portfolioChart')">⤢</button>
+      <!-- Historical Performance -->
+      <div id="historical-section" class="chart-card" style="margin-bottom:1rem; display:none;">
+        <div class="chart-header">
+          <div class="chart-title">Historical Performance <span id="port-period-chg" style="font-size:13px;font-weight:700;"></span></div>
+          <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+            <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
+              <button id="historical-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
+              <button id="historical-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
             </div>
-            <div id="portfolio-chart-body">
-              <div id="port-custom-wrap" style="display:none;align-items:center;gap:8px;padding:0.5rem 0 0.75rem;flex-wrap:wrap;">
-                <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-                <span style="color:var(--text3)">to</span>
-                <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-size:12px;">
-                <button class="tf-btn active" onclick="applyPortCustom()">Apply</button>
-              </div>
-              <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+            <div class="benchmark-toggle" style="display:flex; gap:6px; background:var(--bg3); padding:4px 12px; border-radius:40px; flex-wrap:wrap;">
+              <span style="font-size:11px; color:var(--text3);">Compare:</span>
+              <button class="benchmark-btn" data-benchmark="nifty50" onclick="toggleBenchmark('nifty50')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty 50</button>
+              <button class="benchmark-btn" data-benchmark="niftyBank" onclick="toggleBenchmark('niftyBank')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty Bank</button>
+              <button class="benchmark-btn" data-benchmark="niftyMidcap" onclick="toggleBenchmark('niftyMidcap')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Nifty Midcap 50</button>
+            </div>
+            <div class="time-filters" style="display:flex; gap:4px; background:var(--bg3); padding:4px 12px; border-radius:40px;">
+              <button class="tf-btn" onclick="setTimeFilter('1M',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">1M</button>
+              <button class="tf-btn" onclick="setTimeFilter('3M',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">3M</button>
+              <button class="tf-btn active" onclick="setTimeFilter('1Y',this)" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">1Y</button>
+              <button class="tf-btn" onclick="setTimeFilter('CUSTOM',this)" style="background:transparent; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text2);">Custom</button>
             </div>
           </div>
+        </div>
+        <div id="portfolio-chart-body">
+          <div id="port-custom-wrap" style="display:none; align-items:center; gap:12px; padding:1rem 0; flex-wrap:wrap; justify-content:flex-end;">
+            <input type="date" id="port-from" name="port-from" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;">
+            <span style="color:var(--text3)">→</span>
+            <input type="date" id="port-to" name="port-to" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 12px;font-size:12px;">
+            <button class="tf-btn active" onclick="applyPortCustom()" style="background:var(--accent);color:white;border:none;padding:6px 16px;border-radius:8px;">Apply</button>
+          </div>
+          <div class="chart-wrap" style="height:420px;"><canvas id="portfolioChart"></canvas></div>
+        </div>
+      </div>
 
           <!-- P&L Analysis -->
           <div id="pnl-section" class="two-col" style="margin-bottom:0; display:none;">
