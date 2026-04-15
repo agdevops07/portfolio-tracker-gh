@@ -146,13 +146,43 @@
     </div><!-- /overview -->
 
     <!-- HOLDINGS TAB -->
-    <div id="dash-tab-holdings" style="display:none">
-      <div class="section-header" style="margin-top:0.5rem">
-        <div class="section-title">Holdings</div>
-        <button class="holdings-detail-btn" onclick="openHoldingsModal()">📋 Full Holdings View</button>
-      </div>
-      <div class="holdings-grid" id="holdings-grid"></div>
-    </div>
+<!-- Add this to dashboard.html inside the HOLDINGS TAB section, replacing the existing holdings-grid -->
+<div class="holdings-view-controls" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+  <div class="view-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:var(--r-sm); padding:2px;">
+    <button id="holdings-table-view-btn" class="view-toggle-btn active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">📋 Table View</button>
+    <button id="holdings-card-view-btn" class="view-toggle-btn" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s;">🃏 Card View</button>
+  </div>
+  <div class="holdings-actions" style="display:flex; gap:8px;">
+    <button class="holdings-detail-btn" onclick="exportHoldingsCSV()" style="background:var(--bg4); border:1px solid var(--border2); color:var(--text2); padding:6px 14px; border-radius:var(--r-sm); font-size:12px; font-weight:600; cursor:pointer;">📥 Export CSV</button>
+  </div>
+</div>
+
+<div id="holdings-table-container" style="display:block; overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
+  <table class="holdings-table" style="width:100%; border-collapse:collapse; font-size:12px;">
+    <thead>
+      <tr style="background:var(--bg3);">
+        <th onclick="sortHoldingsTable('ticker')" style="padding:12px 16px; text-align:left; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Ticker</th>
+        <th onclick="sortHoldingsTable('totalQty')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Qty</th>
+        <th onclick="sortHoldingsTable('avgBuy')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Avg Buy</th>
+        <th onclick="sortHoldingsTable('livePrice')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Live Price</th>
+        <th onclick="sortHoldingsTable('prevClose')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Prev Close</th>
+        <th onclick="sortHoldingsTable('invested')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Invested</th>
+        <th onclick="sortHoldingsTable('currentVal')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Current Value</th>
+        <th onclick="sortHoldingsTable('pnlAbs')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (₹)</th>
+        <th onclick="sortHoldingsTable('pnlPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (%)</th>
+        <th onclick="sortHoldingsTable('dayChgAbs')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day Change</th>
+        <th onclick="sortHoldingsTable('dayChgPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day %</th>
+        <th onclick="sortHoldingsTable('allocPct')" style="padding:12px 16px; text-align:right; cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text3); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Allocation</th>
+      </tr>
+    </thead>
+    <tbody id="holdings-table-tbody"></tbody>
+  </table>
+</div>
+
+<div id="holdings-card-container" style="display:none;">
+  <div class="holdings-grid" id="holdings-grid"></div>
+</div>
+
   </div>
 </div>
 

@@ -267,7 +267,12 @@ export function renderDashboard() {
   renderTodayPnlChart(holdings);
   renderPieChart(holdings, totalCurrent);
   renderPnlChart(holdings);
-  renderHoldingCards(holdings, totalCurrent);
+  if (holdingsView === 'table') {
+    renderHoldingsTable();
+  } else {
+    renderHoldingCards(holdings, totalCurrent);
+  }
+
   updateRefreshTimestamp();
 }
 
@@ -302,7 +307,19 @@ function renderDashboardInPlace() {
   renderTodayPnlChart(holdings);
   renderPieChart(holdings, totalCurrent);
   renderPnlChart(holdings);
-  updateHoldingCardsInPlace(holdings, totalCurrent);
+  
+  // Update based on current view
+  if (holdingsView === 'table') {
+    renderHoldingsTable();
+  } else {
+    // Update card view in place if cards exist
+    const grid = document.getElementById('holdings-grid');
+    if (grid && grid.children.length === holdings.length) {
+      updateHoldingCardsInPlace(holdings, totalCurrent);
+    } else {
+      renderHoldingCards(holdings, totalCurrent);
+    }
+  }
 
   const modal = document.getElementById('holdings-modal');
   if (modal && modal.style.display !== 'none') {
@@ -311,7 +328,6 @@ function renderDashboardInPlace() {
 
   updateRefreshTimestamp();
 }
-
 function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
                             todayChange, todayChangePct, best, holdings }) {
   const hasPrevClose = todayChange !== null;
@@ -463,3 +479,164 @@ function updateHoldingCardsInPlace(holdings, totalCurrent) {
     }
   });
 }
+
+// Holdings view state
+let holdingsView = 'table'; // 'table' or 'card'
+let holdingsSort = { key: 'currentVal', asc: false };
+
+// Sort holdings table
+export function sortHoldingsTable(key) {
+  if (holdingsSort.key === key) {
+    holdingsSort.asc = !holdingsSort.asc;
+  } else {
+    holdingsSort.key = key;
+    holdingsSort.asc = false;
+  }
+  renderHoldingsTable();
+}
+
+// Set holdings view (table or card)
+export function setHoldingsView(view) {
+  holdingsView = view;
+  const tableContainer = document.getElementById('holdings-table-container');
+  const cardContainer = document.getElementById('holdings-card-container');
+  const tableViewBtn = document.getElementById('holdings-table-view-btn');
+  const cardViewBtn = document.getElementById('holdings-card-view-btn');
+  
+  if (view === 'table') {
+    tableContainer.style.display = 'block';
+    cardContainer.style.display = 'none';
+    tableViewBtn.style.background = 'var(--accent)';
+    tableViewBtn.style.color = 'white';
+    cardViewBtn.style.background = 'transparent';
+    cardViewBtn.style.color = 'var(--text2)';
+    renderHoldingsTable();
+  } else {
+    tableContainer.style.display = 'none';
+    cardContainer.style.display = 'block';
+    cardViewBtn.style.background = 'var(--accent)';
+    cardViewBtn.style.color = 'white';
+    tableViewBtn.style.background = 'transparent';
+    tableViewBtn.style.color = 'var(--text2)';
+    renderHoldingCards(Object.values(state.holdings), getTotalCurrent());
+  }
+}
+
+// Helper to calculate total current value
+function getTotalCurrent() {
+  let total = 0;
+  Object.values(state.holdings).forEach(h => {
+    const lp = state.livePrices[h.ticker];
+    if (lp) total += lp * h.totalQty;
+  });
+  return total;
+}
+
+// Compute row data for table
+function computeTableRow(h, totalCurrent, i) {
+  const lp = state.livePrices[h.ticker];
+  const pc = state.prevClosePrices[h.ticker];
+  const currentVal = lp ? lp * h.totalQty : null;
+  const pnlAbs = currentVal != null ? currentVal - h.invested : null;
+  const pnlPct = pnlAbs != null ? (pnlAbs / h.invested) * 100 : null;
+  const allocPct = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
+  const dayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+  const dayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
+  return { h, lp, pc, currentVal, pnlAbs, pnlPct, allocPct, dayChgAbs, dayChgPct, color: COLORS[i % COLORS.length] };
+}
+
+// Render holdings table
+function renderHoldingsTable() {
+  const holdings = Object.values(state.holdings);
+  const totalCurrent = getTotalCurrent();
+  
+  const rows = holdings.map((h, i) => computeTableRow(h, totalCurrent, i));
+  
+  // Sort
+  rows.sort((a, b) => {
+    let va, vb;
+    switch (holdingsSort.key) {
+      case 'ticker':     va = a.h.ticker;    vb = b.h.ticker;    break;
+      case 'totalQty':   va = a.h.totalQty;  vb = b.h.totalQty;  break;
+      case 'avgBuy':     va = a.h.avgBuy;    vb = b.h.avgBuy;    break;
+      case 'livePrice':  va = a.lp ?? -Infinity;  vb = b.lp ?? -Infinity; break;
+      case 'prevClose':  va = a.pc ?? -Infinity;  vb = b.pc ?? -Infinity; break;
+      case 'invested':   va = a.h.invested;  vb = b.h.invested;  break;
+      case 'currentVal': va = a.currentVal ?? -Infinity; vb = b.currentVal ?? -Infinity; break;
+      case 'pnlAbs':     va = a.pnlAbs ?? -Infinity;    vb = b.pnlAbs ?? -Infinity;    break;
+      case 'pnlPct':     va = a.pnlPct ?? -Infinity;    vb = b.pnlPct ?? -Infinity;    break;
+      case 'dayChgAbs':  va = a.dayChgAbs ?? -Infinity; vb = b.dayChgAbs ?? -Infinity; break;
+      case 'dayChgPct':  va = a.dayChgPct ?? -Infinity; vb = b.dayChgPct ?? -Infinity; break;
+      case 'allocPct':   va = a.allocPct ?? -Infinity;  vb = b.allocPct ?? -Infinity;  break;
+      default:           va = a.currentVal ?? -Infinity; vb = b.currentVal ?? -Infinity;
+    }
+    if (typeof va === 'string') return holdingsSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return holdingsSort.asc ? va - vb : vb - va;
+  });
+  
+  // Update sort indicators on headers
+  // Update sort indicators on headers - FIXED VERSION
+  const headers = document.querySelectorAll('.holdings-table th');
+  headers.forEach(th => {
+    // Get the original onclick attribute to determine which column this is
+    const onclickAttr = th.getAttribute('onclick');
+    let columnKey = null;
+    if (onclickAttr) {
+      const match = onclickAttr.match(/sortHoldingsTable\('([^']+)'\)/);
+      if (match) columnKey = match[1];
+    }
+    
+    // Get the base text (remove any existing arrow)
+    let baseText = th.textContent.replace(/[ ↑↓]/g, '');
+    
+    // Add arrow if this is the sorted column
+    if (columnKey === holdingsSort.key) {
+      th.textContent = baseText + (holdingsSort.asc ? ' ↑' : ' ↓');
+    } else {
+      th.textContent = baseText;
+    }
+  });
+  const tbody = document.getElementById('holdings-table-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  rows.forEach(({ h, lp, pc, currentVal, pnlAbs, pnlPct, allocPct, dayChgAbs, dayChgPct, color }) => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.title = 'Click to view stock detail';
+    tr.onclick = () => import('./drilldown.js').then((m) => m.openDrilldown(h.ticker));
+    tr.innerHTML = `
+      <td style="padding:10px 16px; border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
+          <strong>${h.ticker}</strong>
+        </div>
+      </td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border);">${h.totalQty}</td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border);">${h.avgBuy.toFixed(2)}</td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); font-weight:600;">${lp ? lp.toFixed(2) : '—'}</td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); color:var(--text2);">${pc ? pc.toFixed(2) : '—'}</td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border);">${fmt(h.invested)}</td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); font-weight:600;">${currentVal ? fmt(currentVal) : '—'}</td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); color:${pnlAbs != null ? colorPnl(pnlAbs) : 'var(--text2)'}; font-weight:600;">
+        ${pnlAbs != null ? (pnlAbs >= 0 ? '+' : '') + fmt(Math.abs(pnlAbs)) : '—'}
+      </td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); color:${pnlPct != null ? colorPnl(pnlPct) : 'var(--text2)'};">
+        ${pnlPct != null ? pct(pnlPct) : '—'}
+      </td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); color:${dayChgAbs != null ? colorPnl(dayChgAbs) : 'var(--text2)'};">
+        ${dayChgAbs != null ? (dayChgAbs >= 0 ? '+' : '') + fmt(Math.abs(dayChgAbs)) : '—'}
+      </td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border); color:${dayChgPct != null ? colorPnl(dayChgPct) : 'var(--text2)'};">
+        ${dayChgPct != null ? pct(dayChgPct) : '—'}
+      </td>
+      <td style="padding:10px 16px; text-align:right; border-bottom:1px solid var(--border);">
+        ${allocPct != null ? allocPct.toFixed(1) + '%' : '—'}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Update the existing renderDashboard function to call renderHoldingsTable
+// Find the line that calls renderHoldingCards and replace/update accordingly

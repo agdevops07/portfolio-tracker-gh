@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════
 
 import { openStockPicker, closeStockPicker } from './stockPicker.js';
-import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser } from './dashboard.js';
+import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, sortHoldingsTable, setHoldingsView } from './dashboard.js';
 import { setTimeFilter } from './charts.js';
 import { showDashboard } from './utils.js';
 import { exportHoldingsCSV, exportPDF, toggleExportMenu } from './export.js';
@@ -14,6 +14,8 @@ import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS, destroyAllCharts } from './charts.js';
 
 // Expose globals
+window.sortHoldingsTable = sortHoldingsTable;
+window.setHoldingsView = setHoldingsView;
 window.openStockPicker    = openStockPicker;
 window.closeStockPicker   = closeStockPicker;
 window.loadDashboard      = loadDashboard;
@@ -27,9 +29,9 @@ window.exportHoldingsCSV  = exportHoldingsCSV;
 window.exportPDF          = exportPDF;
 window.toggleExportMenu   = toggleExportMenu;
 window.openDrilldown      = openDrilldown;
-window.openHoldingsModal  = openHoldingsModal;
-window.closeHoldingsModal = closeHoldingsModal;
-window.sortHoldingsModal  = sortHoldingsModal;
+// window.openHoldingsModal  = openHoldingsModal;
+// window.closeHoldingsModal = closeHoldingsModal;
+// window.sortHoldingsModal  = sortHoldingsModal;
 window._destroyAllCharts  = destroyAllCharts;
 window._stopAutoRefresh   = stopAutoRefresh;
 window.switchDashUser     = switchDashUser;  // ← ADD THIS
