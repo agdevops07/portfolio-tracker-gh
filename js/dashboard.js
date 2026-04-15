@@ -19,6 +19,23 @@ import {
 } from './charts.js';
 import { getFilteredHoldings } from './fileHandler.js';
 
+// Save current user to sessionStorage
+function saveCurrentUser(user) {
+  try {
+    sessionStorage.setItem('dashboard_active_user', user);
+  } catch(e) {}
+}
+
+// Restore saved user from sessionStorage
+function restoreCurrentUser() {
+  try {
+    const savedUser = sessionStorage.getItem('dashboard_active_user');
+    if (savedUser && (savedUser === 'all' || (state.users && state.users.includes(savedUser)))) {
+      return savedUser;
+    }
+  } catch(e) {}
+  return 'all';
+}
 
 export async function loadDashboard() {
   const ds = document.getElementById('dashboard-screen');
@@ -26,8 +43,22 @@ export async function loadDashboard() {
   if (ds) ds.style.display = 'block';
   if (dd) dd.style.display = 'none';
 
+  // Get saved tab from sessionStorage, default to 'overview'
+  let savedTab = 'overview';
+  try {
+    const stored = sessionStorage.getItem('dashboard_current_tab');
+    if (stored && (stored === 'overview' || stored === 'holdings')) {
+      savedTab = stored;
+    }
+  } catch(e) {}
+  
+  // Restore saved user
+  const savedUser = restoreCurrentUser();
+  state.activeUser = savedUser;
+  
+  // Only switch to saved tab if switchDashTab is available
   if (typeof window.switchDashTab === 'function') {
-    window.switchDashTab('overview', document.querySelector('[data-tab="overview"]'));
+    window.switchDashTab(savedTab, document.querySelector(`[data-tab="${savedTab}"]`));
   }
 
   const loadingDiv = document.getElementById('dash-loading');
@@ -82,6 +113,11 @@ export async function loadDashboard() {
     state.fullTimeSeries = await buildTimeSeries(histories);
     state.histories      = histories;
 
+    // Apply user filter if needed
+    if (state.activeUser && state.activeUser !== 'all') {
+      state.holdings = getFilteredHoldings(state.rawRows, state.activeUser);
+    }
+
     loadingDiv.style.display = 'none';
     contentDiv.style.display  = 'block';
     renderDashboard();
@@ -93,7 +129,6 @@ export async function loadDashboard() {
     loadingDiv.innerHTML = `<div class="error-box">Failed to load portfolio data: ${err.message}</div>`;
   }
 }
-
 export async function refreshPricesOnly() {
   showToast('Refreshing prices…');
   resetCaches();
@@ -209,7 +244,14 @@ export function renderUserTabs() {
     if (!wrap) return;
     if (users.length <= 1) { wrap.style.display = 'none'; return; }
     wrap.style.display = 'flex';
-    const active = state.activeUser || 'all';
+    
+    // Restore saved user, default to 'all' if none saved
+    let active = state.activeUser || restoreCurrentUser();
+    if (active !== 'all' && !users.includes(active)) {
+      active = 'all';
+    }
+    state.activeUser = active;
+    
     const tabs = ['all', ...users];
     wrap.innerHTML = tabs.map(u => `
       <button class="dash-user-tab${u === active ? ' active' : ''}" data-user="${u}"
@@ -224,6 +266,7 @@ export function renderUserTabs() {
 
 export function switchDashUser(user) {
   state.activeUser = user;
+  saveCurrentUser(user);  // Add this line
   state.holdings = getFilteredHoldings(state.rawRows, user);
   document.querySelectorAll('.dash-user-tab').forEach(t => {
     const isActive = t.dataset.user === user;
@@ -637,6 +680,3 @@ function renderHoldingsTable() {
     tbody.appendChild(tr);
   });
 }
-
-// Update the existing renderDashboard function to call renderHoldingsTable
-// Find the line that calls renderHoldingCards and replace/update accordingly

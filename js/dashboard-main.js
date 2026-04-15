@@ -29,19 +29,37 @@ window.exportHoldingsCSV  = exportHoldingsCSV;
 window.exportPDF          = exportPDF;
 window.toggleExportMenu   = toggleExportMenu;
 window.openDrilldown      = openDrilldown;
-// window.openHoldingsModal  = openHoldingsModal;
-// window.closeHoldingsModal = closeHoldingsModal;
-// window.sortHoldingsModal  = sortHoldingsModal;
 window._destroyAllCharts  = destroyAllCharts;
 window._stopAutoRefresh   = stopAutoRefresh;
-window.switchDashUser     = switchDashUser;  // ← ADD THIS
+window.switchDashUser     = switchDashUser;
 
 window.switchDashTab = function(tab, btn) {
-  document.querySelectorAll('.dash-tab').forEach(b => b.classList.toggle('active', b.dataset && b.dataset.tab === tab));
+  // Save current tab to sessionStorage
+  try {
+    sessionStorage.setItem('dashboard_current_tab', tab);
+  } catch(e) {}
+  
+  document.querySelectorAll('.dash-tab').forEach(b => {
+    if (b.dataset && b.dataset.tab === tab) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
+  });
+  
   const ov = document.getElementById('dash-tab-overview');
   const ho = document.getElementById('dash-tab-holdings');
   if (ov) ov.style.display = tab === 'overview' ? '' : 'none';
   if (ho) ho.style.display = tab === 'holdings' ? '' : 'none';
+  
+  // Re-render holdings table when switching to holdings tab
+  if (tab === 'holdings') {
+    setTimeout(() => {
+      if (typeof renderHoldingsTable === 'function') {
+        renderHoldingsTable();
+      }
+    }, 50);
+  }
 };
 
 async function loadStocksDB() {
@@ -61,6 +79,7 @@ async function loadStocksDB() {
   });
 }
 
+// Main DOMContentLoaded - ONLY ONE
 document.addEventListener('DOMContentLoaded', async () => {
   await loadStocksDB();
   
@@ -92,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   
   await new Promise(r => setTimeout(r, 100));
-  await loadDashboard();
+  await loadDashboard();  // This will now restore the saved tab
   
   document.addEventListener('click', e => {
     const card = e.target.closest('.holding-card[data-ticker]');
@@ -106,6 +125,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
+// Remove the duplicate DOMContentLoaded that was trying to restore the tab
+// The modal-related functions can stay but aren't used
 const modalSort = { key: 'currentVal', asc: false };
 
 export function sortHoldingsModal(key) {
