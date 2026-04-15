@@ -26,6 +26,32 @@ function saveCurrentUser(user) {
   } catch(e) {}
 }
 
+// Rebuild time series based on current filtered holdings
+async function rebuildTimeSeriesForCurrentUser() {
+  const holdings = Object.values(state.holdings);
+  if (!holdings.length) {
+    state.fullTimeSeries = [];
+    return;
+  }
+  
+  // Get histories for current filtered holdings
+  const histories = {};
+  for (const h of holdings) {
+    if (state.histories[h.ticker]) {
+      histories[h.ticker] = state.histories[h.ticker];
+    } else {
+      // Fetch history if not available
+      const hist = await fetchHistory(h.ticker, h.upstoxTicker, '2y');
+      const filled = (hist && Object.keys(hist).length > 0) ? forwardFill(hist) : {};
+      histories[h.ticker] = filled;
+      state.histories[h.ticker] = filled;
+    }
+  }
+  
+  // Rebuild time series
+  state.fullTimeSeries = await buildTimeSeries(histories);
+}
+
 // Restore saved user from sessionStorage
 function restoreCurrentUser() {
   try {
@@ -264,19 +290,25 @@ export function renderUserTabs() {
   });
 }
 
-export function switchDashUser(user) {
+export async function switchDashUser(user) {
   state.activeUser = user;
-  saveCurrentUser(user);  // Add this line
+  saveCurrentUser(user);
   state.holdings = getFilteredHoldings(state.rawRows, user);
+  
+  // Update user tab UI
   document.querySelectorAll('.dash-user-tab').forEach(t => {
     const isActive = t.dataset.user === user;
     t.classList.toggle('active', isActive);
     t.style.background = isActive ? 'var(--accent)' : 'var(--bg3)';
     t.style.color = isActive ? '#fff' : 'var(--text2)';
   });
+  
+  // Rebuild time series for the filtered holdings
+  await rebuildTimeSeriesForCurrentUser();
+  
+  // Re-render dashboard with new data
   renderDashboard();
 }
-
 export function renderDashboard() {
   renderUserTabs();
   const holdings = Object.values(state.holdings);
