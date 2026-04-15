@@ -11,6 +11,14 @@ export const COLORS = [
   '#3b82f6', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316', '#06b6d4',
 ];
 
+// Color palette for benchmarks
+const BENCHMARK_COLORS = {
+  nifty50: '#f59e0b',
+  niftyBank: '#06b6d4',
+  niftyFinancial: '#ec4899',
+  niftyMidcap: '#10b981'
+};
+
 const TOOLTIP_DEFAULTS = {
   backgroundColor: '#1a1a1f',
   borderColor: 'rgba(255,255,255,0.1)',
@@ -32,6 +40,464 @@ function makeGrad(ctx, h, upColor, downColor) {
   return grad;
 }
 
+// Chart display mode state ('percentage' or 'absolute')
+let chartDisplayMode = 'percentage';
+
+// Selected benchmarks for comparison (multiple)
+let selectedBenchmarks = new Set();
+
+// Benchmark configuration with Upstox keys
+const BENCHMARK_CONFIG = {
+  nifty50: {
+    name: 'Nifty 50',
+    upstoxKey: 'NSE_INDEX|Nifty 50',
+    color: '#f59e0b'
+  },
+  niftyBank: {
+    name: 'Nifty Bank',
+    upstoxKey: 'NSE_INDEX|Nifty Bank',
+    color: '#06b6d4'
+  },
+  niftyMidcap: {
+    name: 'Nifty Midcap 50',
+    upstoxKey: 'NSE_INDEX|Nifty Midcap 50',
+    color: '#10b981'
+  }
+};
+
+// Add function to fetch intraday data for benchmarks
+async function fetchBenchmarkIntraday(benchmark) {
+  const config = BENCHMARK_CONFIG[benchmark];
+  if (!config) return null;
+  
+  try {
+    const { fetchDayHistory } = await import('./api.js');
+    // Use the upstoxKey to fetch intraday data
+    const intradayData = await fetchDayHistory(config.upstoxKey, null);
+    if (intradayData && intradayData.length > 0) {
+      return intradayData;
+    }
+  } catch(e) {
+    console.warn(`Failed to fetch intraday data for ${benchmark}:`, e);
+  }
+  return null;
+}
+
+// Process intraday benchmark data - normalize to percentage change from previous close
+function processBenchmarkIntraday(intradayData, prevClose) {
+  if (!intradayData || !intradayData.length || !prevClose) return null;
+  
+  return intradayData.map(point => ({
+    time: point.time,
+    price: point.price,
+    changePercent: ((point.price - prevClose) / prevClose) * 100
+  }));
+}
+
+// Get benchmark label
+function getBenchmarkLabel(benchmark) {
+  return BENCHMARK_CONFIG[benchmark]?.name || benchmark;
+}
+
+// Fetch benchmark data using Upstox
+async function fetchBenchmarkData(benchmark, dates) {
+  const config = BENCHMARK_CONFIG[benchmark];
+  if (!config) return null;
+  
+  try {
+    const { fetchHistory } = await import('./api.js');
+    const hist = await fetchHistory(config.upstoxKey, null, '2y');
+    if (hist && Object.keys(hist).length > 0) {
+      return hist;
+    }
+  } catch(e) {
+    console.warn(`Failed to fetch ${benchmark}:`, e);
+  }
+  
+  return null;
+}
+
+// Process benchmark history data - normalize to percentage based on period start
+function processBenchmarkHistory(hist, dates, periodStartValue = null) {
+  const filtered = [];
+  let firstValue = periodStartValue;
+  
+  // If no period start value provided, find the first available price for the first date
+  if (!firstValue) {
+    const firstDate = dates[0];
+    let price = hist[firstDate];
+    if (!price) {
+      const prevDates = Object.keys(hist).filter(d => d <= firstDate).sort();
+      if (prevDates.length) price = hist[prevDates[prevDates.length - 1]];
+    }
+    firstValue = price;
+  }
+  
+  if (!firstValue) return null;
+  
+  for (const date of dates) {
+    let price = hist[date];
+    if (!price) {
+      const prevDates = Object.keys(hist).filter(d => d <= date).sort();
+      if (prevDates.length) price = hist[prevDates[prevDates.length - 1]];
+    }
+    if (price) {
+      filtered.push((price / firstValue) * 100);
+    } else {
+      filtered.push(null);
+    }
+  }
+  
+  // Forward fill nulls
+  let lastVal = null;
+  for (let i = 0; i < filtered.length; i++) {
+    if (filtered[i] !== null) lastVal = filtered[i];
+    else if (lastVal !== null) filtered[i] = lastVal;
+  }
+  
+  return filtered;
+}
+
+// Toggle benchmark selection (multiple allowed)
+export function toggleBenchmark(benchmark) {
+  if (selectedBenchmarks.has(benchmark)) {
+    selectedBenchmarks.delete(benchmark);
+  } else {
+    selectedBenchmarks.add(benchmark);
+  }
+  
+  // Update button styles
+  document.querySelectorAll('.benchmark-btn').forEach(btn => {
+    const btnBenchmark = btn.getAttribute('data-benchmark');
+    if (selectedBenchmarks.has(btnBenchmark)) {
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--text2)';
+    }
+  });
+  
+  // Save preference
+  try {
+    sessionStorage.setItem('selected_benchmarks', JSON.stringify([...selectedBenchmarks]));
+  } catch(e) {}
+  
+  // Refresh charts
+  renderPortfolioChart(state.currentFilter);
+  renderPortfolioDayChart();
+}
+
+// Save time filter preference
+function saveTimeFilter(filter) {
+  try {
+    sessionStorage.setItem('time_filter', filter);
+  } catch(e) {}
+}
+
+// Restore time filter preference
+function restoreTimeFilter() {
+  try {
+    const saved = sessionStorage.getItem('time_filter');
+    if (saved && (saved === '1M' || saved === '3M' || saved === '1Y' || saved === 'CUSTOM')) {
+      return saved;
+    }
+  } catch(e) {}
+  return '1M'; // Default to 1M
+}
+
+// Restore benchmark preferences
+// Restore benchmark preferences
+export function restoreBenchmarks() {
+  try {
+    const saved = sessionStorage.getItem('selected_benchmarks');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        selectedBenchmarks.clear();
+        parsed.forEach(b => {
+          // Only add if the benchmark still exists in config
+          if (BENCHMARK_CONFIG[b]) selectedBenchmarks.add(b);
+        });
+        // Update UI
+        document.querySelectorAll('.benchmark-btn').forEach(btn => {
+          const btnBenchmark = btn.getAttribute('data-benchmark');
+          if (selectedBenchmarks.has(btnBenchmark)) {
+            btn.style.background = 'var(--accent)';
+            btn.style.color = 'white';
+          } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'var(--text2)';
+          }
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+// Toggle chart display mode
+export function toggleChartDisplayMode(mode) {
+  chartDisplayMode = mode;
+  
+  document.querySelectorAll('.display-mode-btn').forEach(btn => {
+    const btnMode = btn.getAttribute('data-mode');
+    if (btnMode === mode) {
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--text2)';
+    }
+  });
+  
+  try {
+    sessionStorage.setItem('chart_display_mode', mode);
+  } catch(e) {}
+  
+  renderPortfolioChart(state.currentFilter);
+  renderPortfolioDayChart();
+}
+
+export function restoreChartDisplayMode() {
+  try {
+    const saved = sessionStorage.getItem('chart_display_mode');
+    if (saved && (saved === 'percentage' || saved === 'absolute')) {
+      chartDisplayMode = saved;
+      document.querySelectorAll('.display-mode-btn').forEach(btn => {
+        const btnMode = btn.getAttribute('data-mode');
+        if (btnMode === saved) {
+          btn.style.background = 'var(--accent)';
+          btn.style.color = 'white';
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--text2)';
+        }
+      });
+    }
+  } catch(e) {}
+  return chartDisplayMode;
+}
+
+// Calculate ATH (All Time High) from full history
+function getATHFromFullHistory(series) {
+  if (!series || !series.length) return null;
+  const maxValue = Math.max(...series.map(p => p.value));
+  const athPoint = series.find(p => p.value === maxValue);
+  return { value: maxValue, date: athPoint?.date };
+}
+
+// Render portfolio chart with benchmark support
+async function renderPortfolioChartWithBenchmark(filter) {
+  const portFromEl = document.getElementById('port-from');
+  const portToEl = document.getElementById('port-to');
+  const _today = new Date().toISOString().split('T')[0];
+  const portCustom = { active: true, from: '2026-03-31', to: _today };
+  
+  if (portFromEl && !portFromEl.value) portFromEl.value = portCustom.from;
+  if (portToEl && !portToEl.value) portToEl.value = portCustom.to;
+
+  // Restore saved time filter if not already set
+  if (!state.currentFilter || state.currentFilter === '1Y') {
+    const savedFilter = restoreTimeFilter();
+    if (savedFilter !== state.currentFilter) {
+      state.currentFilter = savedFilter;
+      // Update the active button UI
+      const activeBtn = document.querySelector(`.tf-btn[onclick*="${savedFilter}"]`);
+      if (activeBtn) {
+        const portFilters = activeBtn.closest('.time-filters');
+        if (portFilters) {
+          portFilters.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+          activeBtn.classList.add('active');
+        }
+      }
+    }
+  }
+
+  let series;
+  if (filter === 'CUSTOM') {
+    const from = document.getElementById('port-from')?.value;
+    const to = document.getElementById('port-to')?.value;
+    if (from && to) {
+      series = state.fullTimeSeries.filter(p => p.date >= from && p.date <= to);
+    } else {
+      series = state.fullTimeSeries;
+    }
+  } else {
+    series = filterTimeSeries(filter);
+  }
+
+  if (!series.length) return;
+
+  const rawDates = series.map(p => p.date);
+  const labels = rawDates.map(d => formatDateLabel(d));
+  const portfolioValues = series.map(p => p.value);
+  
+  const startValue = portfolioValues[0];
+  const endValue = portfolioValues[portfolioValues.length - 1];
+  const periodChg = ((endValue - startValue) / startValue) * 100;
+  
+  // Calculate ATH from full history
+  const ath = getATHFromFullHistory(state.fullTimeSeries);
+  const athChg = ath ? ((endValue - ath.value) / ath.value) * 100 : null;
+  
+  // Update period change and ATH badge
+  const periodChgEl = document.getElementById('port-period-chg');
+  if (periodChgEl) {
+    let athHtml = '';
+    if (athChg !== null && Math.abs(athChg) > 0.01) {
+      const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
+      athHtml = `<span style="color:${athColor};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:2px 8px;border-radius:4px;margin-left:8px;">${athChg >= 0 ? '+' : ''}${athChg.toFixed(2)}% from ATH (${ath.date})</span>`;
+    }
+    periodChgEl.innerHTML = `<span style="color:${periodChg >= 0 ? 'var(--green)' : 'var(--red)'}">${periodChg >= 0 ? '+' : ''}${periodChg.toFixed(2)}%</span>${athHtml}`;
+  }
+  
+  let portfolioData, yAxisLabel, yAxisCallback;
+  
+  if (chartDisplayMode === 'percentage') {
+    portfolioData = portfolioValues.map(v => ((v - startValue) / startValue) * 100);
+    yAxisLabel = 'Change (%)';
+    yAxisCallback = (v) => v.toFixed(1) + '%';
+  } else {
+    portfolioData = portfolioValues;
+    yAxisLabel = 'Portfolio Value (₹)';
+    yAxisCallback = (v) => {
+      if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
+      if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+      return '₹' + v.toLocaleString('en-IN');
+    };
+  }
+  
+  const datasets = [{
+    label: 'Portfolio',
+    data: portfolioData,
+    borderColor: '#6366f1',
+    borderWidth: 2.5,
+    backgroundColor: 'rgba(99,102,241,0.05)',
+    fill: true,
+    pointRadius: 0,
+    pointHoverRadius: 5,
+    tension: 0.3,
+    order: 0
+  }];
+  
+  // Add selected benchmarks (only in percentage mode)
+// Add selected benchmarks (only in percentage mode)
+if (chartDisplayMode === 'percentage') {
+  for (const benchmark of selectedBenchmarks) {
+    const fullHist = await fetchBenchmarkData(benchmark, rawDates);
+    if (fullHist && Object.keys(fullHist).length > 0) {
+      // Get the starting price for the period
+      let periodStartPrice = null;
+      const firstDate = rawDates[0];
+      periodStartPrice = fullHist[firstDate];
+      if (!periodStartPrice) {
+        const prevDates = Object.keys(fullHist).filter(d => d <= firstDate).sort();
+        if (prevDates.length) periodStartPrice = fullHist[prevDates[prevDates.length - 1]];
+      }
+      
+      if (periodStartPrice) {
+        // Calculate percentage CHANGE from period start (so it starts at 0%, same as portfolio)
+        const benchmarkData = rawDates.map(date => {
+          let price = fullHist[date];
+          if (!price) {
+            const prevDates = Object.keys(fullHist).filter(d => d <= date).sort();
+            if (prevDates.length) price = fullHist[prevDates[prevDates.length - 1]];
+          }
+          if (price) {
+            // Return percentage CHANGE, not normalized value
+            return ((price - periodStartPrice) / periodStartPrice) * 100;
+          }
+          return null;
+        });
+        
+        // Forward fill nulls
+        let lastVal = null;
+        for (let i = 0; i < benchmarkData.length; i++) {
+          if (benchmarkData[i] !== null) lastVal = benchmarkData[i];
+          else if (lastVal !== null) benchmarkData[i] = lastVal;
+        }
+        
+        if (benchmarkData.some(v => v !== null)) {
+          datasets.push({
+            label: getBenchmarkLabel(benchmark),
+            data: benchmarkData,
+            borderColor: BENCHMARK_CONFIG[benchmark]?.color || '#f59e0b',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            backgroundColor: 'transparent',
+            fill: false,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            tension: 0.3,
+            order: 1
+          });
+        }
+      }
+    }
+  }
+}
+  
+  if (state.portfolioChartInstance) state.portfolioChartInstance.destroy();
+  
+  const ctx = document.getElementById('portfolioChart').getContext('2d');
+  
+  state.portfolioChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          position: 'top', 
+          labels: { 
+            color: '#a0a0b0', 
+            usePointStyle: true, 
+            boxWidth: 10,
+            font: { size: 11 }
+          } 
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: '#1a1a1f',
+          titleColor: '#8a8a9a',
+          bodyColor: '#f0f0f5',
+          callbacks: {
+            label: (context) => {
+              let value = context.parsed.y;
+              if (chartDisplayMode === 'percentage') {
+                return `${context.dataset.label}: ${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+              } else {
+                return `${context.dataset.label}: ₹${value.toLocaleString('en-IN')}`;
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        x: { 
+          grid: { color: 'rgba(255,255,255,0.04)' }, 
+          ticks: { color: '#7777a0', maxRotation: 0, font: { size: 10 } }
+        },
+        y: { 
+          grid: { color: 'rgba(255,255,255,0.04)' }, 
+          ticks: { color: '#7777a0', callback: yAxisCallback, font: { size: 10 } },
+          title: { display: true, text: yAxisLabel, color: '#7777a0', font: { size: 11 } }
+        }
+      },
+      interaction: { mode: 'index', intersect: false }
+    }
+  });
+  
+  if (!window._chartInstances) window._chartInstances = {};
+  window._chartInstances['portfolioChart'] = state.portfolioChartInstance;
+}
+
+export async function renderPortfolioChart(filter) {
+  await renderPortfolioChartWithBenchmark(filter);
+}
+
 function noDataMsg(container, msg = 'No data available') {
   container.innerHTML = `<div style="color:var(--text2);text-align:center;padding:2rem;font-size:13px;">${msg}</div>`;
 }
@@ -41,120 +507,31 @@ function formatDateLabel(dateStr) {
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 }
 
-// ── Portfolio custom date state ──────────────────
-// Default: 31 March 2026 → today
+// Portfolio custom date state
 const _today = new Date().toISOString().split('T')[0];
 const portCustom = { active: true, from: '2026-03-31', to: _today };
 
-function filterPortfolioCustom(from, to) {
-  const all = state.fullTimeSeries;
-  return all.filter(p => p.date >= from && p.date <= to);
-}
-
-function updatePortPeriodChg(series) {
-  const el = document.getElementById('port-period-chg');
-  if (!el) return;
-  if (series.length >= 2) {
-    const startVal = series[0].value;
-    const endVal   = series[series.length - 1].value;
-    const chg = ((endVal - startVal) / startVal) * 100;
-    // ATH = all-time high from full unfiltered series
-    const allMax = state.fullTimeSeries?.length ? Math.max(...state.fullTimeSeries.map(p => p.value)) : Math.max(...series.map(p => p.value));
-    const athChg = ((endVal - allMax) / allMax) * 100;
-    const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
-    const athTxt = Math.abs(athChg) > 0.01
-      ? ` <span style="color:${athColor};font-size:12px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH Closing</span>` : '';
-    el.innerHTML = `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}% </span>${athTxt}`;
-    el.style.color = '';
-  } else {
-    el.textContent = '';
-  }
-}
-
-// ── Portfolio history chart ───────────────────────
-export function renderPortfolioChart(filter) {
-  // Pre-populate date inputs with defaults if empty
-  const portFromEl = document.getElementById('port-from');
-  const portToEl   = document.getElementById('port-to');
-  if (portFromEl && !portFromEl.value) portFromEl.value = portCustom.from;
-  if (portToEl   && !portToEl.value)   portToEl.value   = portCustom.to;
-
-  let series;
-  // Treat first render (filter='1Y' from state default) as CUSTOM too
-  if (portCustom.active && portCustom.from && portCustom.to) {
-    series = filterPortfolioCustom(portCustom.from, portCustom.to);
-    // Activate the CUSTOM button visually on first render
-    if (filter !== 'CUSTOM') {
-      const customBtn = document.querySelector('.tf-btn[onclick*="CUSTOM"]');
-      if (customBtn) {
-        customBtn.closest('.time-filters')?.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-        customBtn.classList.add('active');
-      }
-      // Show the custom date picker
-      const customWrap = document.getElementById('port-custom-wrap');
-      if (customWrap) customWrap.style.display = 'flex';
-    }
-  } else if (filter === 'CUSTOM') {
-    series = state.fullTimeSeries; // fallback if no dates set
-  } else {
-    series = filterTimeSeries(filter);
-  }
-
-  const rawDates = series.map(p => p.date);
-  const labels   = rawDates.map(d => formatDateLabel(d));
-  const values   = series.map(p => p.value);
-  const isUp     = values.length > 1 && values[values.length - 1] >= values[0];
-  const color    = isUp ? '#22c55e' : '#ef4444';
-
-  updatePortPeriodChg(series);
-
-  if (state.portfolioChartInstance) state.portfolioChartInstance.destroy();
-
-  const ctx  = document.getElementById('portfolioChart').getContext('2d');
-  const grad = makeGrad(ctx, 300, isUp ? 'rgba(34,197,94,0.18)' : 'rgba(239,68,68,0.18)', 'rgba(0,0,0,0)');
-
-  state.portfolioChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{ data: values, borderColor: color, borderWidth: 2,
-        backgroundColor: grad, fill: true, pointRadius: 0, pointHoverRadius: 5,
-        pointHoverBackgroundColor: color, tension: 0.3 }],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
-          callbacks: {
-            title: (items) => rawDates[items[0].dataIndex] || items[0].label,
-            label: (c) => '  ₹' + c.parsed.y.toLocaleString('en-IN'),
-          },
-        },
-      },
-      scales: {
-        x: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks, maxTicksLimit: 10, maxRotation: 0 } },
-        y: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks,
-          callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 1 }) } },
-      },
-      interaction: { mode: 'index', intersect: false },
-    },
-  });
-  if (!window._chartInstances) window._chartInstances = {};
-  window._chartInstances['portfolioChart'] = state.portfolioChartInstance;}
-
 export function setTimeFilter(filter, btn) {
   state.currentFilter = filter;
-  // Only clear portfolio chart filter buttons (within same .time-filters parent)
+  saveTimeFilter(filter);
+  
+  // Update button styles within the same time-filters group
   const portFilters = btn.closest('.time-filters');
-  if (portFilters) portFilters.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (portFilters) {
+    portFilters.querySelectorAll('.tf-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text2)';
+    });
+    btn.classList.add('active');
+    btn.style.background = 'var(--accent)';
+    btn.style.color = 'white';
+  }
 
   const customWrap = document.getElementById('port-custom-wrap');
   if (filter === 'CUSTOM') {
     portCustom.active = true;
     if (customWrap) customWrap.style.display = 'flex';
-    // If dates already set, render immediately
     if (portCustom.from && portCustom.to) renderPortfolioChart('CUSTOM');
   } else {
     portCustom.active = false;
@@ -165,36 +542,52 @@ export function setTimeFilter(filter, btn) {
 
 window.applyPortCustom = function() {
   const from = document.getElementById('port-from').value;
-  const to   = document.getElementById('port-to').value;
+  const to = document.getElementById('port-to').value;
   if (!from || !to) return;
   portCustom.active = true;
   portCustom.from = from;
-  portCustom.to   = to;
+  portCustom.to = to;
   renderPortfolioChart('CUSTOM');
 };
 
-// ── Portfolio Day Chart (intraday 5-min) ──────────
-export function renderPortfolioDayChart() {
-  const wrap   = document.getElementById('portfolio-day-wrap');
+// ── Portfolio Day Chart (intraday) with prev close comparison ──
+// ── Portfolio Day Chart (intraday) with benchmark comparison ──
+export async function renderPortfolioDayChart() {
+  const wrap = document.getElementById('portfolio-day-wrap');
   const canvas = document.getElementById('portfolioDayChart');
   if (!wrap || !canvas) return;
 
   const holdings = Object.values(state.holdings);
   const allTimesSet = new Set();
+  
+  // Collect all time points from portfolio holdings
   holdings.forEach(h => {
     const ticks = state.dayHistories[h.ticker];
     if (ticks && ticks.length) ticks.forEach(({ time }) => allTimesSet.add(time));
   });
+  
+  // Also collect time points from selected benchmarks
+  const benchmarkIntradayData = {};
+  if (selectedBenchmarks.size > 0 && chartDisplayMode === 'percentage') {
+    for (const benchmark of selectedBenchmarks) {
+      const data = await fetchBenchmarkIntraday(benchmark);
+      if (data && data.length) {
+        benchmarkIntradayData[benchmark] = data;
+        data.forEach(({ time }) => allTimesSet.add(time));
+      }
+    }
+  }
 
   const sortedTimes = [...allTimesSet].sort();
   if (!sortedTimes.length) { noDataMsg(wrap, 'Intraday data unavailable for today'); return; }
 
-  const values = new Array(sortedTimes.length).fill(0);
+  // Calculate portfolio values at each time point
+  const portfolioValues = new Array(sortedTimes.length).fill(0);
   holdings.forEach(h => {
     const ticks = state.dayHistories[h.ticker];
     const seedPrice = state.livePrices[h.ticker] || h.avgBuy;
     if (!ticks || !ticks.length) {
-      sortedTimes.forEach((_, i) => { values[i] += seedPrice * h.totalQty; });
+      sortedTimes.forEach((_, i) => { portfolioValues[i] += seedPrice * h.totalQty; });
       return;
     }
     const tickMap = {};
@@ -202,72 +595,166 @@ export function renderPortfolioDayChart() {
     let lastPrice = seedPrice;
     sortedTimes.forEach((t, i) => {
       if (tickMap[t] != null) lastPrice = tickMap[t];
-      values[i] += lastPrice * h.totalQty;
+      portfolioValues[i] += lastPrice * h.totalQty;
     });
   });
 
-  const roundedValues = values.map(Math.round);
+  const roundedValues = portfolioValues.map(Math.round);
 
-  // ── Compute portfolio-level prev close value ──────
+  // Compute portfolio-level prev close value
   let prevClosePortfolioValue = 0;
   let hasPrevClose = false;
   holdings.forEach(h => {
     const pc = state.prevClosePrices[h.ticker];
-    if (pc && pc > 0) { prevClosePortfolioValue += pc * h.totalQty; hasPrevClose = true; }
-    else { const lp = state.livePrices[h.ticker] || h.avgBuy; prevClosePortfolioValue += lp * h.totalQty; }
+    if (pc && pc > 0) { 
+      prevClosePortfolioValue += pc * h.totalQty; 
+      hasPrevClose = true; 
+    } else { 
+      const lp = state.livePrices[h.ticker] || h.avgBuy; 
+      prevClosePortfolioValue += lp * h.totalQty; 
+    }
   });
   prevClosePortfolioValue = Math.round(prevClosePortfolioValue);
 
-  // Determine up/down vs prev close if available, otherwise vs first tick
   const lastVal = roundedValues[roundedValues.length - 1];
   const baseVal = hasPrevClose ? prevClosePortfolioValue : roundedValues[0];
-  const isUp    = lastVal >= baseVal;
-  const color   = isUp ? '#22c55e' : '#ef4444';
+  const dayChgAbs = lastVal - baseVal;
+  const dayChgPct = baseVal > 0 ? (dayChgAbs / baseVal) * 100 : 0;
+  const isUp = lastVal >= baseVal;
+  const color = isUp ? '#22c55e' : '#ef4444';
 
-  // ── Update header % change badge ──────────────────
-  const titleEl = document.querySelector('#day-chart-body')?.closest('.chart-card')?.querySelector('.chart-title');
+  // Update header with percentage change
+  const titleEl = document.querySelector('#intraday-section .chart-title');
   if (titleEl) {
-    const chgPct = baseVal > 0 ? ((lastVal - baseVal) / baseVal) * 100 : null;
-    const chgAbs = lastVal - baseVal;
     const existingSpan = titleEl.querySelector('.day-chg-badge');
     if (existingSpan) existingSpan.remove();
-    if (chgPct !== null) {
-      const span = document.createElement('span');
-      span.className = 'day-chg-badge';
-      span.style.cssText = `font-size:13px;font-weight:700;margin-left:8px;color:${isUp ? 'var(--green)' : 'var(--red)'}`;
-      span.textContent = `${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%)`;
-      titleEl.appendChild(span);
-    }
+    const span = document.createElement('span');
+    span.className = 'day-chg-badge';
+    span.style.cssText = `font-size:13px;font-weight:700;margin-left:8px;color:${isUp ? 'var(--green)' : 'var(--red)'}`;
+    span.textContent = `${dayChgAbs >= 0 ? '+' : ''}₹${Math.abs(dayChgAbs).toLocaleString('en-IN')} (${dayChgPct >= 0 ? '+' : ''}${dayChgPct.toFixed(2)}%)`;
+    titleEl.appendChild(span);
+  }
+
+  // Prepare data based on display mode
+  let yAxisLabel, yAxisCallback;
+  if (chartDisplayMode === 'percentage') {
+    yAxisLabel = 'Change from Prev Close (%)';
+    yAxisCallback = (v) => v.toFixed(1) + '%';
+  } else {
+    yAxisLabel = 'Portfolio Value (₹)';
+    yAxisCallback = (v) => {
+      if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
+      if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
+      return '₹' + v.toLocaleString('en-IN');
+    };
   }
 
   if (state.portfolioDayChartInstance) state.portfolioDayChartInstance.destroy();
 
   wrap.innerHTML = '<canvas id="portfolioDayChart" style="width:100%;height:100%"></canvas>';
-  const ctx  = document.getElementById('portfolioDayChart').getContext('2d');
+  const ctx = document.getElementById('portfolioDayChart').getContext('2d');
   const grad = makeGrad(ctx, 250, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
 
   const datasets = [];
 
-  // Prev close dashed line (if available)
-  if (hasPrevClose) {
+  // Add benchmark lines for intraday (full timeline, not just daily change)
+  if (chartDisplayMode === 'percentage' && selectedBenchmarks.size > 0) {
+    for (const benchmark of selectedBenchmarks) {
+      const config = BENCHMARK_CONFIG[benchmark];
+      const intradayData = benchmarkIntradayData[benchmark];
+      
+      if (config && intradayData && intradayData.length) {
+        // Create a map of time to price
+        const priceMap = {};
+        intradayData.forEach(point => {
+          priceMap[point.time] = point.price;
+        });
+        
+        // Get previous close for this benchmark
+        let benchmarkPrevClose = null;
+        try {
+          const { fetchHistory } = await import('./api.js');
+          const hist = await fetchHistory(config.upstoxKey, null, '5d');
+          if (hist && Object.keys(hist).length > 0) {
+            const dates = Object.keys(hist).sort();
+            if (dates.length >= 2) {
+              benchmarkPrevClose = hist[dates[dates.length - 2]];
+            }
+          }
+        } catch(e) {
+          console.warn(`Failed to fetch prev close for ${benchmark}:`, e);
+        }
+        
+        if (benchmarkPrevClose) {
+          // Build benchmark values aligned with portfolio time points
+          const benchmarkValues = [];
+          let lastPrice = null;
+          
+          for (const time of sortedTimes) {
+            let price = priceMap[time];
+            if (!price && lastPrice) price = lastPrice;
+            if (price) lastPrice = price;
+            
+            if (price && benchmarkPrevClose) {
+              benchmarkValues.push(((price - benchmarkPrevClose) / benchmarkPrevClose) * 100);
+            } else {
+              benchmarkValues.push(null);
+            }
+          }
+          
+          // Forward fill any remaining nulls
+          let lastVal = null;
+          for (let i = 0; i < benchmarkValues.length; i++) {
+            if (benchmarkValues[i] !== null) lastVal = benchmarkValues[i];
+            else if (lastVal !== null) benchmarkValues[i] = lastVal;
+          }
+          
+          if (benchmarkValues.some(v => v !== null)) {
+            datasets.push({
+              data: benchmarkValues,
+              borderColor: config.color,
+              borderWidth: 2,
+              borderDash: [6, 4],
+              pointRadius: 0,
+              fill: false,
+              tension: 0.2,
+              order: 1,
+              label: `${config.name}`
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // Portfolio data
+  let portfolioDisplayValues;
+  if (chartDisplayMode === 'percentage') {
+    portfolioDisplayValues = roundedValues.map(v => ((v - baseVal) / baseVal) * 100);
+  } else {
+    portfolioDisplayValues = roundedValues;
+  }
+
+  // Prev close dashed line (at 0% in percentage mode)
+  if (hasPrevClose && chartDisplayMode === 'percentage') {
     datasets.push({
-      data: new Array(sortedTimes.length).fill(prevClosePortfolioValue),
-      borderColor: 'rgba(150,150,180,0.35)',
-      borderWidth: 1,
+      data: new Array(sortedTimes.length).fill(0),
+      borderColor: 'rgba(150,150,180,0.5)',
+      borderWidth: 1.5,
       borderDash: [4, 4],
       pointRadius: 0,
       fill: false,
       tension: 0,
-      order: 1,
-      label: 'Prev Close',
+      order: 2,
+      label: 'Prev Close'
     });
   }
 
   // Live portfolio value line
   datasets.push({
-    data: roundedValues,
+    data: portfolioDisplayValues,
     borderColor: color,
-    borderWidth: 2,
+    borderWidth: 2.5,
     backgroundColor: grad,
     fill: true,
     pointRadius: 0,
@@ -281,39 +768,82 @@ export function renderPortfolioDayChart() {
     type: 'line',
     data: { labels: sortedTimes, datasets },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
-          filter: (item) => item.datasetIndex === datasets.length - 1,
-          callbacks: {
-            label: (c) => {
-              const val = c.parsed.y;
-              const chgAbs = val - baseVal;
-              const chgPct = baseVal > 0 ? (chgAbs / baseVal) * 100 : 0;
-              return [
-                '  ₹' + val.toLocaleString('en-IN'),
-                `  ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%) today`,
-              ];
-            },
-          },
+        legend: { 
+          position: 'top',
+          labels: { color: '#a0a0b0', usePointStyle: true, boxWidth: 10, font: { size: 10 } }
         },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: '#1a1a1f',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#8a8a9a',
+          bodyColor: '#f0f0f5',
+          padding: 10,
+          callbacks: {
+            label: (context) => {
+              const val = context.parsed.y;
+              if (chartDisplayMode === 'percentage') {
+                return `${context.dataset.label}: ${val >= 0 ? '+' : ''}${val.toFixed(2)}%`;
+              } else {
+                const originalVal = roundedValues[context.dataIndex];
+                const chgAbs = originalVal - baseVal;
+                const chgPct = baseVal > 0 ? (chgAbs / baseVal) * 100 : 0;
+                return [
+                  `${context.dataset.label}: ₹${originalVal.toLocaleString('en-IN')}`,
+                  `  Change: ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%)`
+                ];
+              }
+            }
+          }
+        }
       },
       scales: {
         x: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks, maxTicksLimit: 8, maxRotation: 0 } },
-        y: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks,
-          callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 1 }) } },
+        y: {
+          ...AXIS_DEFAULTS,
+          ticks: { ...AXIS_DEFAULTS.ticks, callback: yAxisCallback },
+          title: { display: true, text: yAxisLabel, color: '#7777a0', font: { size: 11 } }
+        }
       },
-      interaction: { mode: 'index', intersect: false },
-    },
+      interaction: { mode: 'index', intersect: false }
+    }
   });
   if (!window._chartInstances) window._chartInstances = {};
   window._chartInstances['portfolioDayChart'] = state.portfolioDayChartInstance;
 }
 
+// Fetch benchmark's daily change percentage
+async function fetchBenchmarkDailyChange(benchmark) {
+  const config = BENCHMARK_CONFIG[benchmark];
+  if (!config) return null;
+  
+  try {
+    const { fetchHistory } = await import('./api.js');
+    const hist = await fetchHistory(config.upstoxKey, null, '5d');
+    if (hist && Object.keys(hist).length > 0) {
+      const dates = Object.keys(hist).sort();
+      if (dates.length >= 2) {
+        const prevClose = hist[dates[dates.length - 2]];
+        const currentPrice = hist[dates[dates.length - 1]];
+        if (prevClose && currentPrice && prevClose > 0) {
+          return ((currentPrice - prevClose) / prevClose) * 100;
+        }
+      }
+    }
+  } catch(e) {
+    console.warn(`Failed to fetch daily change for ${benchmark}:`, e);
+  }
+  return null;
+}
+
 // ── Today P&L bar chart ───────────────────────────
 export function renderTodayPnlChart(holdings) {
-  const wrap   = document.getElementById('today-pnl-wrap');
+  const wrap = document.getElementById('today-pnl-wrap');
   const canvas = document.getElementById('todayPnlChart');
   if (!wrap || !canvas) return;
 
@@ -332,7 +862,7 @@ export function renderTodayPnlChart(holdings) {
   });
 
   const labels = sorted.map(h => h.ticker.replace('.NS','').replace('.BO',''));
-  const data   = sorted.map(h => {
+  const data = sorted.map(h => {
     const lp = state.livePrices[h.ticker];
     const pc = state.prevClosePrices[h.ticker];
     return parseFloat(((lp - pc) / pc * 100).toFixed(2));
@@ -354,9 +884,9 @@ export function renderTodayPnlChart(holdings) {
         tooltip: { ...TOOLTIP_DEFAULTS,
           callbacks: {
             label: (c) => {
-              const h   = sorted[c.dataIndex];
-              const lp  = state.livePrices[h.ticker];
-              const pc  = state.prevClosePrices[h.ticker];
+              const h = sorted[c.dataIndex];
+              const lp = state.livePrices[h.ticker];
+              const pc = state.prevClosePrices[h.ticker];
               const abs = (lp - pc) * h.totalQty;
               return [
                 ` ${c.parsed.y >= 0 ? '+' : ''}${c.parsed.y.toFixed(2)}%`,
@@ -374,99 +904,6 @@ export function renderTodayPnlChart(holdings) {
   });
 }
 
-// ── Allocation: horizontal bar chart with labels ──
-export function renderPieChart(holdings, totalCurrent) {
-  const filtered = holdings
-    .filter(h => (state.livePrices[h.ticker] || 0) > 0)
-    .map((h, i) => ({
-      ticker: h.ticker,
-      label: h.ticker.replace('.NS','').replace('.BO',''),
-      value: state.livePrices[h.ticker] * h.totalQty,
-      color: COLORS[i % COLORS.length],
-    }))
-    .sort((a, b) => b.value - a.value);
-
-  const total = filtered.reduce((s, h) => s + h.value, 0);
-  const data   = filtered.map(h => parseFloat(((h.value / total) * 100).toFixed(2)));
-  const labels = filtered.map(h => h.label);
-  const bgColors = filtered.map(h => h.color);
-
-  if (state.pieChartInstance) state.pieChartInstance.destroy();
-
-  const ctx = document.getElementById('pieChart').getContext('2d');
-
-  // Inline label plugin
-  const inlineLabelPlugin = {
-    id: 'inlineBarLabels',
-    afterDraw(chart) {
-      const { ctx: c, data: d } = chart;
-      c.save();
-      d.datasets.forEach((dataset, di) => {
-        chart.getDatasetMeta(di).data.forEach((bar, idx) => {
-          const val  = dataset.data[idx];
-          const item = filtered[idx];
-          const labelText = `${val.toFixed(1)}%  ₹${(item.value/1e5).toFixed(1)}L`;
-          c.font = '600 10px system-ui, sans-serif';
-          c.fillStyle = 'rgba(230,230,240,0.85)';
-          c.textBaseline = 'middle';
-          // Position: just to right of bar end
-          const xPos = bar.x + 8;
-          const yPos = bar.y;
-          if (bar.width > 30) c.fillText(labelText, xPos, yPos);
-        });
-      });
-      c.restore();
-    },
-  };
-
-  const maxVal = Math.max(...data);
-
-  state.pieChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: bgColors,
-        borderRadius: 5,
-        borderSkipped: false,
-        barThickness: 20,
-      }],
-    },
-    plugins: [inlineLabelPlugin],
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { right: 110 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_DEFAULTS,
-          callbacks: {
-            label: (c) => {
-              const item = filtered[c.dataIndex];
-              return [
-                ` Allocation: ${c.parsed.x.toFixed(2)}%`,
-                ` Value: ₹${item.value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
-              ];
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          ...AXIS_DEFAULTS,
-          max: Math.min(100, Math.ceil(maxVal * 1.3)),
-          ticks: { ...AXIS_DEFAULTS.ticks, callback: v => v + '%' },
-        },
-        y: {
-          grid: { display: false },
-          ticks: { color: '#9a9ab0', font: { size: 11, weight: '600' } },
-        },
-      },
-    },
-  });
-}
-
 // ── Overall P&L bar chart ────────────────────────
 export function renderPnlChart(holdings) {
   const sorted = holdings
@@ -478,7 +915,7 @@ export function renderPnlChart(holdings) {
     });
 
   const labels = sorted.map(h => h.ticker.replace('.NS','').replace('.BO',''));
-  const data   = sorted.map(h =>
+  const data = sorted.map(h =>
     parseFloat((((state.livePrices[h.ticker] - h.avgBuy) / h.avgBuy) * 100).toFixed(2))
   );
   const colors = data.map(v => v >= 0 ? 'rgba(34,197,94,0.8)' : 'rgba(239,68,68,0.8)');
@@ -502,205 +939,6 @@ export function renderPnlChart(holdings) {
       },
     },
   });
-}
-
-// ── Drilldown: price history ──────────────────────
-export function renderDrilldownChart(ticker, hist, buyDate) {
-  const dates  = Object.keys(hist).sort();
-  let   prices = dates.map(d => hist[d]);
-
-  // ── Patch today's last point with live price ──────
-  // Ensures the rightmost tick is always the current price, not yesterday's close.
-  const todayStr = new Date().toISOString().split('T')[0];
-  const livePrice = state.livePrices[ticker];
-  if (livePrice && livePrice > 0) {
-    const todayIdx = dates.indexOf(todayStr);
-    if (todayIdx >= 0) {
-      prices = [...prices];
-      prices[todayIdx] = livePrice;
-    } else if (dates.length && dates[dates.length - 1] < todayStr) {
-      // Today not in filtered range — append if the filter includes today
-      const [fy, fm, fd] = (dates[dates.length - 1]).split('-').map(Number);
-      const lastDate = new Date(fy, fm - 1, fd);
-      const today = new Date();
-      if (today > lastDate) { dates.push(todayStr); prices.push(livePrice); }
-    }
-  }
-
-  // ── Period % change + ATH badge ───────────────────
-  const periodEl = document.getElementById('dd-period-chg');
-  if (periodEl && prices.length >= 2) {
-    const startP = prices[0], endP = prices[prices.length - 1];
-    const chg    = ((endP - startP) / startP) * 100;
-    // ATH from the full unfiltered history
-    const fullHist = state.histories?.[ticker] || {};
-    const allPrices = Object.values(fullHist);
-    const ath = allPrices.length ? Math.max(...allPrices) : endP;
-    const athChg = ((endP - ath) / ath) * 100;
-    periodEl.innerHTML =
-      `<span style="color:${chg>=0?'var(--green)':'var(--red)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>` +
-      (Math.abs(athChg) > 0.01
-        ? ` <span style="color:${athChg>=0?'var(--green)':'var(--red)'};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:1px 6px;border-radius:4px">&nbsp;${athChg.toFixed(2)}% from ATH Closing</span>`
-        : '');
-  }
-
-  // ── Dynamic colour: green if current > period-start ──
-  const isUp  = prices.length > 1 && prices[prices.length - 1] >= prices[0];
-  const color = isUp ? '#22c55e' : '#ef4444';
-
-  if (state.ddChartInstance) state.ddChartInstance.destroy();
-
-  const ctx  = document.getElementById('ddChart').getContext('2d');
-  const grad = makeGrad(ctx, 300,
-    isUp ? 'rgba(34,197,94,0.18)' : 'rgba(239,68,68,0.18)', 'rgba(0,0,0,0)');
-  const displayLabels = dates.map(d => formatDateLabel(d));
-
-  if (!window._chartInstances) window._chartInstances = {};
-  state.ddChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: displayLabels,
-      datasets: [{ data: prices, borderColor: color,
-        borderWidth: 2, backgroundColor: grad, fill: true,
-        pointRadius: 0, pointHoverRadius: 5, tension: 0.3 }],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
-          callbacks: {
-            title: (items) => dates[items[0].dataIndex] || items[0].label,
-            label: (c) => {
-              const price = c.parsed.y;
-              const chgVsStart = prices[0] > 0 ? ((price - prices[0]) / prices[0]) * 100 : null;
-              return chgVsStart != null
-                ? [` ₹${price.toFixed(2)}`, ` ${chgVsStart >= 0 ? '+' : ''}${chgVsStart.toFixed(2)}% from period start`]
-                : ` ₹${price.toFixed(2)}`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(255,255,255,0.03)' },
-          border: { color: 'rgba(255,255,255,0.1)' },
-          ticks: { color: '#7777a0', font: { size: 11 }, maxTicksLimit: 10, maxRotation: 0, autoSkip: true },
-        },
-        y: {
-          ...AXIS_DEFAULTS,
-          ticks: { color: '#7777a0', font: { size: 11 },
-            callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 1 }) },
-        },
-      },
-      interaction: { mode: 'index', intersect: false },
-    },
-  });
-  window._chartInstances['ddChart'] = state.ddChartInstance;
-}
-
-// ── Drilldown: intraday day chart ─────────────────
-export function renderDrilldownDayChart(ticker) {
-  const wrap   = document.getElementById('dd-day-wrap');
-  if (!wrap) return;
-
-  const ticks = state.dayHistories[ticker];
-  if (!ticks || !ticks.length) { noDataMsg(wrap, 'Intraday data unavailable for today'); return; }
-
-  const labels = ticks.map(d => d.time);
-  const prices = ticks.map(d => d.price);
-
-  // ── Prev-close anchor ─────────────────────────────
-  // Use prevClosePrices → last history close → first tick as fallback chain
-  let prevClose = state.prevClosePrices[ticker];
-  if (!prevClose || prevClose <= 0) {
-    const hist = state.histories?.[ticker];
-    if (hist && Object.keys(hist).length) {
-      const hdates = Object.keys(hist).sort();
-      prevClose = hist[hdates[hdates.length - 1]];
-    }
-  }
-  if (!prevClose || prevClose <= 0) prevClose = prices[0];
-
-  const lastPrice = prices[prices.length - 1];
-  const dayChgAbs = lastPrice - prevClose;
-  const dayChgPct = prevClose > 0 ? (dayChgAbs / prevClose) * 100 : 0;
-  const isUp  = dayChgAbs >= 0;
-  const color = isUp ? '#22c55e' : '#ef4444';
-
-  // ── Populate day-change badge ─────────────────────
-  const dayChgEl = document.getElementById('dd-day-chg');
-  if (dayChgEl) {
-    dayChgEl.innerHTML =
-      `<span style="color:${isUp?'var(--green)':'var(--red)'}">` +
-      `${dayChgAbs >= 0 ? '+' : ''}₹${Math.abs(dayChgAbs).toFixed(2)} ` +
-      `(${dayChgPct >= 0 ? '+' : ''}${dayChgPct.toFixed(2)}%)</span>` +
-      `<span style="font-size:10px;color:var(--text3);margin-left:6px;">vs prev close</span>`;
-  }
-
-  if (state.ddDayChartInstance) state.ddDayChartInstance.destroy();
-
-  wrap.innerHTML = '<canvas id="ddDayChart" style="width:100%;height:100%"></canvas>';
-  const ctx  = document.getElementById('ddDayChart').getContext('2d');
-  const grad = makeGrad(ctx, 220,
-    isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
-
-  if (!window._chartInstances) window._chartInstances = {};
-  state.ddDayChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [
-      // Prev-close dashed baseline
-      {
-        data: new Array(labels.length).fill(prevClose),
-        borderColor: 'rgba(150,150,180,0.35)',
-        borderWidth: 1,
-        borderDash: [4, 4],
-        pointRadius: 0,
-        fill: false,
-        tension: 0,
-        order: 1,
-      },
-      // Live price line
-      {
-        data: prices,
-        borderColor: color,
-        borderWidth: 2,
-        backgroundColor: grad,
-        fill: true,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        tension: 0.2,
-        order: 0,
-      },
-    ]},
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_DEFAULTS, mode: 'index', intersect: false,
-          filter: (item) => item.datasetIndex === 1,
-          callbacks: {
-            label: (c) => {
-              const price  = c.parsed.y;
-              const chgAbs = price - prevClose;
-              const chgPct = prevClose > 0 ? (chgAbs / prevClose) * 100 : 0;
-              return [
-                ` ₹${price.toFixed(2)}`,
-                ` ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toFixed(2)} (${chgPct >= 0?'+':''}${chgPct.toFixed(2)}%) today`,
-              ];
-            },
-          },
-        },
-      },
-      scales: {
-        x: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks, maxTicksLimit: 8, maxRotation: 0 } },
-        y: { ...AXIS_DEFAULTS, ticks: { ...AXIS_DEFAULTS.ticks,
-          callback: (v) => '₹' + v.toLocaleString('en-IN', { notation: 'compact', maximumFractionDigits: 2 }) } },
-      },
-      interaction: { mode: 'index', intersect: false },
-    },
-  });
-  window._chartInstances['ddDayChart'] = state.ddDayChartInstance;
 }
 
 // ── Destroy all ──────────────────────────────────

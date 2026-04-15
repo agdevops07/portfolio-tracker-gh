@@ -7,28 +7,57 @@
 import { state } from './state.js';
 import { showToast } from './utils.js';
 
-// ── Export holdings as CSV ───────────────────────
+// ── Export holdings as CSV (with live prices) ──
 export function exportHoldingsCSV() {
-  const rows = state.rawRows;
-  if (!rows || !rows.length) {
+  const holdings = Object.values(state.holdings);
+  
+  if (!holdings || !holdings.length) {
     showToast('No holdings data to export.');
     closeExportMenu();
     return;
   }
 
-  const header = 'ticker,quantity,average_buy_price,buy_date,upstox_ticker';
-  const lines = rows.map(r =>
-    [
-      r.ticker,
-      r.qty,
-      r.avg,
-      r.date || '',
-      r.upstoxTicker || '',
-    ].join(',')
-  );
+  // Calculate total current value for allocation
+  let totalCurrent = 0;
+  holdings.forEach(h => {
+    const lp = state.livePrices[h.ticker];
+    if (lp) totalCurrent += lp * h.totalQty;
+  });
 
-  const csv = [header, ...lines].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
+  // CSV Header
+  const header = ['Ticker', 'Quantity', 'Avg Buy Price', 'Invested (₹)', 'Live Price (₹)', 'Current Value (₹)', 'P&L (₹)', 'P&L (%)', 'Day Change (₹)', 'Day Change (%)', 'Allocation (%)'];
+  
+  // Build rows with live data
+  const rows = holdings.map(h => {
+    const lp = state.livePrices[h.ticker];
+    const pc = state.prevClosePrices[h.ticker];
+    const currentVal = lp ? lp * h.totalQty : null;
+    const pnlAbs = currentVal != null ? currentVal - h.invested : null;
+    const pnlPct = pnlAbs != null ? (pnlAbs / h.invested) * 100 : null;
+    const allocPct = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
+    const dayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+    const dayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
+    
+    return [
+      h.ticker,
+      h.totalQty,
+      h.avgBuy.toFixed(2),
+      h.invested.toFixed(2),
+      lp ? lp.toFixed(2) : 'N/A',
+      currentVal ? currentVal.toFixed(2) : 'N/A',
+      pnlAbs ? (pnlAbs >= 0 ? '+' : '') + pnlAbs.toFixed(2) : 'N/A',
+      pnlPct ? (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(2) : 'N/A',
+      dayChgAbs ? (dayChgAbs >= 0 ? '+' : '') + dayChgAbs.toFixed(2) : 'N/A',
+      dayChgPct ? (dayChgPct >= 0 ? '+' : '') + dayChgPct.toFixed(2) : 'N/A',
+      allocPct ? allocPct.toFixed(2) : 'N/A'
+    ];
+  });
+
+  // Convert to CSV string
+  const csvContent = [header, ...rows].map(row => row.join(',')).join('\n');
+  
+  // Download file
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -36,6 +65,7 @@ export function exportHoldingsCSV() {
   a.download = `portfolio-holdings-${ts}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+  
   showToast('Holdings exported as CSV!');
   closeExportMenu();
 }
@@ -81,8 +111,14 @@ export async function exportPDF() {
     } catch (e) { /* skip if canvas is tainted */ }
   }
 
-  // Build holdings table HTML from state
+  // Build holdings table HTML from state with live data
   const holdings = Object.values(state.holdings);
+  let totalCurrent = 0;
+  holdings.forEach(h => {
+    const lp = state.livePrices[h.ticker];
+    if (lp) totalCurrent += lp * h.totalQty;
+  });
+  
   let holdingsRows = '';
   holdings.forEach(h => {
     const lp  = state.livePrices[h.ticker];
@@ -90,7 +126,9 @@ export async function exportPDF() {
     const cv  = lp ? lp * h.totalQty : null;
     const pnl = cv != null ? cv - h.invested : null;
     const pnlPct = pnl != null ? (pnl / h.invested * 100).toFixed(2) : '—';
-    const dayChg = (lp && pc) ? ((lp - pc) / pc * 100).toFixed(2) : '—';
+    const dayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+    const dayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc * 100).toFixed(2) : '—';
+    const allocPct = totalCurrent && cv ? (cv / totalCurrent * 100).toFixed(1) : '—';
     const pnlColor = pnl != null ? (pnl >= 0 ? '#22c55e' : '#ef4444') : '#888';
     holdingsRows += `<tr>
       <td><strong>${h.ticker}</strong></td>
@@ -101,7 +139,9 @@ export async function exportPDF() {
       <td>${cv ? '₹' + cv.toLocaleString('en-IN', { maximumFractionDigits: 0 }) : '—'}</td>
       <td style="color:${pnlColor}">${pnl != null ? (pnl >= 0 ? '+' : '') + '₹' + Math.abs(pnl).toLocaleString('en-IN', { maximumFractionDigits: 0 }) : '—'}</td>
       <td style="color:${pnlColor}">${pnl != null ? (pnl >= 0 ? '+' : '') + pnlPct + '%' : '—'}</td>
-      <td style="color:${dayChg !== '—' ? (parseFloat(dayChg) >= 0 ? '#22c55e' : '#ef4444') : '#888'}">${dayChg !== '—' ? (parseFloat(dayChg) >= 0 ? '+' : '') + dayChg + '%' : '—'}</td>
+      <td style="color:${dayChgPct !== '—' ? (parseFloat(dayChgPct) >= 0 ? '#22c55e' : '#ef4444') : '#888'}">${dayChgAbs ? (dayChgAbs >= 0 ? '+' : '') + '₹' + Math.abs(dayChgAbs).toLocaleString('en-IN', { maximumFractionDigits: 0 }) : '—'}</td>
+      <td style="color:${dayChgPct !== '—' ? (parseFloat(dayChgPct) >= 0 ? '#22c55e' : '#ef4444') : '#888'}">${dayChgPct !== '—' ? (parseFloat(dayChgPct) >= 0 ? '+' : '') + dayChgPct + '%' : '—'}</td>
+      <td>${allocPct !== '—' ? allocPct + '%' : '—'}</td>
     </tr>`;
   });
 
@@ -169,6 +209,7 @@ export async function exportPDF() {
     th { background: #f0f0f0; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 10px; text-align: left; border-bottom: 2px solid #ddd; }
     td { padding: 7px 10px; border-bottom: 1px solid #eee; }
     tr:last-child td { border-bottom: none; }
+    .text-right { text-align: right; }
 
     /* ── Print rules ── */
     @media print {
@@ -199,11 +240,11 @@ export async function exportPDF() {
     <thead>
       <tr>
         <th>Ticker</th><th>Qty</th><th>Avg Buy</th><th>Live Price</th>
-        <th>Invested</th><th>Current Val</th><th>P&L (₹)</th><th>P&L %</th><th>Day Chg</th>
+        <th>Invested</th><th>Current Val</th><th>P&L (₹)</th><th>P&L %</th><th>Day P&L</th><th>Day %</th><th>Allocation</th>
       </tr>
     </thead>
     <tbody>${holdingsRows}</tbody>
-  </table>
+   </table>
 </div>
 
 <script>

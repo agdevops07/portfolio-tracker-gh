@@ -3,7 +3,14 @@
 // ═══════════════════════════════════════════════
 
 import { openStockPicker, closeStockPicker } from './stockPicker.js';
-import { loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser } from './dashboard.js';
+
+import { 
+  loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
+  setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, 
+  sortHoldingsTable, setHoldingsView, toggleChartSection, restoreChartSection,
+  toggleMainView , setPortfolioView 
+} from './dashboard.js';
+
 import { setTimeFilter } from './charts.js';
 import { showDashboard } from './utils.js';
 import { exportHoldingsCSV, exportPDF, toggleExportMenu } from './export.js';
@@ -12,8 +19,27 @@ import { state } from './state.js';
 import { processCSV } from './fileHandler.js';
 import { fmt, pct, colorPnl } from './utils.js';
 import { COLORS, destroyAllCharts } from './charts.js';
+import { toggleBenchmark } from './charts.js';
+
+import { toggleChartDisplayMode, restoreChartDisplayMode } from './charts.js';
+
+import { restoreBenchmarks } from './charts.js';
+
+// Add to window exports
+window.toggleBenchmark = toggleBenchmark;
+window.restoreBenchmarks = restoreBenchmarks;
+
 
 // Expose globals
+window.toggleChartDisplayMode = toggleChartDisplayMode;
+window.restoreChartDisplayMode = restoreChartDisplayMode;
+window.toggleBenchmark = toggleBenchmark;
+window.toggleMainView = toggleMainView;
+window.toggleChartSection = toggleChartSection;
+window.restoreChartSection = restoreChartSection;
+window.setPortfolioView = setPortfolioView;
+window.sortHoldingsTable = sortHoldingsTable;
+window.setHoldingsView = setHoldingsView;
 window.openStockPicker    = openStockPicker;
 window.closeStockPicker   = closeStockPicker;
 window.loadDashboard      = loadDashboard;
@@ -27,19 +53,37 @@ window.exportHoldingsCSV  = exportHoldingsCSV;
 window.exportPDF          = exportPDF;
 window.toggleExportMenu   = toggleExportMenu;
 window.openDrilldown      = openDrilldown;
-window.openHoldingsModal  = openHoldingsModal;
-window.closeHoldingsModal = closeHoldingsModal;
-window.sortHoldingsModal  = sortHoldingsModal;
 window._destroyAllCharts  = destroyAllCharts;
 window._stopAutoRefresh   = stopAutoRefresh;
-window.switchDashUser     = switchDashUser;  // ← ADD THIS
+window.switchDashUser     = switchDashUser;
 
 window.switchDashTab = function(tab, btn) {
-  document.querySelectorAll('.dash-tab').forEach(b => b.classList.toggle('active', b.dataset && b.dataset.tab === tab));
-  const ov = document.getElementById('dash-tab-overview');
-  const ho = document.getElementById('dash-tab-holdings');
-  if (ov) ov.style.display = tab === 'overview' ? '' : 'none';
-  if (ho) ho.style.display = tab === 'holdings' ? '' : 'none';
+  // Save current tab to sessionStorage
+  try {
+    sessionStorage.setItem('dashboard_current_tab', tab);
+  } catch(e) {}
+  
+  // Update tab buttons - only one tab now (portfolio)
+  document.querySelectorAll('.dash-tab').forEach(b => {
+    if (b.dataset && b.dataset.tab === tab) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
+  });
+  
+  // Show/hide the portfolio tab content (only one tab now)
+  const portfolio = document.getElementById('dash-tab-portfolio');
+  if (portfolio) portfolio.style.display = tab === 'portfolio' ? '' : 'none';
+  
+  // Re-render holdings table if table view is selected
+  if (tab === 'portfolio' && typeof portfolioView !== 'undefined' && portfolioView === 'table') {
+    setTimeout(() => {
+      if (typeof renderHoldingsTable === 'function') {
+        renderHoldingsTable();
+      }
+    }, 50);
+  }
 };
 
 async function loadStocksDB() {
@@ -59,6 +103,7 @@ async function loadStocksDB() {
   });
 }
 
+// Main DOMContentLoaded - ONLY ONE
 document.addEventListener('DOMContentLoaded', async () => {
   await loadStocksDB();
   
@@ -90,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   
   await new Promise(r => setTimeout(r, 100));
-  await loadDashboard();
+  await loadDashboard();  // This will now restore the saved tab
   
   document.addEventListener('click', e => {
     const card = e.target.closest('.holding-card[data-ticker]');
@@ -104,6 +149,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
+// Remove the duplicate DOMContentLoaded that was trying to restore the tab
+// The modal-related functions can stay but aren't used
 const modalSort = { key: 'currentVal', asc: false };
 
 export function sortHoldingsModal(key) {

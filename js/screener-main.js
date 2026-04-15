@@ -1326,7 +1326,7 @@ async function loadConcalls(ticker, meta, fundData) {
       let label = (cc.label || '').trim();
       const url  = cc.url || '';
       // PPT → Investor Presentation
-      label = label.replace(/\\bPPT\\b/gi, 'Investor Presentation');
+      label = label.replace(/\bPPT\b/gi, 'Investor Presentation');
       const isPpt = url.toLowerCase().includes('ppt') || label.toLowerCase().includes('investor presentation');
 
       // If label is a bare generic word, derive from URL
@@ -1335,26 +1335,40 @@ async function loadConcalls(ticker, meta, fundData) {
       }
 
       // Prefer date from label text, else from cc.date, else try to parse from URL
-      const dateFromLabel = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\\s,]+20\\d{2}/i);
+      const dateFromLabel = label.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]+20\d{2}/i);
       // Also try Q1FY25 style from URL or label
-      const qtrFromUrl   = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\\d{2,4})/);
+      const qtrFromUrl   = url.match(/[Qq]([1-4])[-_]?[Ff][Yy][-_]?(\d{2,4})/);
       const qtrLabel     = qtrFromUrl ? `Q${qtrFromUrl[1]} FY${qtrFromUrl[2].length===2?'20'+qtrFromUrl[2]:qtrFromUrl[2]}` : '';
 
       const dateStr = cc.date || (dateFromLabel ? dateFromLabel[0] : '') || qtrLabel;
 
       // Remove the date from the label if it's embedded in it to avoid duplication
       if (dateStr && label.includes(dateStr)) {
-        label = label.replace(dateStr, '').replace(/[-–·\\s]+$/, '').trim() || label;
+        label = label.replace(dateStr, '').replace(/[-–·\s]+$/, '').trim() || label;
       }
 
       return { label, date: dateStr, url, isPdf: cc.isPdf };
     });
   }
 
-  // Fallback: direct Screener parse only if we got nothing from fundData
+  // Fallback: direct Screener parse using the correct URL (with BSE code if available)
   if (!concalls.length) {
     try {
-      const res = await fetch(proxyUrl(`https://www.screener.in/company/${sym}/`));
+      // Get the correct Screener.in URL - use fundData._url if available (has BSE code)
+      let screenerUrl;
+      if (source?._url) {
+        screenerUrl = source._url;
+      } else {
+        // If no fundData, check if it's a BSE stock and use BSE code
+        const isBSE = /\.BO$/i.test(ticker);
+        if (isBSE && meta?.bseCode) {
+          screenerUrl = `https://www.screener.in/company/${meta.bseCode}/`;
+        } else {
+          screenerUrl = `https://www.screener.in/company/${sym}/`;
+        }
+      }
+      
+      const res = await fetch(proxyUrl(screenerUrl));
       if (res.ok) {
         const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
         ['#concalls a[href]', '#investor-presentations a[href]', 'a.concall-link[href]'].forEach(sel => {

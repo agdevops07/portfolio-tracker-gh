@@ -20,6 +20,67 @@ function getPreviousWeekday(dateStr) {
   return d.toISOString().split('T')[0];
 }
 
+// Add this function to api.js
+
+/**
+ * Fetches historical chart data for NSE indices (e.g., NIFTY 50, NIFTY SMALLCAP 250)
+ * @param {string} indexName - The NSE index name (e.g., "NIFTY 50", "NIFTY SMALLCAP 250")
+ * @returns {Promise<Object>} - A promise that resolves to an object containing the historical data series.
+ */
+// Add this function to api.js
+export async function fetchNseIndexHistory(indexName) {
+  const baseUrl = 'https://www.nseindia.com';
+  const proxy = 'https://corsproxy.io/?url=';
+  
+  try {
+    // Step 1: Fetch homepage to get cookies
+    const homeResponse = await fetch(proxy + encodeURIComponent(baseUrl + '/'), {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+      }
+    });
+    
+    // Extract cookies from response
+    const cookies = homeResponse.headers.get('set-cookie');
+    
+    // Step 2: Fetch chart data
+    const apiUrl = `${baseUrl}/api/chart-databyindex?index=${encodeURIComponent(indexName)}`;
+    const dataResponse = await fetch(proxy + encodeURIComponent(apiUrl), {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Referer': baseUrl + '/',
+        'Cookie': cookies || '',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    
+    if (dataResponse.ok) {
+      const data = await dataResponse.json();
+      if (data && data.grapthData && data.grapthData.length > 0) {
+        const series = {};
+        for (const point of data.grapthData) {
+          const date = new Date(point[0]).toISOString().split('T')[0];
+          const price = point[1];
+          const day = new Date(date + 'T12:00:00Z').getUTCDay();
+          if (day !== 0 && day !== 6 && price != null) {
+            series[date] = price;
+          }
+        }
+        return series;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error(`Failed to fetch NSE index history for ${indexName}:`, error);
+    return null;
+  }
+}
+
 export async function fetchPrice(ticker) {
   if (state.priceCache[ticker]) return state.priceCache[ticker];
 
@@ -67,8 +128,11 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
 
   const todayStr = new Date().toISOString().split('T')[0];
   
+  // Check if this is an NSE_INDEX request (benchmark)
+  const isNseIndex = ticker.startsWith('NSE_INDEX|');
+  
   let effectiveUpstoxTicker = upstoxTicker;
-  if (!effectiveUpstoxTicker && window._stocksDb) {
+  if (!effectiveUpstoxTicker && window._stocksDb && !isNseIndex) {
     const entry = window._stocksDb.find(s =>
       s.yahooTicker && s.yahooTicker.toUpperCase() === ticker
     );
@@ -77,17 +141,29 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
     }
   }
 
-  if (effectiveUpstoxTicker) {
+  // For NSE_INDEX, use the ticker directly as the instrument key
+  const instrumentKey = isNseIndex ? ticker : effectiveUpstoxTicker;
+
+  if (instrumentKey) {
     try {
       const fromDate = new Date();
       fromDate.setFullYear(fromDate.getFullYear() - 2);
       const from = fromDate.toISOString().split('T')[0];
       
-      const upstoxUrls = [
-        `https://api.upstox.com/v2/historical-candle/NSE_EQ|${effectiveUpstoxTicker}/day/${todayStr}/${from}`,
-        `https://api.upstox.com/v2/historical-candle/NSE|${effectiveUpstoxTicker}/day/${todayStr}/${from}`,
-        `https://api.upstox.com/v2/historical-candle/BSE|${effectiveUpstoxTicker}/day/${todayStr}/${from}`,
-      ];
+      let upstoxUrls;
+      if (isNseIndex) {
+        // NSE_INDEX format - use as-is with proper encoding
+        const encodedKey = encodeURIComponent(instrumentKey);
+        upstoxUrls = [
+          `https://api.upstox.com/v2/historical-candle/${encodedKey}/day/${todayStr}/${from}`
+        ];
+      } else {
+        upstoxUrls = [
+          `https://api.upstox.com/v2/historical-candle/NSE_EQ|${instrumentKey}/day/${todayStr}/${from}`,
+          `https://api.upstox.com/v2/historical-candle/NSE|${instrumentKey}/day/${todayStr}/${from}`,
+          `https://api.upstox.com/v2/historical-candle/BSE|${instrumentKey}/day/${todayStr}/${from}`,
+        ];
+      }
       
       for (const url of upstoxUrls) {
         try {
@@ -116,39 +192,41 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
     } catch (e) { }
   }
 
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=${range}`;
-    const res = await fetch(proxyUrl(url));
-    const data = await res.json();
+  // Only fallback to Yahoo for regular stocks, not for NSE_INDEX
+  if (!isNseIndex) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=${range}`;
+      const res = await fetch(proxyUrl(url));
+      const data = await res.json();
 
-    const result = data?.chart?.result?.[0];
-    const timestamps = result?.timestamp || [];
-    const closes = result?.indicators?.quote?.[0]?.close || [];
-    const meta = result?.meta || {};
+      const result = data?.chart?.result?.[0];
+      const timestamps = result?.timestamp || [];
+      const closes = result?.indicators?.quote?.[0]?.close || [];
+      const meta = result?.meta || {};
 
-    const series = {};
-    timestamps.forEach((ts, i) => {
-      const date = new Date(ts * 1000).toISOString().split('T')[0];
-      if (!isWeekend(date) && closes[i] != null) series[date] = closes[i];
-    });
+      const series = {};
+      timestamps.forEach((ts, i) => {
+        const date = new Date(ts * 1000).toISOString().split('T')[0];
+        if (!isWeekend(date) && closes[i] != null) series[date] = closes[i];
+      });
 
-    if (Object.keys(series).length > 0) {
-      const livePrice = meta?.regularMarketPrice || state.priceCache[ticker];
-      if (livePrice && !isWeekend(todayStr)) {
-        series[todayStr] = livePrice;
-      } else if (livePrice) {
-        const lastWD = getPreviousWeekday(todayStr);
-        series[lastWD] = livePrice;
+      if (Object.keys(series).length > 0) {
+        const livePrice = meta?.regularMarketPrice || state.priceCache[ticker];
+        if (livePrice && !isWeekend(todayStr)) {
+          series[todayStr] = livePrice;
+        } else if (livePrice) {
+          const lastWD = getPreviousWeekday(todayStr);
+          series[lastWD] = livePrice;
+        }
+        state.historyCache[key] = series;
+        return series;
       }
-      state.historyCache[key] = series;
-      return series;
-    }
-  } catch (e) { }
+    } catch (e) { }
+  }
 
   state.historyCache[key] = {};
   return {};
 }
-
 export async function fetchDayHistory(ticker, upstoxTicker) {
   const key = `intraday_${ticker}`;
   if (state.dayHistoryCache[key]) return state.dayHistoryCache[key];
