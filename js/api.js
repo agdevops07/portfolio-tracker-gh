@@ -102,8 +102,12 @@ export async function fetchPrice(ticker) {
         const q = data?.quoteResponse?.result?.[0];
         if (q?.regularMarketPrice > 0) {
           state.priceCache[ticker] = q.regularMarketPrice;
+          // IMPORTANT: Set prevClose from quote API
           const pc = q.regularMarketPreviousClose ?? q.chartPreviousClose ?? null;
-          if (pc && pc > 0) state.prevClosePrices[ticker] = pc;
+          if (pc && pc > 0) {
+            state.prevClosePrices[ticker] = pc;
+            console.log(`Set prevClose for ${ticker} from quote API: ${pc}`);
+          }
           return q.regularMarketPrice;
         }
         continue;
@@ -114,10 +118,15 @@ export async function fetchPrice(ticker) {
       const previousClose = meta?.chartPreviousClose ?? meta?.previousClose ?? null;
       if (price && price > 0) {
         state.priceCache[ticker] = price;
-        if (previousClose && previousClose > 0) state.prevClosePrices[ticker] = previousClose;
+        if (previousClose && previousClose > 0) {
+          state.prevClosePrices[ticker] = previousClose;
+          console.log(`Set prevClose for ${ticker} from chart API: ${previousClose}`);
+        }
         return price;
       }
-    } catch (e) { }
+    } catch (e) { 
+      console.warn(`Price fetch error for ${ticker}:`, e);
+    }
   }
   return null;
 }
@@ -227,6 +236,7 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
   state.historyCache[key] = {};
   return {};
 }
+
 export async function fetchDayHistory(ticker, upstoxTicker) {
   const key = `intraday_${ticker}`;
   if (state.dayHistoryCache[key]) return state.dayHistoryCache[key];
@@ -243,6 +253,7 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
     }
   }
 
+  // Try Yahoo Finance first
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=5m&range=1d&_=${bust}`;
     const res = await fetch(proxyUrl(url));
@@ -262,9 +273,11 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       })
       .filter(x => x.price != null);
 
+    // IMPORTANT: Set prevClose from Yahoo meta
     const previousClose = meta?.chartPreviousClose ?? meta?.previousClose ?? null;
     if (previousClose && previousClose > 0 && !state.prevClosePrices[ticker]) {
       state.prevClosePrices[ticker] = previousClose;
+      console.log(`Set prevClose for ${ticker} from dayHistory: ${previousClose}`);
     }
 
     const livePrice = meta?.regularMarketPrice;
@@ -273,14 +286,20 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
       series.push({ time: `${hh}:${mm}`, ts: now.getTime(), price: livePrice });
+      // Also update live price
+      state.priceCache[ticker] = livePrice;
+      state.livePrices[ticker] = livePrice;
     }
 
     if (series.length > 2) {
       state.dayHistoryCache[key] = series;
       return series;
     }
-  } catch (e) { }
+  } catch (e) {
+    console.warn(`Yahoo intraday failed for ${ticker}:`, e);
+  }
 
+  // Try Upstox as fallback
   if (effectiveUpstoxTicker) {
     try {
       const prevDay = getPreviousWeekday(new Date().toISOString().split('T')[0]);
@@ -307,8 +326,10 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
                 .sort((a, b) => a.ts - b.ts);
               if (series.length > 0) {
                 state.dayHistoryCache[key] = series;
-                if (!state.prevClosePrices[ticker] && candles[candles.length - 1]) {
+                // Set prevClose from last candle of previous day
+                if (candles[candles.length - 1] && !state.prevClosePrices[ticker]) {
                   state.prevClosePrices[ticker] = candles[candles.length - 1][4];
+                  console.log(`Set prevClose for ${ticker} from Upstox: ${candles[candles.length - 1][4]}`);
                 }
                 return series;
               }
@@ -318,7 +339,9 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
           continue;
         }
       }
-    } catch (e) { }
+    } catch (e) { 
+      console.warn(`Upstox intraday failed for ${ticker}:`, e);
+    }
   }
 
   state.dayHistoryCache[key] = [];

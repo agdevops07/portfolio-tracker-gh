@@ -396,6 +396,28 @@ async function loadStock(ticker, meta) {
   showSkeleton(ticker, meta);
   renderAIPlaceholder();
 
+  // ── Hydrate meta from stocks DB (covers direct-type and dashboard drilldown paths) ──
+  // Both submitSearch() and the dashboard URL flow pass meta=null; we need bseCode/exchange
+  // for correct exchange links. Look up the DB now (it's already loaded via loadDB()).
+  if (_db) {
+    const symClean = ticker.replace(/\.(NS|BO)$/i, '');
+    const dbEntry  = _db.find(s => s.symbol === symClean);
+    if (dbEntry) {
+      if (!meta) {
+        meta = { symbol: dbEntry.symbol, company: dbEntry.company,
+                 exchange: dbEntry.exchange, bseCode: dbEntry.bseCode || '',
+                 isin: dbEntry.isin || '', yahooTicker: dbEntry.yahooTicker || '' };
+        _meta = meta;
+      } else {
+        // Patch only the fields that are missing
+        if (!meta.bseCode  && dbEntry.bseCode)  { meta.bseCode  = dbEntry.bseCode;  _meta = meta; }
+        if (!meta.exchange && dbEntry.exchange)  { meta.exchange = dbEntry.exchange; _meta = meta; }
+        if (!meta.company  && dbEntry.company)   { meta.company  = dbEntry.company;  _meta = meta; }
+        if (!meta.isin     && dbEntry.isin)      { meta.isin     = dbEntry.isin;     _meta = meta; }
+      }
+    }
+  }
+
   // Resolve upstox/ISIN identifier: prefer meta (from search), then holding context
   const upstoxId = meta?.isin || _holdingCtx?.upstoxTicker || null;
 
@@ -562,55 +584,73 @@ if (cards) {
 
 // ── Exchange links ────────────────────────────────
 function renderExchangeLinks(ticker, meta) {
-  const sym = ticker.replace(/\.(NS|BO)$/i, '').replace(/-SM$/, '');
-  const isBSE = /\.BO$/i.test(ticker);
+  const sym     = ticker.replace(/\.(NS|BO)$/i, '').replace(/-SM$/, '');
+  const isBSE   = /\.BO$/i.test(ticker) || meta?.exchange === 'BSE'  || meta?.exchange === 'BSE-SME';
+  const isNSE   = /\.NS$/i.test(ticker) || meta?.exchange === 'NSE'  || meta?.exchange === 'NSE-SME';
   const linksEl = document.getElementById('ss-exchange-links');
   if (!linksEl) return;
 
-  const nseSym = sym;
-  const screenerSym = meta?.isin ? meta.isin : sym;
+  const bseCode = meta?.bseCode || '';
+  const companySlug = (meta?.company || sym).toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-  linksEl.innerHTML = `
-    <a class="exch-link-btn" href="https://www.nseindia.com/get-quotes/equity?symbol=${encodeURIComponent(nseSym)}" target="_blank" rel="noopener">
+  // screener.in: BSE-only stocks are identified by their numeric BSE code,
+  // NSE/dual-listed stocks use the symbol.
+  const screenerSym = (isBSE && !isNSE && bseCode) ? bseCode : sym;
+
+  let linksHtml = '';
+
+  // NSE Quote — only for NSE (or dual-listed) stocks
+  if (isNSE) {
+    linksHtml += `
+    <a class="exch-link-btn" href="https://www.nseindia.com/get-quotes/equity?symbol=${encodeURIComponent(sym)}" target="_blank" rel="noopener">
       <span class="exch-icon">📊</span> NSE Quote
-    </a>
-    ${(meta?.bseCode || /\.BO$/i.test(ticker)) ? `
-    <a class="exch-link-btn" href="https://www.bseindia.com/stock-share-price/${(meta?.company||sym).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}/${sym}/${meta?.bseCode||''}/" target="_blank" rel="noopener">
+    </a>`;
+  }
+
+  // BSE Quote — only for BSE stocks, and only when we have the code
+  if (isBSE && bseCode) {
+    linksHtml += `
+    <a class="exch-link-btn" href="https://www.bseindia.com/stock-share-price/${companySlug}/${sym}/${bseCode}/" target="_blank" rel="noopener">
       <span class="exch-icon">📈</span> BSE Quote
-    </a>` : ''}
-    <a class="exch-link-btn" href="https://www.screener.in/company/${sym}/" target="_blank" rel="noopener">
+    </a>`;
+  } else if (isBSE && !bseCode) {
+    // Fallback: show button but warn (no code available yet)
+    linksHtml += `
+    <a class="exch-link-btn" href="https://www.bseindia.com/stock-share-price/${companySlug}/${sym}/" target="_blank" rel="noopener">
+      <span class="exch-icon">📈</span> BSE Quote
+    </a>`;
+  }
+
+  // Screener.in — always shown
+  linksHtml += `
+    <a class="exch-link-btn" href="https://www.screener.in/company/${screenerSym}/" target="_blank" rel="noopener">
       <span class="exch-icon">🔎</span> Screener.in
     </a>`;
 
-  // Exchange filing links - show only relevant exchanges
-  const exchange = meta?.exchange || '';
-  const bseCode = meta?.bseCode;
-  const isBseOnly = /\.BO$/i.test(ticker) || exchange === 'BSE';
-  const isNseOnly = /\.NS$/i.test(ticker) || exchange === 'NSE' || exchange === 'NSE-SME';
-  
-  // NSE Filings link
+  linksEl.innerHTML = linksHtml;
+
+  // ── Filing nav links (in the header nav bar) ──────────────────────────────
   const nseFilingsLink = document.getElementById('ss-nse-filings-link');
+  const bseFilingsLink = document.getElementById('ss-bse-filings-link');
+
+  // NSE Filings — only for NSE stocks
   if (nseFilingsLink) {
-    if (!isBseOnly) {
-      // Check if this is an NSE SME stock
+    if (isNSE) {
       const isNseSme = meta?.exchange === 'NSE-SME';
-      if (isNseSme) {
-        // For NSE SME stocks, link directly to the SME tab this is the base page not the stock page
-        nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(nseSym)}&tabIndex=sme`;
-      } else {
-        // For regular NSE stocks
-        nseFilingsLink.href = `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(nseSym)}`;
-      }
+      nseFilingsLink.href = isNseSme
+        ? `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(sym)}&tabIndex=sme`
+        : `https://www.nseindia.com/companies-listing/corporate-filings-announcements?symbol=${encodeURIComponent(sym)}`;
       nseFilingsLink.style.display = '';
     } else {
       nseFilingsLink.style.display = 'none';
     }
   }
-  // BSE Filings link
-  const bseFilingsLink = document.getElementById('ss-bse-filings-link');
+
+  // BSE Filings — only for BSE stocks with a code
   if (bseFilingsLink) {
-    if (bseCode && !isNseOnly) {
-      bseFilingsLink.href = `https://www.bseindia.com/corporates/ann.html?scrip=${bseCode}`;
+    if (isBSE && bseCode) {
+      bseFilingsLink.href = `https://www.bseindia.com/corporates/ann.html?scrip=${bseCode}&type=0`;
       bseFilingsLink.style.display = '';
     } else {
       bseFilingsLink.style.display = 'none';

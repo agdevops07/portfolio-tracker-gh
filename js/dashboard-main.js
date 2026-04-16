@@ -8,7 +8,8 @@ import {
   loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
   setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, 
   sortHoldingsTable, setHoldingsView, toggleChartSection, restoreChartSection,
-  toggleMainView , setPortfolioView , renderAllPortfolios
+  toggleMainView , setPortfolioView , renderAllPortfolios, setAllPortfoliosView,
+  sortAllPortfoliosTable
 } from './dashboard.js';
 
 import { setTimeFilter } from './charts.js';
@@ -31,6 +32,8 @@ window.restoreBenchmarks = restoreBenchmarks;
 
 
 // Expose globals
+window.sortAllPortfoliosTable  = sortAllPortfoliosTable 
+window.setAllPortfoliosView  = setAllPortfoliosView
 window.renderAllPortfolios = renderAllPortfolios
 window.toggleChartDisplayMode = toggleChartDisplayMode;
 window.restoreChartDisplayMode = restoreChartDisplayMode;
@@ -58,50 +61,118 @@ window._destroyAllCharts  = destroyAllCharts;
 window._stopAutoRefresh   = stopAutoRefresh;
 window.switchDashUser     = switchDashUser;
 
+// Update window.switchDashTab in dashboard-main.js
 window.switchDashTab = function(tab, btn) {
-  // Save current tab to sessionStorage
-  try {
-    sessionStorage.setItem('dashboard_current_tab', tab);
-  } catch(e) {}
-  
-  // Update tab buttons
+  // Update active tab button
   document.querySelectorAll('.dash-tab').forEach(b => {
-    if (b.dataset && b.dataset.tab === tab) {
-      b.classList.add('active');
-    } else {
-      b.classList.remove('active');
-    }
+    b.classList.remove('active');
   });
+  btn.classList.add('active');
   
-  // Show/hide tab content
-  const portfolio = document.getElementById('dash-tab-portfolio');
-  const allPortfolios = document.getElementById('dash-tab-all-portfolios');
-  
-  if (portfolio) portfolio.style.display = tab === 'portfolio' ? 'block' : 'none';
-  if (allPortfolios) allPortfolios.style.display = tab === 'all-portfolios' ? 'block' : 'none';
-  
-  // Hide user tabs when on All Portfolios view
+  // Show/hide content
+  const portfolioContent = document.getElementById('dash-tab-portfolio');
+  const allPortfoliosContent = document.getElementById('dash-tab-all-portfolios');
   const userTabs = document.getElementById('dash-user-tabs');
-  if (userTabs) {
-    userTabs.style.display = tab === 'all-portfolios' ? 'none' : 'flex';
-  }
   
-  // Render all portfolios table if needed
-  if (tab === 'all-portfolios') {
+  if (tab === 'portfolio') {
+    if (portfolioContent) portfolioContent.style.display = 'block';
+    if (allPortfoliosContent) allPortfoliosContent.style.display = 'none';
+    // Show user tabs
+    if (userTabs) {
+      // Check if there are multiple users before showing
+      const users = state.users || [];
+      userTabs.style.display = users.length > 1 ? 'flex' : 'none';
+    }
+    
+    // Force re-render dashboard with current data
+    setTimeout(() => {
+      if (typeof renderDashboard === 'function') {
+        renderDashboard();
+      } else if (typeof window.renderDashboard === 'function') {
+        window.renderDashboard();
+      }
+      // Also force chart refresh
+      if (typeof renderPortfolioDayChart === 'function') {
+        renderPortfolioDayChart();
+      }
+      if (typeof renderTodayPnlChart === 'function') {
+        const holdings = Object.values(state.holdings);
+        renderTodayPnlChart(holdings);
+      }
+    }, 50);
+  } else {
+    if (portfolioContent) portfolioContent.style.display = 'none';
+    if (allPortfoliosContent) allPortfoliosContent.style.display = 'block';
+    // Hide user tabs
+    if (userTabs) userTabs.style.display = 'none';
+    
+    // Render all portfolios
     setTimeout(() => {
       if (typeof renderAllPortfolios === 'function') {
         renderAllPortfolios();
-      }
-    }, 100);
-  }
-  
-  // Re-render holdings table if table view is selected
-  if (tab === 'portfolio' && typeof portfolioView !== 'undefined' && portfolioView === 'table') {
-    setTimeout(() => {
-      if (typeof renderHoldingsTable === 'function') {
-        renderHoldingsTable();
+      } else if (typeof window.renderAllPortfolios === 'function') {
+        window.renderAllPortfolios();
       }
     }, 50);
+  }
+  
+  // Save preference
+  try {
+    sessionStorage.setItem('dashboard_current_tab', tab);
+  } catch(e) {}
+};
+
+// Update the switchDashUser function
+window.switchDashUser = async function(user) {
+  // First switch to portfolio tab
+  const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
+  if (portfolioTab) {
+    window.switchDashTab('portfolio', portfolioTab);
+  }
+  
+  // Then switch user
+  if (typeof switchDashUser === 'function') {
+    await switchDashUser(user);
+  }
+  
+  // Ensure user tabs are visible
+  const userTabs = document.getElementById('dash-user-tabs');
+  if (userTabs) userTabs.style.display = 'flex';
+};
+
+// Update the DOMContentLoaded event handler - add this function after processCSV
+// Add this helper function
+window.handleResponsiveAllPortfoliosView = function() {
+  // This function should be defined in dashboard.js, but if not, provide a fallback
+  const isMobile = window.innerWidth < 768;
+  const currentView = sessionStorage.getItem('all_portfolios_view') || 'table';
+  
+  if (isMobile && currentView === 'table') {
+    const userPreference = sessionStorage.getItem('all_portfolios_view');
+    if (!userPreference || userPreference !== 'table') {
+      if (typeof setAllPortfoliosView === 'function') {
+        setAllPortfoliosView('card');
+      }
+    }
+  } else if (!isMobile && currentView === 'card') {
+    const userPreference = sessionStorage.getItem('all_portfolios_view');
+    if (!userPreference || userPreference !== 'card') {
+      if (typeof setAllPortfoliosView === 'function') {
+        setAllPortfoliosView('table');
+      }
+    }
+  }
+};
+
+// Also add window.restoreChartSection properly
+window.restoreChartSection = restoreChartSection;
+window.handleResponsiveAllPortfoliosView = handleResponsiveAllPortfoliosView;
+
+// Make sure updateAllPortfoliosStats is also exposed if needed
+window.updateAllPortfoliosStats = function() {
+  // This will be defined in dashboard.js
+  if (typeof updateAllPortfoliosStats !== 'undefined') {
+    updateAllPortfoliosStats();
   }
 };
 
@@ -178,6 +249,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
   }
+
+  // Add resize listener for responsive views
+  window.addEventListener('resize', () => {
+    handleResponsiveAllPortfoliosView();
+    // Also handle holdings view if needed
+    if (typeof window.innerWidth !== 'undefined') {
+      const isMobile = window.innerWidth < 768;
+      const holdingsView = sessionStorage.getItem('holdings_view');
+      if (isMobile && holdingsView !== 'card') {
+        // Optionally auto-switch holdings to card on mobile
+      }
+    }
+  });
 
   // Parse CSV first to get user count BEFORE loading dashboard
   let userCount = 0;
