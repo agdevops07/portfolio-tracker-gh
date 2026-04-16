@@ -261,20 +261,26 @@ export async function exportPDF() {
 export function toggleExportMenu() {
   const menu = document.getElementById('export-menu');
   if (!menu) return;
-  const isOpen = menu.classList.toggle('open');
-  if (isOpen) {
+  
+  const isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+  
+  if (!isOpen) {
+    // Close menu when clicking outside
+    const closeHandler = (e) => {
+      const dropdown = document.getElementById('export-dropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        menu.style.display = 'none';
+        document.removeEventListener('click', closeHandler);
+      }
+    };
     setTimeout(() => {
-      document.addEventListener('click', closeExportMenuOutside, { once: true });
-    }, 0);
+      document.addEventListener('click', closeHandler);
+    }, 100);
   }
-}
-
-function closeExportMenuOutside(e) {
-  const dropdown = document.getElementById('export-dropdown');
-  if (dropdown && !dropdown.contains(e.target)) closeExportMenu();
 }
 
 export function closeExportMenu() {
   const menu = document.getElementById('export-menu');
-  if (menu) menu.classList.remove('open');
+  if (menu) menu.style.display = 'none';
 }

@@ -1879,3 +1879,13 @@ input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(
     --border: #ddd; --border2: #ccc;
   }
 }
+
+* All Portfolios table */
+.all-portfolios-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.all-portfolios-row:hover {
+  background: var(--bg3) !important;
+}

@@ -8,7 +8,7 @@ import {
   loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
   setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, 
   sortHoldingsTable, setHoldingsView, toggleChartSection, restoreChartSection,
-  toggleMainView , setPortfolioView 
+  toggleMainView , setPortfolioView , renderAllPortfolios
 } from './dashboard.js';
 
 import { setTimeFilter } from './charts.js';
@@ -31,6 +31,7 @@ window.restoreBenchmarks = restoreBenchmarks;
 
 
 // Expose globals
+window.renderAllPortfolios = renderAllPortfolios
 window.toggleChartDisplayMode = toggleChartDisplayMode;
 window.restoreChartDisplayMode = restoreChartDisplayMode;
 window.toggleBenchmark = toggleBenchmark;
@@ -58,12 +59,13 @@ window._stopAutoRefresh   = stopAutoRefresh;
 window.switchDashUser     = switchDashUser;
 
 window.switchDashTab = function(tab, btn) {
+  
   // Save current tab to sessionStorage
   try {
     sessionStorage.setItem('dashboard_current_tab', tab);
   } catch(e) {}
   
-  // Update tab buttons - only one tab now (portfolio)
+  // Update tab buttons
   document.querySelectorAll('.dash-tab').forEach(b => {
     if (b.dataset && b.dataset.tab === tab) {
       b.classList.add('active');
@@ -72,9 +74,27 @@ window.switchDashTab = function(tab, btn) {
     }
   });
   
-  // Show/hide the portfolio tab content (only one tab now)
+  // Show/hide tab content
   const portfolio = document.getElementById('dash-tab-portfolio');
-  if (portfolio) portfolio.style.display = tab === 'portfolio' ? '' : 'none';
+  const allPortfolios = document.getElementById('dash-tab-all-portfolios');
+  
+  if (portfolio) portfolio.style.display = tab === 'portfolio' ? 'block' : 'none';
+  if (allPortfolios) allPortfolios.style.display = tab === 'all-portfolios' ? 'block' : 'none';
+  
+  // Hide user tabs when on All Portfolios view
+  const userTabs = document.getElementById('dash-user-tabs');
+  if (userTabs) {
+    userTabs.style.display = tab === 'all-portfolios' ? 'none' : 'flex';
+  }
+  
+  // Render all portfolios table if needed
+  if (tab === 'all-portfolios') {
+    setTimeout(() => {
+      if (typeof renderAllPortfolios === 'function') {
+        renderAllPortfolios();
+      }
+    }, 100);
+  }
   
   // Re-render holdings table if table view is selected
   if (tab === 'portfolio' && typeof portfolioView !== 'undefined' && portfolioView === 'table') {
@@ -101,6 +121,27 @@ async function loadStocksDB() {
       })
       .catch(() => resolve());
   });
+}
+
+// Function to conditionally show/hide All Portfolios tab based on number of users
+function updateAllPortfoliosTabVisibility() {
+  const users = state.users || [];
+  const allPortfoliosTab = document.querySelector('.dash-tab[data-tab="all-portfolios"]');
+  if (allPortfoliosTab) {
+    if (users.length <= 1) {
+      allPortfoliosTab.style.display = 'none';
+      // If we're currently on this tab and it's hidden, switch to portfolio
+      const currentTab = sessionStorage.getItem('dashboard_current_tab');
+      if (currentTab === 'all-portfolios') {
+        const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
+        if (portfolioTab) {
+          window.switchDashTab('portfolio', portfolioTab);
+        }
+      }
+    } else {
+      allPortfoliosTab.style.display = '';
+    }
+  }
 }
 
 // Main DOMContentLoaded - ONLY ONE
@@ -136,6 +177,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   await new Promise(r => setTimeout(r, 100));
   await loadDashboard();  // This will now restore the saved tab
+  
+  setTimeout(() => {
+  updateAllPortfoliosTabVisibility();
+}, 200);
   
   document.addEventListener('click', e => {
     const card = e.target.closest('.holding-card[data-ticker]');
