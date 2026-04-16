@@ -65,6 +65,9 @@ const BENCHMARK_CONFIG = {
   }
 };
 
+// Store current period change for benchmarks
+let currentPeriodChanges = {};
+
 // Add function to fetch intraday data for benchmarks
 async function fetchBenchmarkIntraday(benchmark) {
   const config = BENCHMARK_CONFIG[benchmark];
@@ -158,6 +161,46 @@ function processBenchmarkHistory(hist, dates, periodStartValue = null) {
   return filtered;
 }
 
+// Get benchmark period change (for display in header)
+async function getBenchmarkPeriodChange(benchmark, series) {
+  if (!series || !series.length) return null;
+  
+  const config = BENCHMARK_CONFIG[benchmark];
+  if (!config) return null;
+  
+  const dates = series.map(p => p.date);
+  const startDate = dates[0];
+  const endDate = dates[dates.length - 1];
+  
+  try {
+    const { fetchHistory } = await import('./api.js');
+    const hist = await fetchHistory(config.upstoxKey, null, '2y');
+    if (!hist || Object.keys(hist).length === 0) return null;
+    
+    // Get start price
+    let startPrice = hist[startDate];
+    if (!startPrice) {
+      const prevDates = Object.keys(hist).filter(d => d <= startDate).sort();
+      if (prevDates.length) startPrice = hist[prevDates[prevDates.length - 1]];
+    }
+    
+    // Get end price
+    let endPrice = hist[endDate];
+    if (!endPrice) {
+      const prevDates = Object.keys(hist).filter(d => d <= endDate).sort();
+      if (prevDates.length) endPrice = hist[prevDates[prevDates.length - 1]];
+    }
+    
+    if (startPrice && endPrice && startPrice > 0) {
+      return ((endPrice - startPrice) / startPrice) * 100;
+    }
+  } catch(e) {
+    console.warn(`Failed to fetch period change for ${benchmark}:`, e);
+  }
+  
+  return null;
+}
+
 // Toggle benchmark selection (multiple allowed)
 export function toggleBenchmark(benchmark) {
   if (selectedBenchmarks.has(benchmark)) {
@@ -199,14 +242,13 @@ function saveTimeFilter(filter) {
 function restoreTimeFilter() {
   try {
     const saved = sessionStorage.getItem('time_filter');
-    if (saved && (saved === '1M' || saved === '3M' || saved === '1Y' || saved === 'CUSTOM')) {
+    if (saved && (saved === '1W' || saved === '1M' || saved === '3M' || saved === '6M' || saved === '1Y' || saved === 'CUSTOM')) {
       return saved;
     }
   } catch(e) {}
-  return '1M'; // Default to 1M
+  return '1W'; // Default to 1W
 }
 
-// Restore benchmark preferences
 // Restore benchmark preferences
 export function restoreBenchmarks() {
   try {
@@ -297,20 +339,26 @@ async function renderPortfolioChartWithBenchmark(filter) {
   if (portToEl && !portToEl.value) portToEl.value = portCustom.to;
 
   // Restore saved time filter if not already set
-  if (!state.currentFilter || state.currentFilter === '1Y') {
+  if (!state.currentFilter) {
     const savedFilter = restoreTimeFilter();
-    if (savedFilter !== state.currentFilter) {
-      state.currentFilter = savedFilter;
-      // Update the active button UI
+    state.currentFilter = savedFilter;
+    // Update the active button UI
+    setTimeout(() => {
       const activeBtn = document.querySelector(`.tf-btn[onclick*="${savedFilter}"]`);
       if (activeBtn) {
         const portFilters = activeBtn.closest('.time-filters');
         if (portFilters) {
-          portFilters.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+          portFilters.querySelectorAll('.tf-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = 'var(--text2)';
+          });
           activeBtn.classList.add('active');
+          activeBtn.style.background = 'var(--accent)';
+          activeBtn.style.color = 'white';
         }
       }
-    }
+    }, 100);
   }
 
   let series;
@@ -340,15 +388,35 @@ async function renderPortfolioChartWithBenchmark(filter) {
   const ath = getATHFromFullHistory(state.fullTimeSeries);
   const athChg = ath ? ((endValue - ath.value) / ath.value) * 100 : null;
   
+  // Get benchmark period changes for display
+  const benchmarkChanges = {};
+  for (const benchmark of selectedBenchmarks) {
+    const change = await getBenchmarkPeriodChange(benchmark, series);
+    if (change !== null) {
+      benchmarkChanges[benchmark] = change;
+    }
+  }
+  
   // Update period change and ATH badge
   const periodChgEl = document.getElementById('port-period-chg');
   if (periodChgEl) {
+    let benchmarkHtml = '';
+    if (selectedBenchmarks.size > 0 && Object.keys(benchmarkChanges).length > 0) {
+      benchmarkHtml = '<div style="display:flex;gap:8px;margin-left:12px;flex-wrap:wrap;">';
+      for (const [benchmark, change] of Object.entries(benchmarkChanges)) {
+        const label = getBenchmarkLabel(benchmark);
+        const changeColor = change >= 0 ? 'var(--green)' : 'var(--red)';
+        benchmarkHtml += `<span style="font-size:11px;font-weight:600;background:rgba(0,0,0,0.2);padding:2px 8px;border-radius:4px;">${label}: <span style="color:${changeColor}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span></span>`;
+      }
+      benchmarkHtml += '</div>';
+    }
+    
     let athHtml = '';
     if (athChg !== null && Math.abs(athChg) > 0.01) {
       const athColor = athChg >= 0 ? 'var(--green)' : 'var(--red)';
       athHtml = `<span style="color:${athColor};font-size:11px;font-weight:600;background:rgba(239,68,68,0.08);padding:2px 8px;border-radius:4px;margin-left:8px;">${athChg >= 0 ? '+' : ''}${athChg.toFixed(2)}% from ATH (${ath.date})</span>`;
     }
-    periodChgEl.innerHTML = `<span style="color:${periodChg >= 0 ? 'var(--green)' : 'var(--red)'}">${periodChg >= 0 ? '+' : ''}${periodChg.toFixed(2)}%</span>${athHtml}`;
+    periodChgEl.innerHTML = `<span style="color:${periodChg >= 0 ? 'var(--green)' : 'var(--red)'}">${periodChg >= 0 ? '+' : ''}${periodChg.toFixed(2)}%</span>${athHtml}${benchmarkHtml}`;
   }
   
   let portfolioData, yAxisLabel, yAxisCallback;
@@ -381,61 +449,60 @@ async function renderPortfolioChartWithBenchmark(filter) {
   }];
   
   // Add selected benchmarks (only in percentage mode)
-// Add selected benchmarks (only in percentage mode)
-if (chartDisplayMode === 'percentage') {
-  for (const benchmark of selectedBenchmarks) {
-    const fullHist = await fetchBenchmarkData(benchmark, rawDates);
-    if (fullHist && Object.keys(fullHist).length > 0) {
-      // Get the starting price for the period
-      let periodStartPrice = null;
-      const firstDate = rawDates[0];
-      periodStartPrice = fullHist[firstDate];
-      if (!periodStartPrice) {
-        const prevDates = Object.keys(fullHist).filter(d => d <= firstDate).sort();
-        if (prevDates.length) periodStartPrice = fullHist[prevDates[prevDates.length - 1]];
-      }
-      
-      if (periodStartPrice) {
-        // Calculate percentage CHANGE from period start (so it starts at 0%, same as portfolio)
-        const benchmarkData = rawDates.map(date => {
-          let price = fullHist[date];
-          if (!price) {
-            const prevDates = Object.keys(fullHist).filter(d => d <= date).sort();
-            if (prevDates.length) price = fullHist[prevDates[prevDates.length - 1]];
-          }
-          if (price) {
-            // Return percentage CHANGE, not normalized value
-            return ((price - periodStartPrice) / periodStartPrice) * 100;
-          }
-          return null;
-        });
-        
-        // Forward fill nulls
-        let lastVal = null;
-        for (let i = 0; i < benchmarkData.length; i++) {
-          if (benchmarkData[i] !== null) lastVal = benchmarkData[i];
-          else if (lastVal !== null) benchmarkData[i] = lastVal;
+  if (chartDisplayMode === 'percentage') {
+    for (const benchmark of selectedBenchmarks) {
+      const fullHist = await fetchBenchmarkData(benchmark, rawDates);
+      if (fullHist && Object.keys(fullHist).length > 0) {
+        // Get the starting price for the period
+        let periodStartPrice = null;
+        const firstDate = rawDates[0];
+        periodStartPrice = fullHist[firstDate];
+        if (!periodStartPrice) {
+          const prevDates = Object.keys(fullHist).filter(d => d <= firstDate).sort();
+          if (prevDates.length) periodStartPrice = fullHist[prevDates[prevDates.length - 1]];
         }
         
-        if (benchmarkData.some(v => v !== null)) {
-          datasets.push({
-            label: getBenchmarkLabel(benchmark),
-            data: benchmarkData,
-            borderColor: BENCHMARK_CONFIG[benchmark]?.color || '#f59e0b',
-            borderWidth: 2,
-            borderDash: [6, 4],
-            backgroundColor: 'transparent',
-            fill: false,
-            pointRadius: 0,
-            pointHoverRadius: 4,
-            tension: 0.3,
-            order: 1
+        if (periodStartPrice) {
+          // Calculate percentage CHANGE from period start (so it starts at 0%, same as portfolio)
+          const benchmarkData = rawDates.map(date => {
+            let price = fullHist[date];
+            if (!price) {
+              const prevDates = Object.keys(fullHist).filter(d => d <= date).sort();
+              if (prevDates.length) price = fullHist[prevDates[prevDates.length - 1]];
+            }
+            if (price) {
+              // Return percentage CHANGE, not normalized value
+              return ((price - periodStartPrice) / periodStartPrice) * 100;
+            }
+            return null;
           });
+          
+          // Forward fill nulls
+          let lastVal = null;
+          for (let i = 0; i < benchmarkData.length; i++) {
+            if (benchmarkData[i] !== null) lastVal = benchmarkData[i];
+            else if (lastVal !== null) benchmarkData[i] = lastVal;
+          }
+          
+          if (benchmarkData.some(v => v !== null)) {
+            datasets.push({
+              label: getBenchmarkLabel(benchmark),
+              data: benchmarkData,
+              borderColor: BENCHMARK_CONFIG[benchmark]?.color || '#f59e0b',
+              borderWidth: 2,
+              borderDash: [6, 4],
+              backgroundColor: 'transparent',
+              fill: false,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              tension: 0.3,
+              order: 1
+            });
+          }
         }
       }
     }
   }
-}
   
   if (state.portfolioChartInstance) state.portfolioChartInstance.destroy();
   

@@ -9,7 +9,7 @@ export const state = {
   dayHistoryCache: {},
   portfolioTimeSeries: [],
   fullTimeSeries: [],
-  currentFilter: '1M',
+  currentFilter: '1W',
   portfolioChartInstance: null,
   pieChartInstance: null,
   pnlChartInstance: null,
