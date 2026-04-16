@@ -15,7 +15,11 @@ import {
   renderTodayPnlChart,
   destroyAllCharts,
   COLORS,
+  restoreChartDisplayMode,
+  restoreBenchmarks,
+  setTimeFilter,
 } from './charts.js';
+
 import { getFilteredHoldings } from './fileHandler.js';
 
 // Save current user to sessionStorage
@@ -24,6 +28,212 @@ function saveCurrentUser(user) {
     sessionStorage.setItem('dashboard_active_user', user);
   } catch(e) {}
 }
+
+
+// Helper to check if currently on portfolio tab
+function isOnPortfolioTab() {
+  const portfolioContent = document.getElementById('dash-tab-portfolio');
+  const allPortfoliosContent = document.getElementById('dash-tab-all-portfolios');
+  if (portfolioContent && allPortfoliosContent) {
+    return portfolioContent.style.display === 'block';
+  }
+  return true;
+}
+
+// All Portfolios view state
+let allPortfoliosView = 'table'; // 'table' or 'card'
+
+// Set All Portfolios view
+export function setAllPortfoliosView(view) {
+  allPortfoliosView = view;
+  const tableView = document.getElementById('all-portfolios-table-view');
+  const cardView = document.getElementById('all-portfolios-card-view');
+  const tableViewBtn = document.getElementById('all-portfolios-table-view-btn');
+  const cardViewBtn = document.getElementById('all-portfolios-card-view-btn');
+  
+  // Save to sessionStorage
+  try {
+    sessionStorage.setItem('all_portfolios_view', view);
+  } catch(e) {}
+  
+  if (view === 'table') {
+    if (tableView) tableView.style.display = 'block';
+    if (cardView) cardView.style.display = 'none';
+    if (tableViewBtn) {
+      tableViewBtn.style.background = 'var(--accent)';
+      tableViewBtn.style.color = 'white';
+    }
+    if (cardViewBtn) {
+      cardViewBtn.style.background = 'transparent';
+      cardViewBtn.style.color = 'var(--text2)';
+    }
+    renderAllPortfoliosTable();
+  } else {
+    if (tableView) tableView.style.display = 'none';
+    if (cardView) cardView.style.display = 'block';
+    if (cardViewBtn) {
+      cardViewBtn.style.background = 'var(--accent)';
+      cardViewBtn.style.color = 'white';
+    }
+    if (tableViewBtn) {
+      tableViewBtn.style.background = 'transparent';
+      tableViewBtn.style.color = 'var(--text2)';
+    }
+    renderAllPortfoliosCards();
+  }
+}
+
+// Restore All Portfolios view
+function restoreAllPortfoliosView() {
+  try {
+    const saved = sessionStorage.getItem('all_portfolios_view');
+    if (saved && (saved === 'table' || saved === 'card')) {
+      allPortfoliosView = saved;
+      return saved;
+    }
+  } catch(e) {}
+  return 'table';
+}
+
+// Responsive view handler for All Portfolios
+function handleResponsiveAllPortfoliosView() {
+  const isMobile = window.innerWidth < 768;
+  const currentView = allPortfoliosView;
+  
+  // On mobile, default to card view if not explicitly set by user
+  if (isMobile && currentView === 'table') {
+    // Check if user had previously set table view on desktop
+    const userPreference = sessionStorage.getItem('all_portfolios_view');
+    if (!userPreference || userPreference !== 'table') {
+      setAllPortfoliosView('card');
+    }
+  } else if (!isMobile && currentView === 'card') {
+    const userPreference = sessionStorage.getItem('all_portfolios_view');
+    if (!userPreference || userPreference !== 'card') {
+      setAllPortfoliosView('table');
+    }
+  }
+}
+
+// Render All Portfolios as cards
+function renderAllPortfoliosCards() {
+  const users = state.users || [];
+  const container = document.getElementById('all-portfolios-cards');
+  if (!container) return;
+  
+  if (!users.length) {
+    container.innerHTML = '<div style="text-align:center;padding:2rem;">No users found</div>';
+    return;
+  }
+  
+  const rows = [];
+  let totalInvestedAll = 0;
+  let totalCurrentAll = 0;
+  let totalPrevCloseAll = 0;
+  
+  for (const user of users) {
+    const userHoldings = getFilteredHoldings(state.rawRows, user);
+    const holdingsList = Object.values(userHoldings);
+    
+    if (!holdingsList.length) continue;
+    
+    let totalInvested = 0;
+    let totalCurrent = 0;
+    let totalPrevClose = 0;
+    
+    holdingsList.forEach(h => {
+      const lp = state.livePrices[h.ticker];
+      const pc = state.prevClosePrices[h.ticker];
+      totalInvested += h.invested;
+      if (lp) totalCurrent += lp * h.totalQty;
+      if (pc) totalPrevClose += pc * h.totalQty;
+    });
+    
+    totalInvestedAll += totalInvested;
+    totalCurrentAll += totalCurrent;
+    totalPrevCloseAll += totalPrevClose;
+    
+    const totalPnl = totalCurrent - totalInvested;
+    const totalPnlPct = totalInvested ? (totalPnl / totalInvested) * 100 : 0;
+    const todayChange = totalPrevClose > 0 ? totalCurrent - totalPrevClose : null;
+    const todayChangePct = totalPrevClose > 0 ? (todayChange / totalPrevClose) * 100 : null;
+    
+    rows.push({
+      user,
+      stockCount: holdingsList.length,
+      totalInvested,
+      totalCurrent,
+      totalPnl,
+      totalPnlPct,
+      todayChange,
+      todayChangePct
+    });
+  }
+  
+  container.innerHTML = rows.map(row => `
+    <div class="all-portfolios-card holding-card" data-user="${row.user}" style="cursor:pointer;">
+      <div class="hc-top">
+        <div>
+          <div class="hc-ticker" style="display:flex; align-items:center; gap:8px;">
+            <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:14px; color:white;">${row.user.charAt(0)}</div>
+            <strong>${escapeHtml(row.user)}</strong>
+          </div>
+          <div class="hc-name">${row.stockCount} stocks</div>
+        </div>
+        <div class="hc-pnl">
+          <div class="hc-pnl-val" style="color:${colorPnl(row.totalPnl)}">
+            ${row.totalPnl >= 0 ? '+' : ''}${fmt(Math.abs(row.totalPnl))}
+          </div>
+          <div class="hc-pnl-pct" style="color:${colorPnl(row.totalPnlPct)}">
+            ${row.totalPnlPct >= 0 ? '+' : ''}${row.totalPnlPct.toFixed(2)}%
+          </div>
+        </div>
+      </div>
+      <div class="hc-bar-bg">
+        <div class="hc-bar" style="width:100%; background:linear-gradient(90deg, var(--accent), var(--accent2));"></div>
+      </div>
+      <div class="hc-bottom">
+        <div>
+          <div class="hc-meta-label">Invested</div>
+          <div class="hc-meta-val">${fmt(row.totalInvested)}</div>
+        </div>
+        <div>
+          <div class="hc-meta-label">Current</div>
+          <div class="hc-meta-val">${fmt(row.totalCurrent)}</div>
+        </div>
+        <div>
+          <div class="hc-meta-label">Day Change</div>
+          <div class="hc-meta-val" style="color:${row.todayChange != null ? colorPnl(row.todayChange) : 'var(--text2)'}">
+            ${row.todayChange != null ? (row.todayChange >= 0 ? '+' : '') + fmt(Math.abs(row.todayChange)) : '—'}
+          </div>
+        </div>
+        <div>
+          <div class="hc-meta-label">Day %</div>
+          <div class="hc-meta-val" style="color:${row.todayChangePct != null ? colorPnl(row.todayChangePct) : 'var(--text2)'}">
+            ${row.todayChangePct != null ? (row.todayChangePct >= 0 ? '+' : '') + row.todayChangePct.toFixed(2) + '%' : '—'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Add click handlers
+  document.querySelectorAll('.all-portfolios-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const user = card.dataset.user;
+      const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
+      if (portfolioTab) {
+        window.switchDashTab('portfolio', portfolioTab);
+      }
+      setTimeout(() => {
+        if (typeof switchDashUser === 'function') {
+          switchDashUser(user);
+        }
+      }, 100);
+    });
+  });
+}
+
 
 // Benchmark comparison state
 let activeBenchmark = 'none'; // 'none', 'nifty50', 'nifty200', 'smallcap'
@@ -506,7 +716,7 @@ async function rebuildTimeSeriesForCurrentUser() {
     }
   }
   
-  // Rebuild time series
+  // Rebuild time series for filtered holdings only
   state.fullTimeSeries = await buildTimeSeries(histories);
 }
 
@@ -521,14 +731,13 @@ function restoreCurrentUser() {
   return 'all';
 }
 
-
 export async function loadDashboard() {
   const ds = document.getElementById('dashboard-screen');
   const dd = document.getElementById('drilldown-screen');
   if (ds) ds.style.display = 'block';
   if (dd) dd.style.display = 'none';
 
-  // Get saved tab from sessionStorage (already set by dashboard-main.js)
+  // Get saved tab from sessionStorage
   let savedTab = 'portfolio';
   try {
     const stored = sessionStorage.getItem('dashboard_current_tab');
@@ -537,15 +746,6 @@ export async function loadDashboard() {
     }
   } catch(e) {}
   
-  // Restore saved user
-  const savedUser = restoreCurrentUser();
-  state.activeUser = savedUser;
-  
-  // Only switch to saved tab if switchDashTab is available
-  if (typeof window.switchDashTab === 'function') {
-    window.switchDashTab(savedTab, document.querySelector(`[data-tab="${savedTab}"]`));
-  }
-
   const loadingDiv = document.getElementById('dash-loading');
   const contentDiv = document.getElementById('dash-content');
   const loadMsg   = document.getElementById('loading-msg');
@@ -553,13 +753,16 @@ export async function loadDashboard() {
   loadingDiv.style.display = 'flex';
   contentDiv.style.display  = 'none';
 
-  const tickers = Object.keys(state.holdings);
+  // Get ALL holdings first (for data fetching)
+  const allHoldings = state.allHoldings || getFilteredHoldings(state.rawRows, 'all');
+  state.allHoldings = allHoldings;
+  const tickers = Object.keys(allHoldings);
   loadMsg.textContent = `Fetching historic data for ${tickers.length} stocks…`;
 
   try {
     const historyResults = await Promise.all(
       tickers.map(async (ticker) => {
-        const h = state.holdings[ticker];
+        const h = allHoldings[ticker];
         const hist = await fetchHistory(h.ticker, h.upstoxTicker, '2y');
         const filled = (hist && Object.keys(hist).length > 0) ? forwardFill(hist) : {};
         return { ticker, data: filled };
@@ -577,7 +780,7 @@ export async function loadDashboard() {
           price = histories[ticker][dates[dates.length - 1]];
         }
         if (!price) {
-          price = state.holdings[ticker]?.avgBuy ?? null;
+          price = allHoldings[ticker]?.avgBuy ?? null;
         }
         return { ticker, price };
       })
@@ -587,7 +790,7 @@ export async function loadDashboard() {
     loadMsg.textContent = 'Fetching intraday data…';
     const dayResults = await Promise.all(
       tickers.map(async (ticker) => {
-        const h = state.holdings[ticker];
+        const h = allHoldings[ticker];
         const dayData = await fetchDayHistory(h.ticker, h.upstoxTicker);
         return { ticker, dayData };
       })
@@ -595,20 +798,42 @@ export async function loadDashboard() {
     dayResults.forEach(({ ticker, dayData }) => { state.dayHistories[ticker] = dayData; });
 
     loadMsg.textContent = 'Building charts…';
-    state.fullTimeSeries = await buildTimeSeries(histories);
-    state.histories      = histories;
+    // Store the full time series for ALL holdings
+    state.fullTimeSeriesAll = await buildTimeSeries(histories);
+    state.histories = histories;
 
-    // Apply user filter if needed
-    if (state.activeUser && state.activeUser !== 'all') {
-      state.holdings = getFilteredHoldings(state.rawRows, state.activeUser);
+    // CRITICAL: Restore saved user and apply filter
+    const savedUser = restoreCurrentUser();
+    state.activeUser = savedUser;
+    
+    // Filter holdings based on saved user
+    if (savedUser && savedUser !== 'all') {
+      state.holdings = getFilteredHoldings(state.rawRows, savedUser);
+    } else {
+      state.holdings = allHoldings;
     }
+    
+    // CRITICAL: Rebuild time series for the FILTERED holdings only
+    // Get histories for filtered holdings
+    const filteredHistories = {};
+    for (const ticker of Object.keys(state.holdings)) {
+      if (histories[ticker]) {
+        filteredHistories[ticker] = histories[ticker];
+      }
+    }
+    state.fullTimeSeries = await buildTimeSeries(filteredHistories);
 
     loadingDiv.style.display = 'none';
     contentDiv.style.display  = 'block';
+    
+    // Only switch to saved tab if switchDashTab is available
+    if (typeof window.switchDashTab === 'function') {
+      window.switchDashTab(savedTab, document.querySelector(`[data-tab="${savedTab}"]`));
+    }
+    
     renderDashboard();
     startAutoRefresh();
 
-    // Render all portfolios table if needed
     if (typeof renderAllPortfolios === 'function') {
       renderAllPortfolios();
     }
@@ -729,8 +954,95 @@ function updateRefreshTimestamp() {
   if (el) el.textContent = `Updated ${new Date().toLocaleTimeString()}`;
 }
 
-// Render All Portfolios table and stats
+// Update All Portfolios stats without re-rendering the table
+function updateAllPortfoliosStats() {
+  const users = state.users || [];
+  const statsContainer = document.getElementById('all-portfolios-stats');
+  if (!statsContainer) return;
+  
+  if (!users.length) {
+    statsContainer.innerHTML = '';
+    return;
+  }
+  
+  let totalInvestedAll = 0;
+  let totalCurrentAll = 0;
+  let totalPrevCloseAll = 0;
+  const uniqueTickersAll = new Set();
+  
+  for (const user of users) {
+    const userHoldings = getFilteredHoldings(state.rawRows, user);
+    const holdingsList = Object.values(userHoldings);
+    
+    if (!holdingsList.length) continue;
+    
+    Object.keys(userHoldings).forEach(ticker => uniqueTickersAll.add(ticker));
+    
+    let totalInvested = 0;
+    let totalCurrent = 0;
+    let totalPrevClose = 0;
+    
+    holdingsList.forEach(h => {
+      const lp = state.livePrices[h.ticker];
+      const pc = state.prevClosePrices[h.ticker];
+      totalInvested += h.invested;
+      if (lp) totalCurrent += lp * h.totalQty;
+      if (pc) totalPrevClose += pc * h.totalQty;
+    });
+    
+    totalInvestedAll += totalInvested;
+    totalCurrentAll += totalCurrent;
+    totalPrevCloseAll += totalPrevClose;
+  }
+  
+  const consolidatedPnl = totalCurrentAll - totalInvestedAll;
+  const consolidatedPnlPct = totalInvestedAll ? (consolidatedPnl / totalInvestedAll) * 100 : 0;
+  const consolidatedDayChange = totalPrevCloseAll > 0 ? totalCurrentAll - totalPrevCloseAll : null;
+  const consolidatedDayChangePct = totalPrevCloseAll > 0 ? (consolidatedDayChange / totalPrevCloseAll) * 100 : null;
+  
+  statsContainer.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total Portfolios</div>
+      <div class="stat-value" style="font-size:1.4rem">${users.length}</div>
+      <div class="stat-sub">${uniqueTickersAll.size} unique stocks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Consolidated Invested</div>
+      <div class="stat-value">${fmt(totalInvestedAll)}</div>
+      <div class="stat-sub">Across all users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Consolidated Value</div>
+      <div class="stat-value" style="color:${totalCurrentAll ? 'var(--text)' : 'var(--text2)'}">${totalCurrentAll ? fmt(totalCurrentAll) : '—'}</div>
+      <div class="stat-sub" style="color:${colorPnl(consolidatedPnl)}">${consolidatedPnlPct.toFixed(2)}% overall</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total P&amp;L</div>
+      <div class="stat-value" style="color:${colorPnl(consolidatedPnl)}">${consolidatedPnl >= 0 ? '+' : ''}${fmt(Math.abs(consolidatedPnl))}</div>
+      <div class="stat-sub" style="color:${colorPnl(consolidatedPnl)}">${consolidatedPnl >= 0 ? 'Profit' : 'Loss'} · ${consolidatedPnlPct.toFixed(2)}%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Day's Change (All)</div>
+      <div class="stat-value" style="color:${consolidatedDayChange != null ? colorPnl(consolidatedDayChange) : 'var(--text2)'}">${consolidatedDayChange != null ? (consolidatedDayChange >= 0 ? '+' : '') + fmt(Math.abs(consolidatedDayChange)) : '—'}</div>
+      <div class="stat-sub" style="color:${consolidatedDayChangePct != null ? colorPnl(consolidatedDayChangePct) : 'var(--text2)'}">${consolidatedDayChangePct != null ? (consolidatedDayChangePct >= 0 ? '+' : '') + consolidatedDayChangePct.toFixed(2) + '%' : '—'}</div>
+    </div>
+  `;
+}
+
+// Update renderAllPortfolios function to use the new stats function
 export function renderAllPortfolios() {
+  // First update stats
+  updateAllPortfoliosStats();
+  
+  // Then render the current view
+  if (allPortfoliosView === 'table') {
+    renderAllPortfoliosTable();
+  } else {
+    renderAllPortfoliosCards();
+  }
+}
+
+export function renderAllPortfoliosTable() {
   const users = state.users || [];
   const tbody = document.getElementById('all-portfolios-tbody');
   if (!tbody) {
@@ -742,7 +1054,6 @@ export function renderAllPortfolios() {
   
   if (!users.length) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;">No users found</td></tr>';
-    // Hide stats
     const statsContainer = document.getElementById('all-portfolios-stats');
     if (statsContainer) statsContainer.innerHTML = '';
     return;
@@ -752,15 +1063,16 @@ export function renderAllPortfolios() {
   let totalInvestedAll = 0;
   let totalCurrentAll = 0;
   let totalPrevCloseAll = 0;
+  const uniqueTickersAll = new Set();
   
   for (const user of users) {
-    // Get holdings for this user
     const userHoldings = getFilteredHoldings(state.rawRows, user);
     const holdingsList = Object.values(userHoldings);
     
     if (!holdingsList.length) continue;
     
-    // Calculate totals for this user
+    Object.keys(userHoldings).forEach(ticker => uniqueTickersAll.add(ticker));
+    
     let totalInvested = 0;
     let totalCurrent = 0;
     let totalPrevClose = 0;
@@ -794,20 +1106,80 @@ export function renderAllPortfolios() {
     });
   }
   
-  // Calculate consolidated totals
+  // Apply sorting
+  rows.sort((a, b) => {
+    let va, vb;
+    switch (allPortfoliosSort.key) {
+      case 'user':
+        va = a.user.toLowerCase();
+        vb = b.user.toLowerCase();
+        return allPortfoliosSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      case 'stockCount':
+        va = a.stockCount;
+        vb = b.stockCount;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      case 'totalInvested':
+        va = a.totalInvested;
+        vb = b.totalInvested;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      case 'totalCurrent':
+        va = a.totalCurrent;
+        vb = b.totalCurrent;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      case 'totalPnl':
+        va = a.totalPnl;
+        vb = b.totalPnl;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      case 'totalPnlPct':
+        va = a.totalPnlPct;
+        vb = b.totalPnlPct;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      case 'todayChange':
+        va = a.todayChange ?? -Infinity;
+        vb = b.todayChange ?? -Infinity;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      case 'todayChangePct':
+        va = a.todayChangePct ?? -Infinity;
+        vb = b.todayChangePct ?? -Infinity;
+        return allPortfoliosSort.asc ? va - vb : vb - va;
+      default:
+        return 0;
+    }
+  });
+  
+  // Update sort indicators on headers
+  const headers = document.querySelectorAll('#all-portfolios-table-view th');
+  headers.forEach(th => {
+    const onclickAttr = th.getAttribute('onclick');
+    let columnKey = null;
+    if (onclickAttr) {
+      const match = onclickAttr.match(/sortAllPortfoliosTable\('([^']+)'\)/);
+      if (match) columnKey = match[1];
+    }
+    
+    let baseText = th.textContent.replace(/[ ↑↓]/g, '');
+    
+    if (columnKey === allPortfoliosSort.key) {
+      th.textContent = baseText + (allPortfoliosSort.asc ? ' ↑' : ' ↓');
+    } else {
+      th.textContent = baseText;
+    }
+  });
+  
+  // Calculate consolidated totals (same as before)
   const consolidatedPnl = totalCurrentAll - totalInvestedAll;
   const consolidatedPnlPct = totalInvestedAll ? (consolidatedPnl / totalInvestedAll) * 100 : 0;
   const consolidatedDayChange = totalPrevCloseAll > 0 ? totalCurrentAll - totalPrevCloseAll : null;
   const consolidatedDayChangePct = totalPrevCloseAll > 0 ? (consolidatedDayChange / totalPrevCloseAll) * 100 : null;
   
-  // Render stat cards for All Portfolios
+  // Render stat cards (same as before)
   const statsContainer = document.getElementById('all-portfolios-stats');
   if (statsContainer) {
     statsContainer.innerHTML = `
       <div class="stat-card">
         <div class="stat-label">Total Portfolios</div>
         <div class="stat-value" style="font-size:1.4rem">${users.length}</div>
-        <div class="stat-sub">${rows.reduce((sum, r) => sum + r.stockCount, 0)} total stocks</div>
+        <div class="stat-sub">${uniqueTickersAll.size} unique stocks</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Consolidated Invested</div>
@@ -832,9 +1204,7 @@ export function renderAllPortfolios() {
     `;
   }
   
-  // Sort by user name
-  rows.sort((a, b) => a.user.localeCompare(b.user));
-  
+  // Render table rows
   tbody.innerHTML = rows.map(row => `
     <tr class="all-portfolios-row" data-user="${row.user}" style="cursor:pointer; transition:background 0.15s;">
       <td style="padding:12px 20px; border-bottom:1px solid var(--border);">
@@ -861,16 +1231,14 @@ export function renderAllPortfolios() {
     </tr>
   `).join('');
   
-  // Add click handlers to rows
+  // Add click handlers (same as before)
   document.querySelectorAll('.all-portfolios-row').forEach(row => {
     row.addEventListener('click', () => {
       const user = row.dataset.user;
-      // Switch to Portfolio tab
       const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
       if (portfolioTab) {
         window.switchDashTab('portfolio', portfolioTab);
       }
-      // Switch to the selected user
       setTimeout(() => {
         if (typeof switchDashUser === 'function') {
           switchDashUser(user);
@@ -878,7 +1246,6 @@ export function renderAllPortfolios() {
       }, 100);
     });
     
-    // Add hover effect
     row.addEventListener('mouseenter', () => {
       row.style.background = 'var(--bg3)';
     });
@@ -887,6 +1254,7 @@ export function renderAllPortfolios() {
     });
   });
 }
+
 
 // Helper function to escape HTML
 function escapeHtml(str) {
@@ -899,23 +1267,28 @@ function escapeHtml(str) {
   });
 }
 
-
+// Update renderUserTabs function
 export function renderUserTabs() {
   const users = state.users || [];
   const wrap = document.getElementById('dash-user-tabs');
   if (!wrap) return;
   
-  // Get current tab from sessionStorage or DOM
+  // Get current tab
   let currentTab = 'portfolio';
   try {
     const savedTab = sessionStorage.getItem('dashboard_current_tab');
     if (savedTab) currentTab = savedTab;
   } catch(e) {}
   
-  // Also check if portfolio tab is visible
-  const portfolioTab = document.getElementById('dash-tab-portfolio');
-  if (portfolioTab && portfolioTab.style.display === 'none') {
-    currentTab = 'all-portfolios';
+  // Check which tab is actually visible
+  const portfolioContent = document.getElementById('dash-tab-portfolio');
+  const allPortfoliosContent = document.getElementById('dash-tab-all-portfolios');
+  if (portfolioContent && allPortfoliosContent) {
+    if (allPortfoliosContent.style.display === 'block') {
+      currentTab = 'all-portfolios';
+    } else if (portfolioContent.style.display === 'block') {
+      currentTab = 'portfolio';
+    }
   }
   
   // Only show user tabs if there are at least 2 users AND we're on portfolio tab
@@ -925,12 +1298,19 @@ export function renderUserTabs() {
   }
   wrap.style.display = 'flex';
   
-  // Restore saved user, default to 'all' if none saved
+  // Restore saved user
   let active = state.activeUser || restoreCurrentUser();
   if (active !== 'all' && !users.includes(active)) {
     active = 'all';
   }
   state.activeUser = active;
+  
+  // CRITICAL: Apply the user filter to holdings
+  if (active !== 'all') {
+    state.holdings = getFilteredHoldings(state.rawRows, active);
+  } else {
+    state.holdings = state.allHoldings || getFilteredHoldings(state.rawRows, 'all');
+  }
   
   const tabs = ['all', ...users];
   wrap.innerHTML = tabs.map(u => `
@@ -942,7 +1322,7 @@ export function renderUserTabs() {
 
 export async function switchDashUser(user) {
   state.activeUser = user;
-  saveCurrentUser(user);
+  saveCurrentUser(user);  // This saves to sessionStorage
   state.holdings = getFilteredHoldings(state.rawRows, user);
   
   // Update user tab UI
@@ -989,17 +1369,20 @@ export function renderDashboard() {
 
   renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct, todayChange, todayChangePct, best, holdings });
   
-  // Always update charts data (even if not visible, they'll be ready when switched)
-  renderPortfolioChart(state.currentFilter);
-  renderPortfolioDayChart();
-  renderTodayPnlChart(holdings);
-  renderPnlChart(holdings);
+  // Small delay to ensure DOM is ready for charts
+  setTimeout(() => {
+    // Always update charts data (even if not visible, they'll be ready when switched)
+    renderPortfolioChart(state.currentFilter);
+    renderPortfolioDayChart();
+    renderTodayPnlChart(holdings);
+    renderPnlChart(holdings);
+  }, 100);
     
   // Show the appropriate view based on saved preference
-    const savedHoldingsView = restoreHoldingsView();
-    setHoldingsView(savedHoldingsView);
-    updateRefreshTimestamp();
-  }
+  const savedHoldingsView = restoreHoldingsView();
+  setHoldingsView(savedHoldingsView);
+  updateRefreshTimestamp();
+}
 
 function renderDashboardInPlace() {
   const holdings = Object.values(state.holdings);
@@ -1257,6 +1640,20 @@ export function sortHoldingsTable(key) {
     holdingsSort.asc = false;
   }
   renderHoldingsTable();
+}
+
+// All Portfolios sort state
+let allPortfoliosSort = { key: 'user', asc: true }; // default sort by user name ascending
+
+// Sort All Portfolios table
+export function sortAllPortfoliosTable(key) {
+  if (allPortfoliosSort.key === key) {
+    allPortfoliosSort.asc = !allPortfoliosSort.asc;
+  } else {
+    allPortfoliosSort.key = key;
+    allPortfoliosSort.asc = true;
+  }
+  renderAllPortfoliosTable();
 }
 
 // Set holdings view (table or card)

@@ -458,35 +458,45 @@
       </div>
     </div>
 
-    <!-- ALL PORTFOLIOS TAB - This must be OUTSIDE dash-tab-portfolio -->
-    <div id="dash-tab-all-portfolios" style="display:none;">
-      <div class="all-portfolios-section">
-        <!-- Stat Cards for All Portfolios -->
-        <div class="cards-grid" id="all-portfolios-stats" style="margin-bottom:1.5rem;"></div>
-        
-        <div style="margin-bottom:1rem;">
-          <div class="section-title" style="font-size:14px; font-weight:600; color:var(--text3);">📊 Portfolio Summary by User</div>
-          <div style="font-size:12px; color:var(--text2); margin-top:4px;">Click on any user row to view their detailed portfolio</div>
-        </div>
-        <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
-          <table class="all-portfolios-table" style="width:100%; border-collapse:collapse; font-size:13px;">
-            <thead>
-              <tr style="background:var(--bg3);">
-                <th style="padding:14px 20px; text-align:left; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">User</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Stocks</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Invested</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Current Value</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (₹)</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (%)</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day Change</th>
-                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day %</th>
-              </tr>
-            </thead>
-            <tbody id="all-portfolios-tbody"></tbody>
-          </table>
-        </div>
+<!-- ALL PORTFOLIOS TAB -->
+<div id="dash-tab-all-portfolios" style="display:none;">
+  <div class="all-portfolios-section">
+    <!-- Stat Cards for All Portfolios -->
+    <div class="cards-grid" id="all-portfolios-stats" style="margin-bottom:1.5rem;"></div>
+    
+    <!-- View Toggle for All Portfolios -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:1rem;">
+      <div class="view-toggle-group" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
+        <button id="all-portfolios-table-view-btn" class="all-portfolios-view-toggle active" onclick="setAllPortfoliosView('table')" style="background:var(--accent); color:white; border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">📋 Table View</button>
+        <button id="all-portfolios-card-view-btn" class="all-portfolios-view-toggle" onclick="setAllPortfoliosView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">🃏 Card View</button>
       </div>
     </div>
+    
+    <!-- Table View -->
+    <div id="all-portfolios-table-view" style="display:block; overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
+      <table class="all-portfolios-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="background:var(--bg3);">
+            <th style="padding:14px 20px; text-align:left; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('user')">User</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('stockCount')">Stocks</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('totalInvested')">Invested</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('totalCurrent')">Current Value</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('totalPnl')">P&amp;L (₹)</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('totalPnlPct')">P&amp;L (%)</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('todayChange')">Day Change</th>
+            <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;" onclick="sortAllPortfoliosTable('todayChangePct')">Day %</th>
+          </tr>
+        </thead>
+        <tbody id="all-portfolios-tbody"></tbody>
+      </table>
+    </div>
+    
+    <!-- Card View -->
+    <div id="all-portfolios-card-view" style="display:none;">
+      <div id="all-portfolios-cards" class="holdings-grid"></div>
+    </div>
+  </div>
+</div>
 
   </div>
 
