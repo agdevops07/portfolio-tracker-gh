@@ -396,30 +396,34 @@ async function loadStock(ticker, meta) {
   showSkeleton(ticker, meta);
   renderAIPlaceholder();
 
-  // ── Hydrate meta from stocks DB (covers direct-type and dashboard drilldown paths) ──
-  // Both submitSearch() and the dashboard URL flow pass meta=null; we need bseCode/exchange
-  // for correct exchange links. Look up the DB now (it's already loaded via loadDB()).
+  // ── CRITICAL: Look up DB entry FIRST before anything else ──
+  // This ensures _meta has exchange info for correct filing links
   if (_db) {
-    const symClean = ticker.replace(/\.(NS|BO)$/i, '');
+    const symClean = ticker.replace(/\.(NS|BO)$/i, '').replace(/-SM$/, '');
     const dbEntry  = _db.find(s => s.symbol === symClean);
     if (dbEntry) {
-      if (!meta) {
-        meta = { symbol: dbEntry.symbol, company: dbEntry.company,
-                 exchange: dbEntry.exchange, bseCode: dbEntry.bseCode || '',
-                 isin: dbEntry.isin || '', yahooTicker: dbEntry.yahooTicker || '' };
-        _meta = meta;
+      if (!_meta) {
+        _meta = { 
+          symbol: dbEntry.symbol, 
+          company: dbEntry.company,
+          exchange: dbEntry.exchange,  // This will be 'NSE-SME' for SME stocks
+          bseCode: dbEntry.bseCode || '',
+          isin: dbEntry.isin || '', 
+          yahooTicker: dbEntry.yahooTicker || '' 
+        };
       } else {
         // Patch only the fields that are missing
-        if (!meta.bseCode  && dbEntry.bseCode)  { meta.bseCode  = dbEntry.bseCode;  _meta = meta; }
-        if (!meta.exchange && dbEntry.exchange)  { meta.exchange = dbEntry.exchange; _meta = meta; }
-        if (!meta.company  && dbEntry.company)   { meta.company  = dbEntry.company;  _meta = meta; }
-        if (!meta.isin     && dbEntry.isin)      { meta.isin     = dbEntry.isin;     _meta = meta; }
+        if (!_meta.bseCode  && dbEntry.bseCode)  { _meta.bseCode  = dbEntry.bseCode; }
+        if (!_meta.exchange && dbEntry.exchange) { _meta.exchange = dbEntry.exchange; }
+        if (!_meta.company  && dbEntry.company)  { _meta.company  = dbEntry.company; }
+        if (!_meta.isin     && dbEntry.isin)     { _meta.isin     = dbEntry.isin; }
+        if (!_meta.yahooTicker && dbEntry.yahooTicker) { _meta.yahooTicker = dbEntry.yahooTicker; }
       }
     }
   }
 
   // Resolve upstox/ISIN identifier: prefer meta (from search), then holding context
-  const upstoxId = meta?.isin || _holdingCtx?.upstoxTicker || null;
+  const upstoxId = _meta?.isin || _holdingCtx?.upstoxTicker || null;
 
   // Parallel fetch
   const [livePrice, hist, fund, dayHist] = await Promise.all([
@@ -434,21 +438,23 @@ async function loadStock(ticker, meta) {
   _fundData = fund;
   state.dayHistories[ticker] = dayHist || [];
 
-  fillHeader(ticker, meta, fund);
+  fillHeader(ticker, _meta, fund);
   fillCards(ticker, fund);
   renderChart();
   renderDayChart(ticker);
   renderFundTab();
   syncFilterUI();
-  renderExchangeLinks(ticker, meta);
+  
+  // ── Render exchange links AFTER _meta is fully populated ──
+  renderExchangeLinks(ticker, _meta);
 
   // Start auto-refresh for live prices on the screener page
   startScreenerRefresh();
 
   // Load news and filings — pass fund so concalls don't race against _fundData assignment
-  loadNews(ticker, meta);
-  loadFilings(ticker, meta);
-  loadConcalls(ticker, meta, fund);
+  loadNews(ticker, _meta);
+  loadFilings(ticker, _meta);
+  loadConcalls(ticker, _meta, fund);
 }
 
 // ── Skeleton ──────────────────────────────────────
