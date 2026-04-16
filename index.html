@@ -187,7 +187,7 @@
           </button>
           <button class="btn btn-secondary upload-btn" id="add-holdings-btn" onclick="openStockPicker()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Holdings
+            Add Holdings Manually
           </button>
         </div>
 
@@ -195,7 +195,7 @@
 
         <button class="sample-btn" id="demo-btn">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Try with sample portfolio
+          Try Sample Portfolio (10 stocks 6 Users)
         </button>
 
         <div class="or-divider"><span>just browsing?</span></div>
@@ -214,6 +214,16 @@
           <button class="btn btn-secondary" style="font-size:12px;padding:7px 16px;" onclick="downloadSampleCSV()">
             📥 Download Sample CSV
           </button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:7px 16px;" onclick="toggleCsvTextInput()">
+            📋 Paste CSV Text
+          </button>
+        </div>
+        <!-- Paste CSV text area (hidden by default) -->
+        <div id="csv-text-wrap" style="display:none;margin-top:0.75rem;">
+          <textarea id="csv-text-input" rows="5"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;"
+            placeholder="Paste CSV here...&#10;ticker,quantity,average_buy_price,buy_date&#10;RELIANCE.NS,10,2400.50,2023-06-01"></textarea>
+          <button class="btn btn-primary" style="margin-top:0.5rem;width:100%;" onclick="loadFromTextInput()">Load from CSV Text →</button>
         </div>
       </div>
     </div><!-- /upload-right -->
