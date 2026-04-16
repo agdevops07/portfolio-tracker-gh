@@ -528,11 +528,11 @@ export async function loadDashboard() {
   if (ds) ds.style.display = 'block';
   if (dd) dd.style.display = 'none';
 
-  // Get saved tab from sessionStorage, default to 'portfolio' (not 'overview')
+  // Get saved tab from sessionStorage (already set by dashboard-main.js)
   let savedTab = 'portfolio';
   try {
     const stored = sessionStorage.getItem('dashboard_current_tab');
-    if (stored && (stored === 'portfolio')) {
+    if (stored && (stored === 'portfolio' || stored === 'all-portfolios')) {
       savedTab = stored;
     }
   } catch(e) {}

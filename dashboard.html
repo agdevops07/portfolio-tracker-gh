@@ -272,7 +272,7 @@
 <div id="dashboard-screen" style="display:block">
   <!-- Header with logo and actions -->
   <div class="dash-header">
-    <a href="index.html" class="dash-logo">Portfolio Tracker</a>
+  <a href="#" class="dash-logo" onclick="return false;" style="cursor:default;">Portfolio Tracker</a>
 
     <div class="header-actions">
       <!-- Refresh Controls -->
@@ -315,8 +315,8 @@
   <!-- Tabs Row: Main Tabs (left) + User Tabs (right) -->
   <div class="dash-tabs-row">
     <div class="dash-tabs">
-      <button class="dash-tab" data-tab="portfolio" onclick="switchDashTab('portfolio',this)">📊 Portfolio</button>
       <button class="dash-tab" data-tab="all-portfolios" onclick="switchDashTab('all-portfolios',this)">👥 All Portfolios</button>
+      <button class="dash-tab" data-tab="portfolio" onclick="switchDashTab('portfolio',this)">📊 Portfolio</button>
       <a href="screener.html" class="dash-tab" style="text-decoration:none;">🔍 Stock Search</a>
     </div>
     <div id="dash-user-tabs" class="dash-user-tabs"></div>

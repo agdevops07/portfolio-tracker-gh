@@ -59,7 +59,6 @@ window._stopAutoRefresh   = stopAutoRefresh;
 window.switchDashUser     = switchDashUser;
 
 window.switchDashTab = function(tab, btn) {
-  
   // Save current tab to sessionStorage
   try {
     sessionStorage.setItem('dashboard_current_tab', tab);
@@ -144,6 +143,22 @@ function updateAllPortfoliosTabVisibility() {
   }
 }
 
+// Set default tab based on number of users
+function setDefaultTab() {
+  const users = state.users || [];
+  const defaultTab = users.length > 1 ? 'all-portfolios' : 'portfolio';
+  
+  // Only switch if current tab is not already set or is default
+  const currentTab = sessionStorage.getItem('dashboard_current_tab');
+  if (!currentTab || (currentTab !== 'all-portfolios' && currentTab !== 'portfolio')) {
+    sessionStorage.setItem('dashboard_current_tab', defaultTab);
+    const tabBtn = document.querySelector(`.dash-tab[data-tab="${defaultTab}"]`);
+    if (tabBtn) {
+      window.switchDashTab(defaultTab, tabBtn);
+    }
+  }
+}
+
 // Main DOMContentLoaded - ONLY ONE
 document.addEventListener('DOMContentLoaded', async () => {
   await loadStocksDB();
@@ -164,23 +179,92 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Parse CSV first to get user count BEFORE loading dashboard
+  let userCount = 0;
+  let parsedUsers = [];
+  
   await new Promise((resolve) => {
     Papa.parse(csv, {
       header: true,
       skipEmptyLines: true,
       complete: async (r) => {
+        // Process just enough to get users
+        const rows = r.data;
+        const userSet = new Set();
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const rawUser = (row.user || row.User || row.USER || '').trim();
+          const user = rawUser || 'User 1';
+          userSet.add(user);
+        }
+        parsedUsers = Array.from(userSet);
+        userCount = parsedUsers.length;
+        
+        // Now process the full CSV
         await processCSV(r.data);
         resolve();
       },
     });
   });
   
-  await new Promise(r => setTimeout(r, 100));
-  await loadDashboard();  // This will now restore the saved tab
+  // Determine default tab based on user count
+  const defaultTab = userCount > 1 ? 'all-portfolios' : 'portfolio';
   
-  setTimeout(() => {
-  updateAllPortfoliosTabVisibility();
-}, 200);
+  // Check if there's a saved tab preference
+  let savedTab = defaultTab;
+  try {
+    const stored = sessionStorage.getItem('dashboard_current_tab');
+    if (stored && (stored === 'portfolio' || stored === 'all-portfolios')) {
+      savedTab = stored;
+    }
+  } catch(e) {}
+  
+  // Set the tab in sessionStorage before dashboard loads
+  try {
+    sessionStorage.setItem('dashboard_current_tab', savedTab);
+  } catch(e) {}
+  
+  // Show/hide All Portfolios tab based on user count
+  const allPortfoliosTab = document.querySelector('.dash-tab[data-tab="all-portfolios"]');
+  if (allPortfoliosTab) {
+    if (userCount > 1) {
+      allPortfoliosTab.style.display = '';  // Show the tab
+    } else {
+      allPortfoliosTab.style.display = 'none';  // Hide the tab
+    }
+  }
+  
+  // Update the active tab button visually before dashboard renders
+  const tabBtn = document.querySelector(`.dash-tab[data-tab="${savedTab}"]`);
+  if (tabBtn) {
+    document.querySelectorAll('.dash-tab').forEach(b => {
+      if (b.dataset && b.dataset.tab === savedTab) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+  }
+  
+  // Also hide/show the content containers before rendering
+  const portfolioContent = document.getElementById('dash-tab-portfolio');
+  const allPortfoliosContent = document.getElementById('dash-tab-all-portfolios');
+  
+  if (portfolioContent) {
+    portfolioContent.style.display = savedTab === 'portfolio' ? 'block' : 'none';
+  }
+  if (allPortfoliosContent) {
+    allPortfoliosContent.style.display = savedTab === 'all-portfolios' ? 'block' : 'none';
+  }
+  
+  // Hide user tabs when on All Portfolios view
+  const userTabs = document.getElementById('dash-user-tabs');
+  if (userTabs) {
+    userTabs.style.display = savedTab === 'all-portfolios' ? 'none' : 'flex';
+  }
+  
+  await new Promise(r => setTimeout(r, 100));
+  await loadDashboard();  // This will use the preset tab
   
   document.addEventListener('click', e => {
     const card = e.target.closest('.holding-card[data-ticker]');
