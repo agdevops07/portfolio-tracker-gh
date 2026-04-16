@@ -521,17 +521,18 @@ function restoreCurrentUser() {
   return 'all';
 }
 
+
 export async function loadDashboard() {
   const ds = document.getElementById('dashboard-screen');
   const dd = document.getElementById('drilldown-screen');
   if (ds) ds.style.display = 'block';
   if (dd) dd.style.display = 'none';
 
-  // Get saved tab from sessionStorage, default to 'portfolio' (not 'overview')
+  // Get saved tab from sessionStorage (already set by dashboard-main.js)
   let savedTab = 'portfolio';
   try {
     const stored = sessionStorage.getItem('dashboard_current_tab');
-    if (stored && (stored === 'portfolio')) {
+    if (stored && (stored === 'portfolio' || stored === 'all-portfolios')) {
       savedTab = stored;
     }
   } catch(e) {}
@@ -606,6 +607,12 @@ export async function loadDashboard() {
     contentDiv.style.display  = 'block';
     renderDashboard();
     startAutoRefresh();
+
+    // Render all portfolios table if needed
+    if (typeof renderAllPortfolios === 'function') {
+      renderAllPortfolios();
+    }
+
     updateRefreshUI();
 
   } catch (err) {
@@ -722,12 +729,197 @@ function updateRefreshTimestamp() {
   if (el) el.textContent = `Updated ${new Date().toLocaleTimeString()}`;
 }
 
+// Render All Portfolios table and stats
+export function renderAllPortfolios() {
+  const users = state.users || [];
+  const tbody = document.getElementById('all-portfolios-tbody');
+  if (!tbody) {
+    console.log('All portfolios tbody not found');
+    return;
+  }
+  
+  console.log('Rendering all portfolios for users:', users);
+  
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;">No users found</td></tr>';
+    // Hide stats
+    const statsContainer = document.getElementById('all-portfolios-stats');
+    if (statsContainer) statsContainer.innerHTML = '';
+    return;
+  }
+  
+  const rows = [];
+  let totalInvestedAll = 0;
+  let totalCurrentAll = 0;
+  let totalPrevCloseAll = 0;
+  
+  for (const user of users) {
+    // Get holdings for this user
+    const userHoldings = getFilteredHoldings(state.rawRows, user);
+    const holdingsList = Object.values(userHoldings);
+    
+    if (!holdingsList.length) continue;
+    
+    // Calculate totals for this user
+    let totalInvested = 0;
+    let totalCurrent = 0;
+    let totalPrevClose = 0;
+    
+    holdingsList.forEach(h => {
+      const lp = state.livePrices[h.ticker];
+      const pc = state.prevClosePrices[h.ticker];
+      totalInvested += h.invested;
+      if (lp) totalCurrent += lp * h.totalQty;
+      if (pc) totalPrevClose += pc * h.totalQty;
+    });
+    
+    totalInvestedAll += totalInvested;
+    totalCurrentAll += totalCurrent;
+    totalPrevCloseAll += totalPrevClose;
+    
+    const totalPnl = totalCurrent - totalInvested;
+    const totalPnlPct = totalInvested ? (totalPnl / totalInvested) * 100 : 0;
+    const todayChange = totalPrevClose > 0 ? totalCurrent - totalPrevClose : null;
+    const todayChangePct = totalPrevClose > 0 ? (todayChange / totalPrevClose) * 100 : null;
+    
+    rows.push({
+      user,
+      stockCount: holdingsList.length,
+      totalInvested,
+      totalCurrent,
+      totalPnl,
+      totalPnlPct,
+      todayChange,
+      todayChangePct
+    });
+  }
+  
+  // Calculate consolidated totals
+  const consolidatedPnl = totalCurrentAll - totalInvestedAll;
+  const consolidatedPnlPct = totalInvestedAll ? (consolidatedPnl / totalInvestedAll) * 100 : 0;
+  const consolidatedDayChange = totalPrevCloseAll > 0 ? totalCurrentAll - totalPrevCloseAll : null;
+  const consolidatedDayChangePct = totalPrevCloseAll > 0 ? (consolidatedDayChange / totalPrevCloseAll) * 100 : null;
+  
+  // Render stat cards for All Portfolios
+  const statsContainer = document.getElementById('all-portfolios-stats');
+  if (statsContainer) {
+    statsContainer.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Total Portfolios</div>
+        <div class="stat-value" style="font-size:1.4rem">${users.length}</div>
+        <div class="stat-sub">${rows.reduce((sum, r) => sum + r.stockCount, 0)} total stocks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Consolidated Invested</div>
+        <div class="stat-value">${fmt(totalInvestedAll)}</div>
+        <div class="stat-sub">Across all users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Consolidated Value</div>
+        <div class="stat-value" style="color:${totalCurrentAll ? 'var(--text)' : 'var(--text2)'}">${totalCurrentAll ? fmt(totalCurrentAll) : '—'}</div>
+        <div class="stat-sub" style="color:${colorPnl(consolidatedPnl)}">${consolidatedPnlPct.toFixed(2)}% overall</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total P&amp;L</div>
+        <div class="stat-value" style="color:${colorPnl(consolidatedPnl)}">${consolidatedPnl >= 0 ? '+' : ''}${fmt(Math.abs(consolidatedPnl))}</div>
+        <div class="stat-sub" style="color:${colorPnl(consolidatedPnl)}">${consolidatedPnl >= 0 ? 'Profit' : 'Loss'} · ${consolidatedPnlPct.toFixed(2)}%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Day's Change (All)</div>
+        <div class="stat-value" style="color:${consolidatedDayChange != null ? colorPnl(consolidatedDayChange) : 'var(--text2)'}">${consolidatedDayChange != null ? (consolidatedDayChange >= 0 ? '+' : '') + fmt(Math.abs(consolidatedDayChange)) : '—'}</div>
+        <div class="stat-sub" style="color:${consolidatedDayChangePct != null ? colorPnl(consolidatedDayChangePct) : 'var(--text2)'}">${consolidatedDayChangePct != null ? (consolidatedDayChangePct >= 0 ? '+' : '') + consolidatedDayChangePct.toFixed(2) + '%' : '—'}</div>
+      </div>
+    `;
+  }
+  
+  // Sort by user name
+  rows.sort((a, b) => a.user.localeCompare(b.user));
+  
+  tbody.innerHTML = rows.map(row => `
+    <tr class="all-portfolios-row" data-user="${row.user}" style="cursor:pointer; transition:background 0.15s;">
+      <td style="padding:12px 20px; border-bottom:1px solid var(--border);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:14px; color:white;">${row.user.charAt(0)}</div>
+          <strong style="font-size:14px;">${escapeHtml(row.user)}</strong>
+        </div>
+       </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); font-weight:600;">${row.stockCount}</td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border);">${fmt(row.totalInvested)}</td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); font-weight:600;">${row.totalCurrent ? fmt(row.totalCurrent) : '—'}</td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${colorPnl(row.totalPnl)}; font-weight:600;">
+        ${row.totalPnl >= 0 ? '+' : ''}${fmt(Math.abs(row.totalPnl))}
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${colorPnl(row.totalPnlPct)};">
+        ${row.totalPnlPct >= 0 ? '+' : ''}${row.totalPnlPct.toFixed(2)}%
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${row.todayChange != null ? colorPnl(row.todayChange) : 'var(--text2)'};">
+        ${row.todayChange != null ? (row.todayChange >= 0 ? '+' : '') + fmt(Math.abs(row.todayChange)) : '—'}
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${row.todayChangePct != null ? colorPnl(row.todayChangePct) : 'var(--text2)'};">
+        ${row.todayChangePct != null ? (row.todayChangePct >= 0 ? '+' : '') + row.todayChangePct.toFixed(2) + '%' : '—'}
+      </td>
+    </tr>
+  `).join('');
+  
+  // Add click handlers to rows
+  document.querySelectorAll('.all-portfolios-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const user = row.dataset.user;
+      // Switch to Portfolio tab
+      const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
+      if (portfolioTab) {
+        window.switchDashTab('portfolio', portfolioTab);
+      }
+      // Switch to the selected user
+      setTimeout(() => {
+        if (typeof switchDashUser === 'function') {
+          switchDashUser(user);
+        }
+      }, 100);
+    });
+    
+    // Add hover effect
+    row.addEventListener('mouseenter', () => {
+      row.style.background = 'var(--bg3)';
+    });
+    row.addEventListener('mouseleave', () => {
+      row.style.background = '';
+    });
+  });
+}
+
+// Helper function to escape HTML
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+
 export function renderUserTabs() {
   const users = state.users || [];
   const wrap = document.getElementById('dash-user-tabs');
   if (!wrap) return;
   
-  if (!users || users.length <= 1) { 
+  // Get current tab from sessionStorage or DOM
+  let currentTab = 'portfolio';
+  try {
+    const savedTab = sessionStorage.getItem('dashboard_current_tab');
+    if (savedTab) currentTab = savedTab;
+  } catch(e) {}
+  
+  // Also check if portfolio tab is visible
+  const portfolioTab = document.getElementById('dash-tab-portfolio');
+  if (portfolioTab && portfolioTab.style.display === 'none') {
+    currentTab = 'all-portfolios';
+  }
+  
+  // Only show user tabs if there are at least 2 users AND we're on portfolio tab
+  if (!users || users.length <= 1 || currentTab === 'all-portfolios') { 
     wrap.style.display = 'none'; 
     return; 
   }

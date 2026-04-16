@@ -272,37 +272,51 @@
 <div id="dashboard-screen" style="display:block">
   <!-- Header with logo and actions -->
   <div class="dash-header">
-    <a href="index.html" class="dash-logo">📈 Portfolio Tracker</a>
+  <a href="#" class="dash-logo" onclick="return false;" style="cursor:default;">Portfolio Tracker</a>
+
     <div class="header-actions">
-      <div class="refresh-controls" style="display:flex; align-items:center; gap:4px; background:var(--bg3); border-radius:40px; padding:2px 8px;">
-        <span id="market-status-tag" style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;"></span>
-        <span id="last-refresh-time" class="refresh-timestamp" style="font-size:10px;"></span>
-        <select id="refresh-interval-sel" class="interval-sel" onchange="setRefreshInterval(+this.value)" style="font-size:10px;padding:2px 6px;">
+      <!-- Refresh Controls -->
+      <div class="refresh-controls">
+        <span id="market-status-tag" style="color: var(--red); border-color: rgba(239, 68, 68, 0.3);">🔴 Market Closed</span>
+        <span id="last-refresh-time" class="refresh-timestamp">Updated 5:42:55 am</span>
+        <select id="refresh-interval-sel" class="interval-sel" onchange="setRefreshInterval(+this.value)">
           <option value="30000">30s</option>
           <option value="60000">1m</option>
           <option value="120000">2m</option>
-          <option value="300000" selected>5m</option>
+          <option value="300000" selected="">5m</option>
           <option value="600000">10m</option>
         </select>
-        <button id="refresh-pause-btn" class="export-btn" onclick="toggleRefreshPause()" style="font-size:10px;padding:2px 8px;">⏸</button>
-        <button class="export-btn" onclick="refreshPricesOnly()" style="font-size:10px;padding:2px 8px;">🔄</button>
-        <button class="export-btn" onclick="refreshDashboard()" style="font-size:10px;padding:2px 8px;">⟳</button>
+        <button id="refresh-pause-btn" class="export-btn" onclick="toggleRefreshPause()" title="Market is closed — auto-refresh suspended" disabled="" style="color: var(--text3);">⏸ Pause</button>
+        <button class="export-btn" onclick="refreshPricesOnly()" title="Refresh prices">↻</button>
+        <button class="export-btn" onclick="refreshDashboard()" title="Full refresh">⟳ Refresh</button>
       </div>
+
+      <!-- Export -->
       <div class="export-dropdown" id="export-dropdown" style="position:relative;">
-        <button class="export-btn" onclick="toggleExportMenu()" style="background:var(--bg3);border:none;border-radius:40px;padding:4px 12px;font-size:11px;">⬇ Export</button>
-        <div class="export-menu" id="export-menu" style="position:absolute;top:100%;right:0;background:var(--bg3);border-radius:12px;display:none;z-index:200;">
-          <div class="export-menu-item" onclick="exportPDF()" style="padding:6px 14px;cursor:pointer;font-size:12px;">📄 Download as PDF</div>
-          <div class="export-menu-item" onclick="exportHoldingsCSV()" style="padding:6px 14px;cursor:pointer;font-size:12px;">📥 Export Holdings CSV</div>
+        <button class="btn btn-secondary btn-sm" onclick="toggleExportMenu()" style="display:flex; align-items:center; gap:6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export ▾
+        </button>
+        <div class="export-menu" id="export-menu" style="display:none; position:absolute; top:100%; right:0; background:var(--bg3); border:1px solid var(--border2); border-radius:12px; min-width:180px; z-index:200; overflow:hidden;">
+          <div class="export-menu-item" onclick="exportPDF()" style="padding:10px 16px; cursor:pointer; font-size:13px; transition:background 0.15s;">📄 Download as PDF</div>
+          <div class="export-menu-item" onclick="exportHoldingsCSV()" style="padding:10px 16px; cursor:pointer; font-size:13px; transition:background 0.15s;">📥 Export Holdings CSV</div>
         </div>
       </div>
-      <a href="index.html" class="btn btn-secondary" style="text-decoration:none;background:var(--bg3);border-radius:40px;padding:4px 14px;font-size:11px;">← Upload New</a>
+
+      <!-- Back -->
+      <a href="index.html" class="btn btn-secondary btn-sm" style="text-decoration:none;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Upload New
+      </a>
     </div>
   </div>
+
 
   <!-- Tabs Row: Main Tabs (left) + User Tabs (right) -->
   <div class="dash-tabs-row">
     <div class="dash-tabs">
-      <button class="dash-tab active" data-tab="portfolio" onclick="switchDashTab('portfolio',this)">📊 Portfolio</button>
+      <button class="dash-tab" data-tab="all-portfolios" onclick="switchDashTab('all-portfolios',this)">👥 All Portfolios</button>
+      <button class="dash-tab" data-tab="portfolio" onclick="switchDashTab('portfolio',this)">📊 Portfolio</button>
       <a href="screener.html" class="dash-tab" style="text-decoration:none;">🔍 Stock Search</a>
     </div>
     <div id="dash-user-tabs" class="dash-user-tabs"></div>
@@ -327,8 +341,9 @@
         </div>
 
         <div id="holdings-subtoggles" style="display:flex; gap:6px; background:var(--bg3); border-radius:40px; padding:4px;">
-          <button id="holdings-table-view-btn" class="holdings-view-toggle active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">📋 Table</button>
-          <button id="holdings-card-view-btn" class="holdings-view-toggle" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">🃏 Cards</button>
+          <button id="holdings-table-view-btn" class="holdings-view-toggle active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">📋 Table View</button>
+          <button id="holdings-card-view-btn" class="holdings-view-toggle" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">🃏 Card View</button>
+          <button class="export-btn" onclick="exportHoldingsCSV()" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">📥 Export CSV</button>
         </div>
 
         <div id="charts-subtoggles" style="display:none; gap:6px; background:var(--bg3); border-radius:40px; padding:4px;">
@@ -424,7 +439,7 @@
             </div>
           </div>
 
-          <!-- P&L Analysis - Forces vertical stacking on mobile -->
+          <!-- P&L Analysis -->
           <div id="pnl-section" class="two-col" style="margin-bottom:0; display:none;">
             <div class="chart-card">
               <div class="chart-header">
@@ -442,7 +457,39 @@
         </div>
       </div>
     </div>
+
+    <!-- ALL PORTFOLIOS TAB - This must be OUTSIDE dash-tab-portfolio -->
+    <div id="dash-tab-all-portfolios" style="display:none;">
+      <div class="all-portfolios-section">
+        <!-- Stat Cards for All Portfolios -->
+        <div class="cards-grid" id="all-portfolios-stats" style="margin-bottom:1.5rem;"></div>
+        
+        <div style="margin-bottom:1rem;">
+          <div class="section-title" style="font-size:14px; font-weight:600; color:var(--text3);">📊 Portfolio Summary by User</div>
+          <div style="font-size:12px; color:var(--text2); margin-top:4px;">Click on any user row to view their detailed portfolio</div>
+        </div>
+        <div style="overflow-x:auto; border:1px solid var(--border); border-radius:var(--r-lg); background:var(--bg2);">
+          <table class="all-portfolios-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr style="background:var(--bg3);">
+                <th style="padding:14px 20px; text-align:left; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">User</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Stocks</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Invested</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Current Value</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (₹)</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">P&amp;L (%)</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day Change</th>
+                <th style="padding:14px 20px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--text2); font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">Day %</th>
+              </tr>
+            </thead>
+            <tbody id="all-portfolios-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -644,9 +691,36 @@ function maximizeChart(cardId, bodyId, canvasId) {
 <div id="stock-picker-modal" class="modal-overlay" style="display:none;align-items:flex-start;padding-top:40px;" onclick="if(event.target===this)closeStockPicker()">
   <div class="sp-modal-box">
     <div class="sp-modal-header">
-      <div class="sp-modal-title">➕ Add Holdings</div>
-      <button class="modal-close" onclick="closeStockPicker()">✕</button>
+      <div class="sp-modal-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Holdings
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div id="sp-db-status" style="display:none;font-size:12px;color:var(--text2);padding:4px 10px;background:var(--bg3);border-radius:6px;"></div>
+        <button class="modal-close" onclick="closeStockPicker()">✕</button>
+      </div>
     </div>
     <div class="sp-modal-body">
       <div id="sp-rows"></div>
-      <div id="sp-errors" style="display:none;margin
+      <div id="sp-errors" style="display:none;margin:12px 0;padding:10px 14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:var(--red);font-size:13px;line-height:1.7;"></div>
+      <button class="sp-add-row-btn" onclick="_spAddRow()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Another Stock
+      </button>
+    </div>
+    <div class="sp-modal-footer">
+      <button class="btn btn-ghost" onclick="_spReset()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        Reset
+      </button>
+      <div style="flex:1"></div>
+      <button class="btn btn-secondary" onclick="closeStockPicker()">Cancel</button>
+      <button class="btn btn-primary sp-submit-btn" onclick="_spSubmit()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Preview Holdings
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

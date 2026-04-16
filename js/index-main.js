@@ -42,8 +42,18 @@ window.loadFromTextInput = function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Clear any stale session on fresh visit to upload page
+  // Clear all session storage on fresh visit to upload page
   sessionStorage.removeItem('portfolio_csv');
+  sessionStorage.removeItem('dashboard_current_tab');
+  sessionStorage.removeItem('dashboard_active_user');
+  sessionStorage.removeItem('main_view');
+  sessionStorage.removeItem('holdings_view');
+  sessionStorage.removeItem('portfolio_view');
+  sessionStorage.removeItem('active_chart_section');
+  sessionStorage.removeItem('chart_display_mode');
+  sessionStorage.removeItem('selected_benchmarks');
+  sessionStorage.removeItem('time_filter');
+  sessionStorage.removeItem('active_benchmark');
 
   initFileHandlers();
 
@@ -57,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reset input value after each selection so the same file can be re-uploaded
   if (fileInput) {
     fileInput.addEventListener('change', () => {
-      // Let fileHandler process the file first, then reset so change fires next time
       setTimeout(() => { fileInput.value = ''; }, 500);
     });
   }
