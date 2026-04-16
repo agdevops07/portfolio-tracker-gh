@@ -225,6 +225,34 @@
   .holdings-table {
     min-width: 800px;
   }
+
+  /* ── Mobile: force card view, hide table-toggle buttons ── */
+  @media (max-width: 768px) {
+    /* Hide the Table View / Card View toggle buttons entirely on mobile */
+    #holdings-subtoggles .holdings-view-toggle,
+    .view-toggle-group .all-portfolios-view-toggle {
+      display: none !important;
+    }
+
+    /* Also hide the whole toggle group if it only had those two buttons
+       (keeps the Export CSV button visible in holdings-subtoggles) */
+    #all-portfolios-table-view {
+      display: none !important;
+    }
+
+    #all-portfolios-card-view {
+      display: block !important;
+    }
+
+    /* Force holdings to card view */
+    #holdings-table-view {
+      display: none !important;
+    }
+
+    #holdings-card-view {
+      display: block !important;
+    }
+  }
   
   /* Main toggle row responsive */
   .main-toggle-row {

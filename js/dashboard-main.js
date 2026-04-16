@@ -142,25 +142,19 @@ window.switchDashUser = async function(user) {
 
 // Update the DOMContentLoaded event handler - add this function after processCSV
 // Add this helper function
+// Fallback responsive handler (the real one lives in dashboard.js).
+// On mobile: always card, no exceptions. On desktop: restore preference.
 window.handleResponsiveAllPortfoliosView = function() {
-  // This function should be defined in dashboard.js, but if not, provide a fallback
-  const isMobile = window.innerWidth < 768;
-  const currentView = sessionStorage.getItem('all_portfolios_view') || 'table';
-  
-  if (isMobile && currentView === 'table') {
-    const userPreference = sessionStorage.getItem('all_portfolios_view');
-    if (!userPreference || userPreference !== 'table') {
-      if (typeof setAllPortfoliosView === 'function') {
-        setAllPortfoliosView('card');
-      }
-    }
-  } else if (!isMobile && currentView === 'card') {
-    const userPreference = sessionStorage.getItem('all_portfolios_view');
-    if (!userPreference || userPreference !== 'card') {
-      if (typeof setAllPortfoliosView === 'function') {
-        setAllPortfoliosView('table');
-      }
-    }
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    if (typeof setAllPortfoliosView === 'function') setAllPortfoliosView('card');
+    if (typeof setHoldingsView === 'function') setHoldingsView('card');
+  } else {
+    // Restore desktop preferences
+    const apView = sessionStorage.getItem('all_portfolios_view') || 'table';
+    const hView  = sessionStorage.getItem('holdings_view') || 'table';
+    if (typeof setAllPortfoliosView === 'function') setAllPortfoliosView(apView);
+    if (typeof setHoldingsView === 'function') setHoldingsView(hView);
   }
 };
 
@@ -252,14 +246,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Add resize listener for responsive views
   window.addEventListener('resize', () => {
-    handleResponsiveAllPortfoliosView();
-    // Also handle holdings view if needed
-    if (typeof window.innerWidth !== 'undefined') {
-      const isMobile = window.innerWidth < 768;
-      const holdingsView = sessionStorage.getItem('holdings_view');
-      if (isMobile && holdingsView !== 'card') {
-        // Optionally auto-switch holdings to card on mobile
-      }
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      // Mobile: always card, no table allowed
+      if (typeof setAllPortfoliosView === 'function') setAllPortfoliosView('card');
+      if (typeof setHoldingsView === 'function') setHoldingsView('card');
+    } else {
+      // Desktop: run the soft responsive handler (respects saved prefs)
+      handleResponsiveAllPortfoliosView();
     }
   });
 
