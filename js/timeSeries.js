@@ -151,6 +151,7 @@ export function patchTodayTimeSeries() {
     state.fullTimeSeries.push({ date: todayStr, value: rounded });
   }
 }
+
 export function filterTimeSeries(filter) {
   const all = state.fullTimeSeries;
   if (!all.length) return all;
@@ -158,8 +159,10 @@ export function filterTimeSeries(filter) {
   const last = new Date(all[all.length - 1].date);
   let cutoff;
 
-  if (filter === '1M')  { cutoff = new Date(last); cutoff.setMonth(cutoff.getMonth() - 1); }
+  if (filter === '1W')  { cutoff = new Date(last); cutoff.setDate(cutoff.getDate() - 7); }
+  else if (filter === '1M')  { cutoff = new Date(last); cutoff.setMonth(cutoff.getMonth() - 1); }
   else if (filter === '3M') { cutoff = new Date(last); cutoff.setMonth(cutoff.getMonth() - 3); }
+  else if (filter === '6M') { cutoff = new Date(last); cutoff.setMonth(cutoff.getMonth() - 6); }
   else if (filter === '1Y') { cutoff = new Date(last); cutoff.setFullYear(cutoff.getFullYear() - 1); }
   else return all;
 

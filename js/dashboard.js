@@ -44,18 +44,23 @@ function isOnPortfolioTab() {
 let allPortfoliosView = 'table'; // 'table' or 'card'
 
 // Set All Portfolios view
+// On mobile (≤768px) we always force card view — no table option.
 export function setAllPortfoliosView(view) {
+  const isMobile = window.innerWidth <= 768;
+  // On mobile, coerce to card regardless of what was requested
+  if (isMobile) view = 'card';
+
   allPortfoliosView = view;
   const tableView = document.getElementById('all-portfolios-table-view');
   const cardView = document.getElementById('all-portfolios-card-view');
   const tableViewBtn = document.getElementById('all-portfolios-table-view-btn');
   const cardViewBtn = document.getElementById('all-portfolios-card-view-btn');
-  
+
   // Save to sessionStorage
   try {
     sessionStorage.setItem('all_portfolios_view', view);
   } catch(e) {}
-  
+
   if (view === 'table') {
     if (tableView) tableView.style.display = 'block';
     if (cardView) cardView.style.display = 'none';
@@ -84,7 +89,9 @@ export function setAllPortfoliosView(view) {
 }
 
 // Restore All Portfolios view
+// Always returns 'card' on mobile screens regardless of saved preference.
 function restoreAllPortfoliosView() {
+  if (window.innerWidth <= 768) return 'card';
   try {
     const saved = sessionStorage.getItem('all_portfolios_view');
     if (saved && (saved === 'table' || saved === 'card')) {
@@ -96,22 +103,16 @@ function restoreAllPortfoliosView() {
 }
 
 // Responsive view handler for All Portfolios
+// Called on resize — always enforces card view on mobile with no override option.
 function handleResponsiveAllPortfoliosView() {
-  const isMobile = window.innerWidth < 768;
-  const currentView = allPortfoliosView;
-  
-  // On mobile, default to card view if not explicitly set by user
-  if (isMobile && currentView === 'table') {
-    // Check if user had previously set table view on desktop
-    const userPreference = sessionStorage.getItem('all_portfolios_view');
-    if (!userPreference || userPreference !== 'table') {
-      setAllPortfoliosView('card');
-    }
-  } else if (!isMobile && currentView === 'card') {
-    const userPreference = sessionStorage.getItem('all_portfolios_view');
-    if (!userPreference || userPreference !== 'card') {
-      setAllPortfoliosView('table');
-    }
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile && allPortfoliosView !== 'card') {
+    // Force card — don't check user preference; tables are disabled on mobile
+    setAllPortfoliosView('card');
+  } else if (!isMobile && allPortfoliosView === 'card') {
+    // Returning to desktop: restore saved preference or default to table
+    const saved = sessionStorage.getItem('all_portfolios_view');
+    setAllPortfoliosView(saved === 'card' ? 'card' : 'table');
   }
 }
 
@@ -1657,18 +1658,23 @@ export function sortAllPortfoliosTable(key) {
 }
 
 // Set holdings view (table or card)
+// On mobile (≤768px) we always force card view regardless of the requested view.
 export function setHoldingsView(view) {
+  const isMobile = window.innerWidth <= 768;
+  // On mobile, card is the only valid view — silently coerce
+  if (isMobile) view = 'card';
+
   holdingsView = view;
   const tableView = document.getElementById('holdings-table-view');
   const cardView = document.getElementById('holdings-card-view');
   const tableViewBtn = document.getElementById('holdings-table-view-btn');
   const cardViewBtn = document.getElementById('holdings-card-view-btn');
-  
+
   // Save to sessionStorage
   try {
     sessionStorage.setItem('holdings_view', view);
   } catch(e) {}
-  
+
   if (view === 'table') {
     if (tableView) tableView.style.display = 'block';
     if (cardView) cardView.style.display = 'none';
@@ -1699,7 +1705,9 @@ export function setHoldingsView(view) {
 }
 
 // Restore holdings view from sessionStorage
+// Always returns 'card' on mobile screens regardless of saved preference.
 function restoreHoldingsView() {
+  if (window.innerWidth <= 768) return 'card';
   try {
     const savedView = sessionStorage.getItem('holdings_view');
     if (savedView && (savedView === 'table' || savedView === 'card')) {
