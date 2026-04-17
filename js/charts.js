@@ -41,7 +41,7 @@ function makeGrad(ctx, h, upColor, downColor) {
 }
 
 // Chart display mode state ('percentage' or 'absolute')
-let chartDisplayMode = 'percentage';
+const chartDisplayMode = 'percentage'; // toggle removed — always percentage
 
 // Selected benchmarks for comparison (multiple)
 let selectedBenchmarks = new Set();
@@ -120,6 +120,68 @@ async function fetchBenchmarkData(benchmark, dates) {
   return null;
 }
 
+// Yahoo Finance symbol map for NSE indices
+// Upstox uses 'NSE_INDEX|Nifty 50' etc., but Yahoo needs the proper ^NSEI symbols.
+const BENCHMARK_YAHOO_SYMBOL = {
+  nifty50:       '^NSEI',
+  niftyBank:     '^NSEBANK',
+  niftyMidcap:   'TEST.NS',
+};
+
+/**
+ * Fetch the latest traded price for a benchmark index directly from Yahoo Finance.
+ * This bypasses fetchDayHistory() which uses the Upstox key format and gets a 404
+ * from Yahoo. Returns the price as a number, or null on failure.
+ */
+async function fetchBenchmarkLivePrice(benchmark) {
+  const symbol = BENCHMARK_YAHOO_SYMBOL[benchmark];
+  if (!symbol) return null;
+
+  // Use Yahoo v8 chart endpoint with 1d/1m resolution — smallest available window
+  const encoded = encodeURIComponent(symbol);
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encoded}?interval=1m&range=1d`;
+  const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+
+  try {
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const result = json?.chart?.result?.[0];
+    if (!result) return null;
+
+    // Prefer regularMarketPrice from meta — always the latest price
+    const meta = result.meta;
+    if (meta?.regularMarketPrice) return meta.regularMarketPrice;
+
+    // Fallback: last non-null close from the 1m candles
+    const closes = result.indicators?.quote?.[0]?.close || [];
+    for (let i = closes.length - 1; i >= 0; i--) {
+      if (closes[i] != null) return closes[i];
+    }
+  } catch (e) {
+    console.warn(`fetchBenchmarkLivePrice(${benchmark}) failed:`, e);
+  }
+  return null;
+}
+
+/**
+ * Patch today's date in a benchmark history object with the live market price.
+ * Upstox historical index API never includes today, so without this the benchmark
+ * line flatlines at yesterday's close while the portfolio shows live prices.
+ *
+ * Returns a new history object (does not mutate the original).
+ */
+async function patchBenchmarkHistoryWithLivePrice(benchmark, hist) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dow = new Date(todayStr + 'T12:00:00Z').getUTCDay();
+  if (dow === 0 || dow === 6) return hist;
+
+  const livePrice = await fetchBenchmarkLivePrice(benchmark);
+  if (!livePrice) return hist;
+
+  return { ...hist, [todayStr]: livePrice };
+}
+
 // Process benchmark history data - normalize to percentage based on period start
 function processBenchmarkHistory(hist, dates, periodStartValue = null) {
   const filtered = [];
@@ -171,11 +233,17 @@ async function getBenchmarkPeriodChange(benchmark, series) {
   const dates = series.map(p => p.date);
   const startDate = dates[0];
   const endDate = dates[dates.length - 1];
+  const todayStr = new Date().toISOString().split('T')[0];
   
   try {
     const { fetchHistory } = await import('./api.js');
-    const hist = await fetchHistory(config.upstoxKey, null, '2y');
-    if (!hist || Object.keys(hist).length === 0) return null;
+    const rawHist = await fetchHistory(config.upstoxKey, null, '2y');
+    if (!rawHist || Object.keys(rawHist).length === 0) return null;
+    
+    // Patch today's live price so the badge reflects current level, not prev close
+    const hist = endDate === todayStr
+      ? await patchBenchmarkHistoryWithLivePrice(benchmark, rawHist)
+      : rawHist;
     
     // Get start price
     let startPrice = hist[startDate];
@@ -277,48 +345,10 @@ export function restoreBenchmarks() {
   } catch(e) {}
 }
 
-// Toggle chart display mode
-export function toggleChartDisplayMode(mode) {
-  chartDisplayMode = mode;
-  
-  document.querySelectorAll('.display-mode-btn').forEach(btn => {
-    const btnMode = btn.getAttribute('data-mode');
-    if (btnMode === mode) {
-      btn.style.background = 'var(--accent)';
-      btn.style.color = 'white';
-    } else {
-      btn.style.background = 'transparent';
-      btn.style.color = 'var(--text2)';
-    }
-  });
-  
-  try {
-    sessionStorage.setItem('chart_display_mode', mode);
-  } catch(e) {}
-  
-  renderPortfolioChart(state.currentFilter);
-  renderPortfolioDayChart();
-}
+// toggleChartDisplayMode: kept as no-op so callers don't break; toggle UI can be removed from HTML
+export function toggleChartDisplayMode(_mode) { /* toggle removed — chart always % mode */ }
 
-export function restoreChartDisplayMode() {
-  try {
-    const saved = sessionStorage.getItem('chart_display_mode');
-    if (saved && (saved === 'percentage' || saved === 'absolute')) {
-      chartDisplayMode = saved;
-      document.querySelectorAll('.display-mode-btn').forEach(btn => {
-        const btnMode = btn.getAttribute('data-mode');
-        if (btnMode === saved) {
-          btn.style.background = 'var(--accent)';
-          btn.style.color = 'white';
-        } else {
-          btn.style.background = 'transparent';
-          btn.style.color = 'var(--text2)';
-        }
-      });
-    }
-  } catch(e) {}
-  return chartDisplayMode;
-}
+export function restoreChartDisplayMode() { return 'percentage'; }
 
 // Calculate ATH (All Time High) from full history
 function getATHFromFullHistory(series) {
@@ -419,21 +449,8 @@ async function renderPortfolioChartWithBenchmark(filter) {
     periodChgEl.innerHTML = `<span style="color:${periodChg >= 0 ? 'var(--green)' : 'var(--red)'}">${periodChg >= 0 ? '+' : ''}${periodChg.toFixed(2)}%</span>${athHtml}${benchmarkHtml}`;
   }
   
-  let portfolioData, yAxisLabel, yAxisCallback;
-  
-  if (chartDisplayMode === 'percentage') {
-    portfolioData = portfolioValues.map(v => ((v - startValue) / startValue) * 100);
-    yAxisLabel = 'Change (%)';
-    yAxisCallback = (v) => v.toFixed(1) + '%';
-  } else {
-    portfolioData = portfolioValues;
-    yAxisLabel = 'Portfolio Value (₹)';
-    yAxisCallback = (v) => {
-      if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
-      if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
-      return '₹' + v.toLocaleString('en-IN');
-    };
-  }
+  // Always percentage mode
+  const portfolioData = portfolioValues.map(v => ((v - startValue) / startValue) * 100);
   
   const datasets = [{
     label: 'Portfolio',
@@ -448,59 +465,67 @@ async function renderPortfolioChartWithBenchmark(filter) {
     order: 0
   }];
   
-  // Add selected benchmarks (only in percentage mode)
-  if (chartDisplayMode === 'percentage') {
-    for (const benchmark of selectedBenchmarks) {
-      const fullHist = await fetchBenchmarkData(benchmark, rawDates);
-      if (fullHist && Object.keys(fullHist).length > 0) {
-        // Get the starting price for the period
-        let periodStartPrice = null;
-        const firstDate = rawDates[0];
-        periodStartPrice = fullHist[firstDate];
-        if (!periodStartPrice) {
-          const prevDates = Object.keys(fullHist).filter(d => d <= firstDate).sort();
-          if (prevDates.length) periodStartPrice = fullHist[prevDates[prevDates.length - 1]];
-        }
-        
-        if (periodStartPrice) {
-          // Calculate percentage CHANGE from period start (so it starts at 0%, same as portfolio)
-          const benchmarkData = rawDates.map(date => {
-            let price = fullHist[date];
-            if (!price) {
-              const prevDates = Object.keys(fullHist).filter(d => d <= date).sort();
-              if (prevDates.length) price = fullHist[prevDates[prevDates.length - 1]];
-            }
-            if (price) {
-              // Return percentage CHANGE, not normalized value
-              return ((price - periodStartPrice) / periodStartPrice) * 100;
-            }
-            return null;
-          });
-          
-          // Forward fill nulls
-          let lastVal = null;
-          for (let i = 0; i < benchmarkData.length; i++) {
-            if (benchmarkData[i] !== null) lastVal = benchmarkData[i];
-            else if (lastVal !== null) benchmarkData[i] = lastVal;
-          }
-          
-          if (benchmarkData.some(v => v !== null)) {
-            datasets.push({
-              label: getBenchmarkLabel(benchmark),
-              data: benchmarkData,
-              borderColor: BENCHMARK_CONFIG[benchmark]?.color || '#f59e0b',
-              borderWidth: 2,
-              borderDash: [6, 4],
-              backgroundColor: 'transparent',
-              fill: false,
-              pointRadius: 0,
-              pointHoverRadius: 4,
-              tension: 0.3,
-              order: 1
-            });
-          }
-        }
+  // ── Benchmark datasets (always percentage mode, tooltip shows both % and abs value) ──
+  // benchmarkRawPrices stores the actual index level at each date for tooltip display
+  const benchmarkRawPrices = {};   // benchmark key → array of raw prices aligned to rawDates
+
+  for (const benchmark of selectedBenchmarks) {
+    const rawHist = await fetchBenchmarkData(benchmark, rawDates);
+    if (!rawHist || !Object.keys(rawHist).length) continue;
+
+    // Patch today's price via Yahoo Finance direct fetch — Upstox historical index
+    // API never includes today's date, so the benchmark would otherwise flatline at
+    // the previous close while the portfolio line already reflects live prices.
+    const fullHist = await patchBenchmarkHistoryWithLivePrice(benchmark, rawHist);
+
+    // Period start price: price on (or nearest day before) the first date in the series.
+    // This matches Zerodha's normalisation — the baseline is the close of the session
+    // immediately before the period begins, so day-1 shows the true first-day move.
+    const firstDate = rawDates[0];
+    let periodStartPrice = fullHist[firstDate];
+    if (!periodStartPrice) {
+      const prevDates = Object.keys(fullHist).filter(d => d <= firstDate).sort();
+      if (prevDates.length) periodStartPrice = fullHist[prevDates[prevDates.length - 1]];
+    }
+    if (!periodStartPrice) continue;
+
+    const benchmarkPctData = [];
+    const rawPricesArr = [];
+
+    let lastPrice = null;
+    for (const date of rawDates) {
+      let price = fullHist[date];
+      if (!price) {
+        const pd = Object.keys(fullHist).filter(d => d <= date).sort();
+        if (pd.length) price = fullHist[pd[pd.length - 1]];
       }
+      if (price != null) lastPrice = price;
+      if (lastPrice != null) {
+        benchmarkPctData.push(((lastPrice - periodStartPrice) / periodStartPrice) * 100);
+        rawPricesArr.push(lastPrice);
+      } else {
+        benchmarkPctData.push(null);
+        rawPricesArr.push(null);
+      }
+    }
+
+    if (benchmarkPctData.some(v => v !== null)) {
+      benchmarkRawPrices[benchmark] = rawPricesArr;
+      datasets.push({
+        label: getBenchmarkLabel(benchmark),
+        data: benchmarkPctData,
+        borderColor: BENCHMARK_CONFIG[benchmark]?.color || '#f59e0b',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        backgroundColor: 'transparent',
+        fill: false,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.3,
+        order: 1,
+        _isBenchmark: true,
+        _benchmarkKey: benchmark,
+      });
     }
   }
   
@@ -527,16 +552,29 @@ async function renderPortfolioChartWithBenchmark(filter) {
         tooltip: {
           mode: 'index',
           intersect: false,
-          backgroundColor: '#1a1a1f',
-          titleColor: '#8a8a9a',
-          bodyColor: '#f0f0f5',
+          ...TOOLTIP_DEFAULTS,
           callbacks: {
             label: (context) => {
-              let value = context.parsed.y;
-              if (chartDisplayMode === 'percentage') {
-                return `${context.dataset.label}: ${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+              const idx = context.dataIndex;
+              const pct = context.parsed.y;
+              const ds = context.dataset;
+
+              if (ds._isBenchmark && ds._benchmarkKey) {
+                // Benchmark line: show % change AND the actual index level
+                const absPrice = benchmarkRawPrices[ds._benchmarkKey]?.[idx];
+                const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+                if (absPrice != null) {
+                  return `${ds.label}: ${pctStr}  (${absPrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })})`;
+                }
+                return `${ds.label}: ${pctStr}`;
               } else {
-                return `${context.dataset.label}: ₹${value.toLocaleString('en-IN')}`;
+                // Portfolio line: show % change AND absolute ₹ value + abs change
+                const portVal = portfolioValues[idx];
+                const chgAbs = portVal - startValue;
+                const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+                const absStr = `₹${portVal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+                const chgStr = `${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+                return `${ds.label}: ${pctStr}, ${chgStr} (${absStr})`;
               }
             }
           }
@@ -549,8 +587,8 @@ async function renderPortfolioChartWithBenchmark(filter) {
         },
         y: { 
           grid: { color: 'rgba(255,255,255,0.04)' }, 
-          ticks: { color: '#7777a0', callback: yAxisCallback, font: { size: 10 } },
-          title: { display: true, text: yAxisLabel, color: '#7777a0', font: { size: 11 } }
+          ticks: { color: '#7777a0', callback: (v) => v.toFixed(1) + '%', font: { size: 10 } },
+          title: { display: true, text: 'Change (%)', color: '#7777a0', font: { size: 11 } }
         }
       },
       interaction: { mode: 'index', intersect: false }
@@ -617,7 +655,6 @@ window.applyPortCustom = function() {
   renderPortfolioChart('CUSTOM');
 };
 
-// ── Portfolio Day Chart (intraday) with prev close comparison ──
 // ── Portfolio Day Chart (intraday) with benchmark comparison ──
 export async function renderPortfolioDayChart() {
   const wrap = document.getElementById('portfolio-day-wrap');
@@ -635,7 +672,7 @@ export async function renderPortfolioDayChart() {
   
   // Also collect time points from selected benchmarks
   const benchmarkIntradayData = {};
-  if (selectedBenchmarks.size > 0 && chartDisplayMode === 'percentage') {
+  if (selectedBenchmarks.size > 0) {
     for (const benchmark of selectedBenchmarks) {
       const data = await fetchBenchmarkIntraday(benchmark);
       if (data && data.length) {
@@ -702,19 +739,9 @@ export async function renderPortfolioDayChart() {
     titleEl.appendChild(span);
   }
 
-  // Prepare data based on display mode
-  let yAxisLabel, yAxisCallback;
-  if (chartDisplayMode === 'percentage') {
-    yAxisLabel = 'Change from Prev Close (%)';
-    yAxisCallback = (v) => v.toFixed(1) + '%';
-  } else {
-    yAxisLabel = 'Portfolio Value (₹)';
-    yAxisCallback = (v) => {
-      if (v >= 10000000) return '₹' + (v / 10000000).toFixed(1) + 'Cr';
-      if (v >= 100000) return '₹' + (v / 100000).toFixed(1) + 'L';
-      return '₹' + v.toLocaleString('en-IN');
-    };
-  }
+  // Always percentage mode — y-axis shows % change from prev close
+  const yAxisLabel = 'Change from Prev Close (%)';
+  const yAxisCallback = (v) => v.toFixed(1) + '%';
 
   if (state.portfolioDayChartInstance) state.portfolioDayChartInstance.destroy();
 
@@ -723,88 +750,75 @@ export async function renderPortfolioDayChart() {
   const grad = makeGrad(ctx, 250, isUp ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', 'rgba(0,0,0,0)');
 
   const datasets = [];
+  // Store raw intraday index prices for tooltip display
+  const intradayBenchmarkRawPrices = {};   // benchmark key → array aligned to sortedTimes
 
-  // Add benchmark lines for intraday (full timeline, not just daily change)
-  if (chartDisplayMode === 'percentage' && selectedBenchmarks.size > 0) {
+  // ── Benchmark intraday lines ──
+  if (selectedBenchmarks.size > 0) {
     for (const benchmark of selectedBenchmarks) {
       const config = BENCHMARK_CONFIG[benchmark];
       const intradayData = benchmarkIntradayData[benchmark];
-      
-      if (config && intradayData && intradayData.length) {
-        // Create a map of time to price
-        const priceMap = {};
-        intradayData.forEach(point => {
-          priceMap[point.time] = point.price;
+      if (!config || !intradayData || !intradayData.length) continue;
+
+      const priceMap = {};
+      intradayData.forEach(pt => { priceMap[pt.time] = pt.price; });
+
+      // Get benchmark prev close from 5-day history (last-2 session close)
+      let benchmarkPrevClose = null;
+      try {
+        const { fetchHistory } = await import('./api.js');
+        const hist = await fetchHistory(config.upstoxKey, null, '5d');
+        if (hist && Object.keys(hist).length > 0) {
+          const dates = Object.keys(hist).sort();
+          if (dates.length >= 2) benchmarkPrevClose = hist[dates[dates.length - 2]];
+        }
+      } catch(e) {
+        console.warn(`Failed to fetch prev close for ${benchmark}:`, e);
+      }
+
+      if (!benchmarkPrevClose) continue;
+
+      const benchmarkPctValues = [];
+      const benchmarkRawArr = [];
+      let lastPrice = null;
+
+      for (const time of sortedTimes) {
+        let price = priceMap[time];
+        if (price == null && lastPrice != null) price = lastPrice;
+        if (price != null) lastPrice = price;
+
+        if (lastPrice != null) {
+          benchmarkPctValues.push(((lastPrice - benchmarkPrevClose) / benchmarkPrevClose) * 100);
+          benchmarkRawArr.push(lastPrice);
+        } else {
+          benchmarkPctValues.push(null);
+          benchmarkRawArr.push(null);
+        }
+      }
+
+      if (benchmarkPctValues.some(v => v !== null)) {
+        intradayBenchmarkRawPrices[benchmark] = benchmarkRawArr;
+        datasets.push({
+          label: config.name,
+          data: benchmarkPctValues,
+          borderColor: config.color,
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false,
+          tension: 0.2,
+          order: 1,
+          _isBenchmark: true,
+          _benchmarkKey: benchmark,
         });
-        
-        // Get previous close for this benchmark
-        let benchmarkPrevClose = null;
-        try {
-          const { fetchHistory } = await import('./api.js');
-          const hist = await fetchHistory(config.upstoxKey, null, '5d');
-          if (hist && Object.keys(hist).length > 0) {
-            const dates = Object.keys(hist).sort();
-            if (dates.length >= 2) {
-              benchmarkPrevClose = hist[dates[dates.length - 2]];
-            }
-          }
-        } catch(e) {
-          console.warn(`Failed to fetch prev close for ${benchmark}:`, e);
-        }
-        
-        if (benchmarkPrevClose) {
-          // Build benchmark values aligned with portfolio time points
-          const benchmarkValues = [];
-          let lastPrice = null;
-          
-          for (const time of sortedTimes) {
-            let price = priceMap[time];
-            if (!price && lastPrice) price = lastPrice;
-            if (price) lastPrice = price;
-            
-            if (price && benchmarkPrevClose) {
-              benchmarkValues.push(((price - benchmarkPrevClose) / benchmarkPrevClose) * 100);
-            } else {
-              benchmarkValues.push(null);
-            }
-          }
-          
-          // Forward fill any remaining nulls
-          let lastVal = null;
-          for (let i = 0; i < benchmarkValues.length; i++) {
-            if (benchmarkValues[i] !== null) lastVal = benchmarkValues[i];
-            else if (lastVal !== null) benchmarkValues[i] = lastVal;
-          }
-          
-          if (benchmarkValues.some(v => v !== null)) {
-            datasets.push({
-              data: benchmarkValues,
-              borderColor: config.color,
-              borderWidth: 2,
-              borderDash: [6, 4],
-              pointRadius: 0,
-              fill: false,
-              tension: 0.2,
-              order: 1,
-              label: `${config.name}`
-            });
-          }
-        }
       }
     }
   }
 
-  // Portfolio data
-  let portfolioDisplayValues;
-  if (chartDisplayMode === 'percentage') {
-    portfolioDisplayValues = roundedValues.map(v => ((v - baseVal) / baseVal) * 100);
-  } else {
-    portfolioDisplayValues = roundedValues;
-  }
-
-  // Prev close dashed line (at 0% in percentage mode)
-  if (hasPrevClose && chartDisplayMode === 'percentage') {
+  // Prev close baseline at 0%
+  if (hasPrevClose) {
     datasets.push({
+      label: 'Prev Close',
       data: new Array(sortedTimes.length).fill(0),
       borderColor: 'rgba(150,150,180,0.5)',
       borderWidth: 1.5,
@@ -813,12 +827,14 @@ export async function renderPortfolioDayChart() {
       fill: false,
       tension: 0,
       order: 2,
-      label: 'Prev Close'
     });
   }
 
-  // Live portfolio value line
+  // Portfolio line — always as % from prev close
+  const portfolioDisplayValues = roundedValues.map(v => ((v - baseVal) / baseVal) * 100);
+
   datasets.push({
+    label: 'Portfolio',
     data: portfolioDisplayValues,
     borderColor: color,
     borderWidth: 2.5,
@@ -828,7 +844,6 @@ export async function renderPortfolioDayChart() {
     pointHoverRadius: 4,
     tension: 0.2,
     order: 0,
-    label: 'Portfolio',
   });
 
   state.portfolioDayChartInstance = new Chart(ctx, {
@@ -845,26 +860,32 @@ export async function renderPortfolioDayChart() {
         tooltip: {
           mode: 'index',
           intersect: false,
-          backgroundColor: '#1a1a1f',
-          borderColor: 'rgba(255,255,255,0.1)',
-          borderWidth: 1,
-          titleColor: '#8a8a9a',
-          bodyColor: '#f0f0f5',
-          padding: 10,
+          ...TOOLTIP_DEFAULTS,
           callbacks: {
             label: (context) => {
-              const val = context.parsed.y;
-              if (chartDisplayMode === 'percentage') {
-                return `${context.dataset.label}: ${val >= 0 ? '+' : ''}${val.toFixed(2)}%`;
-              } else {
-                const originalVal = roundedValues[context.dataIndex];
-                const chgAbs = originalVal - baseVal;
-                const chgPct = baseVal > 0 ? (chgAbs / baseVal) * 100 : 0;
-                return [
-                  `${context.dataset.label}: ₹${originalVal.toLocaleString('en-IN')}`,
-                  `  Change: ${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%)`
-                ];
+              const idx = context.dataIndex;
+              const pct = context.parsed.y;
+              const ds = context.dataset;
+
+              if (ds._isBenchmark && ds._benchmarkKey) {
+                // Benchmark: % change from prev close + actual index level
+                const absPrice = intradayBenchmarkRawPrices[ds._benchmarkKey]?.[idx];
+                const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+                if (absPrice != null) {
+                  return `${ds.label}: ${pctStr}  (${absPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })})`;
+                }
+                return `${ds.label}: ${pctStr}`;
+              } else if (ds.label === 'Portfolio') {
+                // Portfolio: % change + absolute ₹ value + absolute ₹ change
+                const absVal = roundedValues[idx];
+                const chgAbs = absVal - baseVal;
+                const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+                const absStr = `₹${absVal.toLocaleString('en-IN')}`;
+                const chgStr = `${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')}`;
+                return `Portfolio: ${pctStr}, ${chgStr} (${absStr})`;
               }
+              // For Prev Close dataset - return null to exclude it completely
+              return null;
             }
           }
         }

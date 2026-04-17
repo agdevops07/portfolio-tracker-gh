@@ -40,14 +40,13 @@ function isOnPortfolioTab() {
   return true;
 }
 
-// All Portfolios view state
-let allPortfoliosView = 'table'; // 'table' or 'card'
+// All Portfolios view state — default to card on mobile immediately
+let allPortfoliosView = window.innerWidth <= 768 ? 'card' : 'table';
 
 // Set All Portfolios view
 // On mobile (≤768px) we always force card view — no table option.
 export function setAllPortfoliosView(view) {
   const isMobile = window.innerWidth <= 768;
-  // On mobile, coerce to card regardless of what was requested
   if (isMobile) view = 'card';
 
   allPortfoliosView = view;
@@ -56,7 +55,6 @@ export function setAllPortfoliosView(view) {
   const tableViewBtn = document.getElementById('all-portfolios-table-view-btn');
   const cardViewBtn = document.getElementById('all-portfolios-card-view-btn');
 
-  // Save to sessionStorage
   try {
     sessionStorage.setItem('all_portfolios_view', view);
   } catch(e) {}
@@ -107,10 +105,8 @@ function restoreAllPortfoliosView() {
 function handleResponsiveAllPortfoliosView() {
   const isMobile = window.innerWidth <= 768;
   if (isMobile && allPortfoliosView !== 'card') {
-    // Force card — don't check user preference; tables are disabled on mobile
     setAllPortfoliosView('card');
   } else if (!isMobile && allPortfoliosView === 'card') {
-    // Returning to desktop: restore saved preference or default to table
     const saved = sessionStorage.getItem('all_portfolios_view');
     setAllPortfoliosView(saved === 'card' ? 'card' : 'table');
   }
@@ -1034,9 +1030,18 @@ function updateAllPortfoliosStats() {
 export function renderAllPortfolios() {
   // First update stats
   updateAllPortfoliosStats();
-  
-  // Then render the current view
-  if (allPortfoliosView === 'table') {
+
+  // On mobile (≤768px) always render cards — never the table
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    allPortfoliosView = 'card';
+    // Ensure the DOM reflects card-only state
+    const tableView = document.getElementById('all-portfolios-table-view');
+    const cardView  = document.getElementById('all-portfolios-card-view');
+    if (tableView) tableView.style.display = 'none';
+    if (cardView)  cardView.style.display  = 'block';
+    renderAllPortfoliosCards();
+  } else if (allPortfoliosView === 'table') {
     renderAllPortfoliosTable();
   } else {
     renderAllPortfoliosCards();
@@ -1661,7 +1666,6 @@ export function sortAllPortfoliosTable(key) {
 // On mobile (≤768px) we always force card view regardless of the requested view.
 export function setHoldingsView(view) {
   const isMobile = window.innerWidth <= 768;
-  // On mobile, card is the only valid view — silently coerce
   if (isMobile) view = 'card';
 
   holdingsView = view;
@@ -1670,7 +1674,6 @@ export function setHoldingsView(view) {
   const tableViewBtn = document.getElementById('holdings-table-view-btn');
   const cardViewBtn = document.getElementById('holdings-card-view-btn');
 
-  // Save to sessionStorage
   try {
     sessionStorage.setItem('holdings_view', view);
   } catch(e) {}
