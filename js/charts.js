@@ -491,7 +491,7 @@ async function renderPortfolioChartWithBenchmark(filter) {
                 const absPrice = benchmarkRawPrices[ds._benchmarkKey]?.[idx];
                 const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
                 if (absPrice != null) {
-                  return `${ds.label}: ${pctStr}  (₹${absPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })})`;
+                  return `${ds.label}: ${pctStr}  (${absPrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })})`;
                 }
                 return `${ds.label}: ${pctStr}`;
               } else {
@@ -501,7 +501,7 @@ async function renderPortfolioChartWithBenchmark(filter) {
                 const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
                 const absStr = `₹${portVal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
                 const chgStr = `${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
-                return `${ds.label}: ${pctStr}  (${absStr}, ${chgStr})`;
+                return `${ds.label}: ${pctStr}, ${chgStr} (${absStr})`;
               }
             }
           }
@@ -582,7 +582,6 @@ window.applyPortCustom = function() {
   renderPortfolioChart('CUSTOM');
 };
 
-// ── Portfolio Day Chart (intraday) with prev close comparison ──
 // ── Portfolio Day Chart (intraday) with benchmark comparison ──
 export async function renderPortfolioDayChart() {
   const wrap = document.getElementById('portfolio-day-wrap');
@@ -800,7 +799,7 @@ export async function renderPortfolioDayChart() {
                 const absPrice = intradayBenchmarkRawPrices[ds._benchmarkKey]?.[idx];
                 const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
                 if (absPrice != null) {
-                  return `${ds.label}: ${pctStr}  (₹${absPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })})`;
+                  return `${ds.label}: ${pctStr}  (${absPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })})`;
                 }
                 return `${ds.label}: ${pctStr}`;
               } else if (ds.label === 'Portfolio') {
@@ -810,13 +809,11 @@ export async function renderPortfolioDayChart() {
                 const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
                 const absStr = `₹${absVal.toLocaleString('en-IN')}`;
                 const chgStr = `${chgAbs >= 0 ? '+' : ''}₹${Math.abs(chgAbs).toLocaleString('en-IN')}`;
-                return `Portfolio: ${pctStr}  (${absStr}, ${chgStr})`;
-              } else {
-                return ds.label;  // Prev Close baseline — no label body needed
+                return `Portfolio: ${pctStr}, ${chgStr} (${absStr})`;
               }
-            },
-            // Suppress the Prev Close label body
-            filter: (item) => item.dataset.label !== 'Prev Close' || false,
+              // For Prev Close dataset - return null to exclude it completely
+              return null;
+            }
           }
         }
       },
