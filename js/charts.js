@@ -120,6 +120,68 @@ async function fetchBenchmarkData(benchmark, dates) {
   return null;
 }
 
+// Yahoo Finance symbol map for NSE indices
+// Upstox uses 'NSE_INDEX|Nifty 50' etc., but Yahoo needs the proper ^NSEI symbols.
+const BENCHMARK_YAHOO_SYMBOL = {
+  nifty50:       '^NSEI',
+  niftyBank:     '^NSEBANK',
+  niftyMidcap:   'TEST.NS',
+};
+
+/**
+ * Fetch the latest traded price for a benchmark index directly from Yahoo Finance.
+ * This bypasses fetchDayHistory() which uses the Upstox key format and gets a 404
+ * from Yahoo. Returns the price as a number, or null on failure.
+ */
+async function fetchBenchmarkLivePrice(benchmark) {
+  const symbol = BENCHMARK_YAHOO_SYMBOL[benchmark];
+  if (!symbol) return null;
+
+  // Use Yahoo v8 chart endpoint with 1d/1m resolution — smallest available window
+  const encoded = encodeURIComponent(symbol);
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encoded}?interval=1m&range=1d`;
+  const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(url)}`;
+
+  try {
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const result = json?.chart?.result?.[0];
+    if (!result) return null;
+
+    // Prefer regularMarketPrice from meta — always the latest price
+    const meta = result.meta;
+    if (meta?.regularMarketPrice) return meta.regularMarketPrice;
+
+    // Fallback: last non-null close from the 1m candles
+    const closes = result.indicators?.quote?.[0]?.close || [];
+    for (let i = closes.length - 1; i >= 0; i--) {
+      if (closes[i] != null) return closes[i];
+    }
+  } catch (e) {
+    console.warn(`fetchBenchmarkLivePrice(${benchmark}) failed:`, e);
+  }
+  return null;
+}
+
+/**
+ * Patch today's date in a benchmark history object with the live market price.
+ * Upstox historical index API never includes today, so without this the benchmark
+ * line flatlines at yesterday's close while the portfolio shows live prices.
+ *
+ * Returns a new history object (does not mutate the original).
+ */
+async function patchBenchmarkHistoryWithLivePrice(benchmark, hist) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dow = new Date(todayStr + 'T12:00:00Z').getUTCDay();
+  if (dow === 0 || dow === 6) return hist;
+
+  const livePrice = await fetchBenchmarkLivePrice(benchmark);
+  if (!livePrice) return hist;
+
+  return { ...hist, [todayStr]: livePrice };
+}
+
 // Process benchmark history data - normalize to percentage based on period start
 function processBenchmarkHistory(hist, dates, periodStartValue = null) {
   const filtered = [];
@@ -171,11 +233,17 @@ async function getBenchmarkPeriodChange(benchmark, series) {
   const dates = series.map(p => p.date);
   const startDate = dates[0];
   const endDate = dates[dates.length - 1];
+  const todayStr = new Date().toISOString().split('T')[0];
   
   try {
     const { fetchHistory } = await import('./api.js');
-    const hist = await fetchHistory(config.upstoxKey, null, '2y');
-    if (!hist || Object.keys(hist).length === 0) return null;
+    const rawHist = await fetchHistory(config.upstoxKey, null, '2y');
+    if (!rawHist || Object.keys(rawHist).length === 0) return null;
+    
+    // Patch today's live price so the badge reflects current level, not prev close
+    const hist = endDate === todayStr
+      ? await patchBenchmarkHistoryWithLivePrice(benchmark, rawHist)
+      : rawHist;
     
     // Get start price
     let startPrice = hist[startDate];
@@ -402,8 +470,13 @@ async function renderPortfolioChartWithBenchmark(filter) {
   const benchmarkRawPrices = {};   // benchmark key → array of raw prices aligned to rawDates
 
   for (const benchmark of selectedBenchmarks) {
-    const fullHist = await fetchBenchmarkData(benchmark, rawDates);
-    if (!fullHist || !Object.keys(fullHist).length) continue;
+    const rawHist = await fetchBenchmarkData(benchmark, rawDates);
+    if (!rawHist || !Object.keys(rawHist).length) continue;
+
+    // Patch today's price via Yahoo Finance direct fetch — Upstox historical index
+    // API never includes today's date, so the benchmark would otherwise flatline at
+    // the previous close while the portfolio line already reflects live prices.
+    const fullHist = await patchBenchmarkHistoryWithLivePrice(benchmark, rawHist);
 
     // Period start price: price on (or nearest day before) the first date in the series.
     // This matches Zerodha's normalisation — the baseline is the close of the session
