@@ -424,10 +424,6 @@
           <div id="intraday-section" class="chart-card">
             <div class="chart-header">
               <div class="chart-title">Intraday Performance <span class="chart-subtitle">(15-min delay)</span></div>
-              <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
-                <button id="intraday-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
-                <button id="intraday-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
-              </div>
             </div>
             <div id="portfolio-day-wrap" class="chart-wrap" style="height:380px;">
               <canvas id="portfolioDayChart"></canvas>
@@ -439,10 +435,6 @@
             <div class="chart-header">
               <div class="chart-title">Historical Performance <span id="port-period-chg" style="font-size:12px;font-weight:700;"></span></div>
               <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
-                <div class="display-mode-toggle" style="display:flex; gap:4px; background:var(--bg3); border-radius:40px; padding:4px;">
-                  <button id="historical-percent-btn" class="display-mode-btn active" data-mode="percentage" onclick="toggleChartDisplayMode('percentage')" style="background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">% Change</button>
-                  <button id="historical-absolute-btn" class="display-mode-btn" data-mode="absolute" onclick="toggleChartDisplayMode('absolute')" style="background:transparent; color:var(--text2); border:none; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer;">Absolute ₹</button>
-                </div>
                 <div class="benchmark-toggle" style="display:flex; gap:4px; background:var(--bg3); padding:4px 10px; border-radius:40px;">
                   <span style="font-size:10px; color:var(--text3);">Compare:</span>
                   <button class="benchmark-btn" data-benchmark="nifty50" onclick="toggleBenchmark('nifty50')" style="background:transparent; color:var(--text2); border:none; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; cursor:pointer;">Nifty 50</button>

@@ -562,6 +562,9 @@ if (cards) {
 }
   } else {
     // ── Standard screener mode: market cap + P/E ──
+    // Clear any stale holding banner from a previously viewed holding stock
+    const holdingWrap = document.getElementById('ss-holding-banner-wrap');
+    if (holdingWrap) holdingWrap.innerHTML = '';
     cards.innerHTML = `
       <div class="stat-card">
         <div class="stat-label">Current Price</div>
