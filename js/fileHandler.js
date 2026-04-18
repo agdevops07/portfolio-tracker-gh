@@ -7,6 +7,7 @@ import { state, resetAllCaches } from './state.js';
 import { showToast, showScreen } from './utils.js';
 import { fetchPortfolioCSV } from './api.js';
 import { showPreview } from './preview.js';
+import { saveSession, getActiveSessionId } from './session.js';
 
 // ── Clear all portfolio state before loading new data ──
 function clearPortfolioState() {
@@ -228,15 +229,20 @@ export async function processCSV(rows) {
   state.allHoldings = aggregateHoldings(clean);
   state.holdings = state.allHoldings;
 
+  const reconstructed = [
+    'ticker,quantity,average_buy_price,buy_date,upstox_ticker,user',
+    ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''},${r.user}`)
+  ].join('\n');
+
   if (!sessionStorage.getItem('portfolio_csv')) {
-    try {
-      const reconstructed = [
-        'ticker,quantity,average_buy_price,buy_date,upstox_ticker,user',
-        ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''},${r.user}`)
-      ].join('\n');
-      sessionStorage.setItem('portfolio_csv', reconstructed);
-    } catch (_e) {}
+    try { sessionStorage.setItem('portfolio_csv', reconstructed); } catch (_e) {}
   }
+
+  // Persist to localStorage session so dashboard reloads correctly
+  try {
+    const activeSid = getActiveSessionId();
+    saveSession(reconstructed, null, activeSid || undefined);
+  } catch (_e) {}
 
   showPreview();
 }

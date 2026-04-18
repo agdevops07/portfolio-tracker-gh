@@ -38,9 +38,23 @@ export function showScreen(id) {
 }
 
 export function goBack() {
-  // Clear session and go back to upload page
-  try { sessionStorage.removeItem('portfolio_csv'); } catch(_e) {}
-  if (typeof window._stopAutoRefresh === 'function') window._stopAutoRefresh();
+  // Clear sessionStorage (tab-scoped) but preserve localStorage sessions
+  try {
+    sessionStorage.removeItem('portfolio_csv');
+    sessionStorage.removeItem('dashboard_current_tab');
+    sessionStorage.removeItem('dashboard_active_user');
+    sessionStorage.removeItem('main_view');
+    sessionStorage.removeItem('holdings_view');
+    sessionStorage.removeItem('portfolio_view');
+    sessionStorage.removeItem('active_chart_section');
+    sessionStorage.removeItem('chart_display_mode');
+    sessionStorage.removeItem('selected_benchmarks');
+    sessionStorage.removeItem('time_filter');
+    sessionStorage.removeItem('active_benchmark');
+    // Signal to index.html: don't auto-redirect, show upload UI
+    sessionStorage.setItem('force_upload', '1');
+  } catch (_e) {}
+  if (typeof window._stopAutoRefresh  === 'function') window._stopAutoRefresh();
   if (typeof window._destroyAllCharts === 'function') window._destroyAllCharts();
   window.location.href = 'index.html';
 }

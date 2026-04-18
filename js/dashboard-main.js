@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════
 
 import { openStockPicker, closeStockPicker } from './stockPicker.js';
+import { getActiveCSV, saveSession, getActiveSessionId } from './session.js';
 
 import { 
   loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
@@ -228,7 +229,14 @@ function setDefaultTab() {
 document.addEventListener('DOMContentLoaded', async () => {
   await loadStocksDB();
   
+  // Try sessionStorage first, then fall back to localStorage session
   let csv = sessionStorage.getItem('portfolio_csv');
+  if (!csv) {
+    csv = getActiveCSV(); // restore from saved session
+    if (csv) {
+      try { sessionStorage.setItem('portfolio_csv', csv); } catch (_e) {}
+    }
+  }
 
   if (!csv) {
     const holdingValues = Object.values(state.holdings);
