@@ -291,10 +291,17 @@
   }
   @media (max-width: 600px) {
     .dash-header {
+      flex-direction: column;
+      align-items: flex-start;
       padding: 0.5rem 0.65rem;
-      gap: 0.35rem;
+      gap: 0.5rem;
     }
-    /* Hide verbose refresh label on mobile; keep controls */
+    .dash-logo { width: 100%; }
+    .header-actions {
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
     .refresh-timestamp { display: none !important; }
     .market-status-tag { display: none !important; }
     #refresh-interval-sel { max-width: 52px; }
@@ -340,7 +347,7 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           Export ▾
         </button>
-        <div class="export-menu" id="export-menu" style="display:none; position:absolute; top:100%; right:0; background:var(--bg3); border:1px solid var(--border2); border-radius:12px; min-width:180px; z-index:200; overflow:hidden;">
+        <div class="export-menu" id="export-menu" style="display:none; position:absolute; top:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:12px; min-width:180px; z-index:200; overflow:hidden; max-width:calc(100vw - 8px);">
           <div class="export-menu-item" onclick="exportPDF()" style="padding:10px 16px; cursor:pointer; font-size:13px; transition:background 0.15s;">📄 Download as PDF</div>
           <div class="export-menu-item" onclick="exportHoldingsCSV()" style="padding:10px 16px; cursor:pointer; font-size:13px; transition:background 0.15s;">📥 Export Holdings CSV</div>
         </div>
@@ -352,7 +359,7 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Portfolio ▾
         </button>
-        <div id="switch-portfolio-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;min-width:220px;z-index:300;overflow:hidden;box-shadow:var(--shadow-md);">
+        <div id="switch-portfolio-menu" style="display:none;position:absolute;top:calc(100% + 6px);background:var(--bg3);border:1px solid var(--border2);border-radius:12px;min-width:220px;z-index:300;overflow:hidden;box-shadow:var(--shadow-md);max-width:calc(100vw - 8px);">
           <div id="switch-session-list"></div>
           <div style="padding:6px 8px;border-top:1px solid var(--border);">
             <a href="index.html" onclick="window._clearActiveAndGo(event)" class="btn btn-primary" style="width:100%;display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;text-decoration:none;">
@@ -817,6 +824,34 @@ function renderSwitchMenu() {
   }).join('');
 }
 
+/* ── Smart dropdown anchor ────────────────────────────────────────────────
+   Always called AFTER menu is visible (requestAnimationFrame) so
+   getBoundingClientRect() returns real dimensions.
+   No inline right:0 exists on either menu, so these writes are final.
+   ──────────────────────────────────────────────────────────────────────── */
+function _anchorMenu(menu, btn) {
+  const vw      = window.innerWidth;
+  const btnRect = btn.getBoundingClientRect();
+  const menuW   = menu.getBoundingClientRect().width || parseInt(menu.style.minWidth) || 200;
+
+  // Reset both sides first
+  menu.style.left  = 'auto';
+  menu.style.right = 'auto';
+
+  const spaceRight = vw - btnRect.left;
+  const spaceLeft  = btnRect.right;
+
+  if (spaceRight >= menuW) {
+    menu.style.left = '0';          // open rightward
+  } else if (spaceLeft >= menuW) {
+    menu.style.right = '0';         // open leftward
+  } else {
+    // Clamp: push left edge so right edge doesn't overflow
+    const overflow = (btnRect.left + menuW) - vw + 8;
+    menu.style.left = Math.max(0, -overflow) + 'px';
+  }
+}
+
 window._togglePortfolioMenu = function() {
   const menu = document.getElementById('switch-portfolio-menu');
   if (!menu) return;
@@ -824,6 +859,10 @@ window._togglePortfolioMenu = function() {
   menu.style.display = open ? 'none' : 'block';
   if (!open) {
     renderSwitchMenu();
+    requestAnimationFrame(() => {
+      const btn = document.getElementById('switch-portfolio-btn');
+      if (btn) _anchorMenu(menu, btn);
+    });
     setTimeout(() => {
       document.addEventListener('click', function handler(e) {
         const wrap = document.getElementById('switch-portfolio-wrap');
@@ -863,5 +902,31 @@ window._clearActiveAndGo = function(e) {
 };
 </script>
 
+<script>
+// Intercept Export toggle to apply smart anchor.
+// Uses 'load' so it runs after the external JS that defines toggleExportMenu.
+window.addEventListener('load', function() {
+  const exportWrap = document.getElementById('export-dropdown');
+  const exportBtn  = exportWrap && exportWrap.querySelector('button');
+  const exportMenu = document.getElementById('export-menu');
+  if (!exportBtn || !exportMenu) return;
+
+  exportBtn.onclick = function() {
+    const open = exportMenu.style.display !== 'none';
+    exportMenu.style.display = open ? 'none' : 'block';
+    if (!open) {
+      requestAnimationFrame(() => _anchorMenu(exportMenu, exportBtn));
+      setTimeout(() => {
+        document.addEventListener('click', function handler(e) {
+          if (!exportWrap.contains(e.target)) {
+            exportMenu.style.display = 'none';
+            document.removeEventListener('click', handler);
+          }
+        });
+      }, 50);
+    }
+  };
+});
+</script>
 </body>
 </html>

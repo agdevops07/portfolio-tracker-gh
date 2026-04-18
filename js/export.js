@@ -8,59 +8,139 @@ import { state } from './state.js';
 import { showToast } from './utils.js';
 
 // ── Export holdings as CSV (with live prices) ──
+// ── Helper: compute one holding row ──────────────────
+function _buildHoldingRow(h, totalCurrent) {
+  const lp  = state.livePrices[h.ticker];
+  const pc  = state.prevClosePrices[h.ticker];
+  const cv  = lp ? lp * h.totalQty : null;
+  const pnl = cv != null ? cv - h.invested : null;
+  const pnlPct    = pnl != null ? (pnl / h.invested) * 100 : null;
+  const alloc     = totalCurrent && cv ? (cv / totalCurrent) * 100 : null;
+  const dayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
+  const dayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
+  const sign = v => v != null ? (v >= 0 ? '+' : '') + v.toFixed(2) : 'N/A';
+  return [
+    (h.users && h.users.length ? h.users.join('/') : (h.user || 'User 1')),
+    h.ticker,
+    h.earliestDate || 'N/A',
+    h.totalQty,
+    h.avgBuy.toFixed(2),
+    h.invested.toFixed(2),
+    lp   ? lp.toFixed(2)  : 'N/A',
+    cv   ? cv.toFixed(2)  : 'N/A',
+    sign(pnl),
+    sign(pnlPct),
+    sign(dayChgAbs),
+    sign(dayChgPct),
+    alloc ? alloc.toFixed(2) : 'N/A',
+  ];
+}
+
 export function exportHoldingsCSV() {
-  const holdings = Object.values(state.holdings);
-  
-  if (!holdings || !holdings.length) {
+  const rawRows = state.rawRows || [];
+  const users   = state.users  || [];
+
+  if (!rawRows.length && !Object.keys(state.holdings).length) {
     showToast('No holdings data to export.');
     closeExportMenu();
     return;
   }
 
-  let totalCurrent = 0;
-  holdings.forEach(h => {
-    const lp = state.livePrices[h.ticker];
-    if (lp) totalCurrent += lp * h.totalQty;
-  });
+  const HEADER = [
+    'User', 'Ticker', 'Buy Date', 'Quantity', 'Avg Buy Price',
+    'Invested', 'Live Price', 'Current Value',
+    'P&L', 'P&L (%)', 'Day Change', 'Day Change (%)', 'Allocation (%)',
+  ];
 
-  const header = ['Ticker', 'Quantity', 'Avg Buy Price', 'Invested (₹)', 'Live Price (₹)', 'Current Value (₹)', 'P&L (₹)', 'P&L (%)', 'Day Change (₹)', 'Day Change (%)', 'Allocation (%)'];
-  
-  const rows = holdings.map(h => {
-    const lp = state.livePrices[h.ticker];
-    const pc = state.prevClosePrices[h.ticker];
-    const currentVal = lp ? lp * h.totalQty : null;
-    const pnlAbs = currentVal != null ? currentVal - h.invested : null;
-    const pnlPct = pnlAbs != null ? (pnlAbs / h.invested) * 100 : null;
-    const allocPct = totalCurrent && currentVal ? (currentVal / totalCurrent) * 100 : null;
-    const dayChgAbs = (lp && pc && pc > 0) ? (lp - pc) * h.totalQty : null;
-    const dayChgPct = (lp && pc && pc > 0) ? ((lp - pc) / pc) * 100 : null;
-    
-    return [
-      h.ticker,
-      h.totalQty,
-      h.avgBuy.toFixed(2),
-      h.invested.toFixed(2),
-      lp ? lp.toFixed(2) : 'N/A',
-      currentVal ? currentVal.toFixed(2) : 'N/A',
-      pnlAbs ? (pnlAbs >= 0 ? '+' : '') + pnlAbs.toFixed(2) : 'N/A',
-      pnlPct ? (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(2) : 'N/A',
-      dayChgAbs ? (dayChgAbs >= 0 ? '+' : '') + dayChgAbs.toFixed(2) : 'N/A',
-      dayChgPct ? (dayChgPct >= 0 ? '+' : '') + dayChgPct.toFixed(2) : 'N/A',
-      allocPct ? allocPct.toFixed(2) : 'N/A'
-    ];
-  });
+  const lines = [];
+  const exportDate = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  lines.push([`# Portfolio Export — ${exportDate}`]);
+  lines.push([]);
 
-  const csvContent = [header, ...rows].map(row => row.join(',')).join('\n');
+  // ── Multi-user: one section per user ──────────────────────────────────────
+  if (users.length > 1) {
+    const { aggregateHoldings, getFilteredHoldings } = _getAggFns();
+
+    users.forEach(user => {
+      const userHoldings = Object.values(getFilteredHoldings(rawRows, user));
+      if (!userHoldings.length) return;
+
+      // Compute user totals
+      let totalInvested = 0, totalCurrent = 0, totalPnl = 0, totalDayChg = 0;
+      userHoldings.forEach(h => {
+        const lp = state.livePrices[h.ticker];
+        const pc = state.prevClosePrices[h.ticker];
+        totalInvested += h.invested;
+        if (lp) {
+          const cv = lp * h.totalQty;
+          totalCurrent += cv;
+          totalPnl     += cv - h.invested;
+          if (pc && pc > 0) totalDayChg += (lp - pc) * h.totalQty;
+        }
+      });
+      const pnlPct = totalInvested ? (totalPnl / totalInvested * 100) : 0;
+
+      lines.push([`## ${user}`]);
+      lines.push([
+        `Invested: ${totalInvested.toFixed(2)}`,
+        `Current: ${totalCurrent ? totalCurrent.toFixed(2) : 'N/A'}`,
+        `P&L: ${totalPnl ? (totalPnl >= 0 ? '+' : '') + totalPnl.toFixed(2) : 'N/A'} (${(pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(2)}%)`,
+        `Day Change: ${totalDayChg ? (totalDayChg >= 0 ? '+' : '') + totalDayChg.toFixed(2) : 'N/A'}`,
+      ]);
+      lines.push(HEADER);
+      userHoldings.forEach(h => lines.push(_buildHoldingRow(h, totalCurrent)));
+      lines.push([]); // blank separator
+    });
+
+  } else {
+    // ── Single user / no user column ─────────────────────────────────────────
+    const holdings = Object.values(state.holdings);
+    let totalCurrent = 0;
+    holdings.forEach(h => { const lp = state.livePrices[h.ticker]; if (lp) totalCurrent += lp * h.totalQty; });
+    lines.push(HEADER);
+    holdings.forEach(h => lines.push(_buildHoldingRow(h, totalCurrent)));
+  }
+
+  const csvContent = lines.map(row => row.join ? row.join(',') : row).join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `portfolio-holdings-${new Date().toISOString().slice(0, 10)}.csv`;
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `portfolio-export-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
-  
-  showToast('Holdings exported as CSV!');
+
+  showToast('Holdings exported!');
   closeExportMenu();
+}
+
+// Lazy import aggregation helpers to avoid circular deps
+function _getAggFns() {
+  // fileHandler exports are available via dynamic import but for simplicity
+  // we inline a minimal aggregation here using state.rawRows
+  function aggregateHoldings(rows) {
+    const map = {};
+    rows.forEach(r => {
+      if (!map[r.ticker]) {
+        map[r.ticker] = { ticker: r.ticker, totalQty: 0, totalCost: 0, dates: [], users: [], upstoxTicker: r.upstoxTicker || null };
+      }
+      map[r.ticker].totalQty  += r.qty;
+      map[r.ticker].totalCost += r.qty * r.avg;
+      if (r.date) map[r.ticker].dates.push(r.date);
+      if (r.user && !map[r.ticker].users.includes(r.user)) map[r.ticker].users.push(r.user);
+    });
+    Object.values(map).forEach(h => {
+      h.avgBuy       = h.totalCost / h.totalQty;
+      h.invested     = h.totalCost;
+      h.earliestDate = h.dates.length ? h.dates.sort()[0] : null;
+    });
+    return map;
+  }
+  function getFilteredHoldings(rawRows, user) {
+    if (!user || user === 'all') return aggregateHoldings(rawRows);
+    return aggregateHoldings(rawRows.filter(r => r.user === user));
+  }
+  return { aggregateHoldings, getFilteredHoldings };
 }
 
 // ── Capture a canvas by ID → { title, dataUrl } or null ──
