@@ -1657,6 +1657,38 @@ input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
 }
+
+/* Export menu base sizing (controlled here, not inline) */
+.export-menu { min-width: 180px; }
+.export-menu-item { padding: 10px 16px; font-size: 13px; }
+
+/* Portfolio switcher session items */
+.switch-session-item { padding: 9px 12px; }
+.ss-item-label { font-size: 13px; }
+.ss-item-date  { font-size: 10.5px; }
+
+@media (max-width: 500px) {
+  .export-menu { min-width: 130px; }
+  .export-menu-item { padding: 7px 11px; font-size: 6px; }
+
+  #switch-portfolio-menu .btn-primary {
+    font-size: 8px !important;
+    padding: 6px 10px !important;
+    gap: 4px !important;
+  }
+
+  #switch-portfolio-menu .btn-primary svg {
+    width: 6px;
+    height: 9px;
+  }
+
+  #switch-portfolio-menu { min-width: 160px !important; }
+  .switch-session-item { padding: 6px 10px; }
+  .ss-item-label { font-size: 8px; }
+  .ss-item-date  { font-size: 7px; }
+  
+}
+
 .export-menu-item:hover { background: var(--bg4); color: var(--text); }
 
 /* Export / misc buttons */

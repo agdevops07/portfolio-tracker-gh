@@ -343,13 +343,13 @@
 
       <!-- Export -->
       <div class="export-dropdown" id="export-dropdown" style="position:relative;">
-        <button class="btn btn-secondary btn-sm" onclick="toggleExportMenu()" style="display:flex; align-items:center; gap:6px;">
+        <button class="btn btn-secondary btn-sm" id="export-btn" onclick="_toggleExportMenuSmart()" style="display:flex; align-items:center; gap:6px;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           Export ▾
         </button>
-        <div class="export-menu" id="export-menu" style="display:none; position:absolute; top:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:12px; min-width:180px; z-index:200; overflow:hidden; max-width:calc(100vw - 8px);">
-          <div class="export-menu-item" onclick="exportPDF()" style="padding:10px 16px; cursor:pointer; font-size:13px; transition:background 0.15s;">📄 Download as PDF</div>
-          <div class="export-menu-item" onclick="exportHoldingsCSV()" style="padding:10px 16px; cursor:pointer; font-size:13px; transition:background 0.15s;">📥 Export Holdings CSV</div>
+        <div class="export-menu" id="export-menu" style="display:none; position:absolute; top:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:12px; z-index:200; overflow:hidden; max-width:calc(100vw - 8px);">
+          <div class="export-menu-item" onclick="exportPDF()" style="cursor:pointer; transition:background 0.15s;">📄 Download as PDF</div>
+          <div class="export-menu-item" onclick="exportHoldingsCSV()" style="cursor:pointer; transition:background 0.15s;">📥 Export Holdings CSV</div>
         </div>
       </div>
 
@@ -359,7 +359,7 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Portfolio ▾
         </button>
-        <div id="switch-portfolio-menu" style="display:none;position:absolute;top:calc(100% + 6px);background:var(--bg3);border:1px solid var(--border2);border-radius:12px;min-width:220px;z-index:300;overflow:hidden;box-shadow:var(--shadow-md);max-width:calc(100vw - 8px);">
+        <div id="switch-portfolio-menu" style="display:none;position:absolute;top:calc(100% + 6px);background:var(--bg3);border:1px solid var(--border2);border-radius:12px;z-index:300;overflow:hidden;box-shadow:var(--shadow-md);max-width:calc(100vw - 8px);">
           <div id="switch-session-list"></div>
           <div style="padding:6px 8px;border-top:1px solid var(--border);">
             <a href="index.html" onclick="window._clearActiveAndGo(event)" class="btn btn-primary" style="width:100%;display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;text-decoration:none;">
@@ -813,10 +813,10 @@ function renderSwitchMenu() {
   }
   list.innerHTML = sessions.map(s => {
     const isActive = s.id === activeSid;
-    return `<div class="switch-session-item ${isActive ? 'switch-session-item--active' : ''}" style="display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.12s;" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background=''" onclick="window._switchToSession('${s.id}')">
+    return `<div class="switch-session-item ${isActive ? 'switch-session-item--active' : ''}" style="display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.12s;" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background=''" onclick="window._switchToSession('${s.id}')">
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:600;color:${isActive ? 'var(--accent2)' : 'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(s.label)}</div>
-        <div style="font-size:10.5px;color:var(--text3);margin-top:1px;">${fmtSessionDate(s.updatedAt)}</div>
+        <div class="ss-item-label" style="font-weight:600;color:${isActive ? 'var(--accent2)' : 'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(s.label)}</div>
+        <div class="ss-item-date" style="color:var(--text3);margin-top:1px;">${fmtSessionDate(s.updatedAt)}</div>
       </div>
       ${isActive ? '<span style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent2);background:var(--accent3);padding:2px 7px;border-radius:100px;">Active</span>' : ''}
       <button title="Delete" onclick="event.stopPropagation();window._deleteSwitchSession('${s.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;line-height:1;" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'">✕</button>
@@ -903,30 +903,26 @@ window._clearActiveAndGo = function(e) {
 </script>
 
 <script>
-// Intercept Export toggle to apply smart anchor.
-// Uses 'load' so it runs after the external JS that defines toggleExportMenu.
-window.addEventListener('load', function() {
+function _toggleExportMenuSmart() {
   const exportWrap = document.getElementById('export-dropdown');
-  const exportBtn  = exportWrap && exportWrap.querySelector('button');
+  const exportBtn  = document.getElementById('export-btn');
   const exportMenu = document.getElementById('export-menu');
-  if (!exportBtn || !exportMenu) return;
+  if (!exportMenu || !exportBtn) return;
 
-  exportBtn.onclick = function() {
-    const open = exportMenu.style.display !== 'none';
-    exportMenu.style.display = open ? 'none' : 'block';
-    if (!open) {
-      requestAnimationFrame(() => _anchorMenu(exportMenu, exportBtn));
-      setTimeout(() => {
-        document.addEventListener('click', function handler(e) {
-          if (!exportWrap.contains(e.target)) {
-            exportMenu.style.display = 'none';
-            document.removeEventListener('click', handler);
-          }
-        });
-      }, 50);
-    }
-  };
-});
+  const open = exportMenu.style.display !== 'none';
+  exportMenu.style.display = open ? 'none' : 'block';
+  if (!open) {
+    requestAnimationFrame(() => _anchorMenu(exportMenu, exportBtn));
+    setTimeout(() => {
+      document.addEventListener('click', function handler(e) {
+        if (!exportWrap.contains(e.target)) {
+          exportMenu.style.display = 'none';
+          document.removeEventListener('click', handler);
+        }
+      });
+    }, 50);
+  }
+}
 </script>
 </body>
 </html>
