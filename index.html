@@ -96,8 +96,17 @@
     allocation, performance trends, and fundamentals.
   </p>
 
+  <!-- Saved Sessions Panel (shown only when sessions exist; JS controls visibility) -->
+  <div id="session-panel" style="display:none;width:100%;max-width:min(680px,100%);margin-bottom:1.5rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);">Saved Sessions</div>
+      <button onclick="window._startFresh()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'">&plus; Start Fresh</button>
+    </div>
+    <div id="session-list" style="display:flex;flex-direction:column;gap:0.4rem;"></div>
+  </div>
+
   <!-- Trust pills -->
-  <div class="trust-bar">
+  <div class="trust-bar" id="trust-bar-wrap">
     <span class="trust-pill">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       15-min delayed prices
@@ -113,7 +122,7 @@
   </div>
 
   <!-- Two-column layout -->
-  <div class="upload-layout">
+  <div class="upload-layout" id="upload-layout">
 
     <!-- LEFT: Feature list -->
     <div class="upload-left">
@@ -282,6 +291,22 @@ function downloadSampleCSV() {
 
 window._chartInstances = {};
 window._clearNoPortMsgs = function() {};
+
+// Called from "Start Fresh" link — bypasses auto-redirect on next load
+window._startFresh = function() {
+  try {
+    sessionStorage.setItem('force_upload', '1');
+    localStorage.removeItem('portfolio_active_sid');
+    sessionStorage.removeItem('portfolio_csv');
+  } catch(_e) {}
+  // Hide session panel, show upload UI
+  var panel = document.getElementById('session-panel');
+  if (panel) panel.style.display = 'none';
+  var ul = document.getElementById('upload-layout');
+  if (ul) { ul.style.display = ''; ul.style.animation = 'fadeUp 0.4s ease both'; }
+  var tb = document.getElementById('trust-bar-wrap');
+  if (tb) { tb.style.display = ''; }
+};
 
 function loadDashboardFromPreview() {
   var existing = sessionStorage.getItem('portfolio_csv');

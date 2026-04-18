@@ -2182,3 +2182,138 @@ input[type="date"].sp-input::-webkit-calendar-picker-indicator { filter: invert(
   .stat-sub { font-size: 10px; }
   .dash-tab { padding: 5px 11px; font-size: 10.5px; }
 }
+
+/* ══════════════════════════════════════════════════════
+   SESSION MANAGER UI
+══════════════════════════════════════════════════════ */
+
+.session-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-md);
+  padding: 0.65rem 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.session-card:hover { background: var(--bg3); border-color: var(--border3); }
+.session-card--active {
+  border-color: rgba(91,94,244,0.45);
+  background: rgba(91,94,244,0.07);
+}
+.session-card-body { flex: 1; min-width: 0; }
+.session-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-card--active .session-card-name { color: var(--accent2); }
+.session-card-meta {
+  font-size: 10.5px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+.session-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  background: var(--accent3);
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-top: 3px;
+  display: inline-block;
+}
+.session-card-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.session-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 3px 5px;
+  border-radius: var(--r-sm);
+  color: var(--text3);
+  transition: background 0.12s, color 0.12s;
+  line-height: 1;
+}
+.session-action-btn:hover { background: var(--bg4); color: var(--text); }
+.session-action-btn--danger:hover { color: var(--red); }
+
+/* ── Mobile responsive improvements ── */
+@media (max-width: 600px) {
+  /* Upload layout: stack vertically on mobile */
+  .upload-layout {
+    grid-template-columns: 1fr !important;
+  }
+  /* Trust bar: tighter on mobile */
+  .trust-bar { gap: 0.75rem; }
+
+  /* Dashboard header: compact on mobile */
+  .dash-header {
+    padding: 0.6rem 0.75rem !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+  }
+  .dash-logo { font-size: 13px !important; }
+
+  /* Hide refresh label text on mobile */
+  .refresh-timestamp { display: none; }
+  #refresh-interval-sel { width: 52px; font-size: 11px; }
+
+  /* Make export & portfolio buttons smaller on mobile */
+  #switch-portfolio-btn,
+  .export-btn { padding: 5px 8px !important; font-size: 11px !important; }
+
+  /* Stack header actions vertically if needed */
+  .header-actions {
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end;
+  }
+
+  /* Refresh controls: strip on mobile */
+  .refresh-controls {
+    gap: 3px !important;
+    flex-wrap: wrap;
+  }
+
+  /* Session panel: full width */
+  #session-panel { max-width: 100%; }
+
+  /* Stat cards: always 2-col on small mobile */
+  .cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Tabs: scrollable row on mobile */
+  .dash-tabs-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .dash-tabs { flex-wrap: nowrap; }
+
+  /* Preview table: horizontally scrollable */
+  .preview-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Holding cards: more compact */
+  .holding-card { padding: 0.6rem 0.75rem !important; }
+  .holding-card-ticker { font-size: 13px !important; }
+}
+
+@media (max-width: 400px) {
+  .dash-logo span, .dash-logo-text { display: none; }
+  .refresh-controls .export-btn[title="Full refresh"] { display: none; }
+}
+
+/* ── Medium tablet improvements ── */
+@media (max-width: 768px) and (min-width: 601px) {
+  .upload-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
