@@ -118,7 +118,7 @@ Enable the `gh-pages-previews` branch as an **additional** GitHub Pages source i
 
 ## 💾 Session Management
 
-The app now persists up to **3 portfolio sessions** in `localStorage` so your data survives browser restarts.
+The app now persists up to **5 portfolio sessions** in `localStorage` so your data survives browser restarts.
 
 | Action | Result |
 |---|---|
