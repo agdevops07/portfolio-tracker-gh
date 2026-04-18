@@ -21,10 +21,11 @@ export function forwardFill(series) {
 
   const filled = {};
   const start = new Date(dates[0] + 'T12:00:00Z');
-  const seriesEnd = new Date(dates[dates.length - 1] + 'T12:00:00Z');
-  const today = new Date();
-  today.setUTCHours(12, 0, 0, 0);
-  const end = seriesEnd > today ? seriesEnd : today;
+  // Stop at the last date Yahoo actually returned — do NOT extend to today.
+  // buildTimeSeries patches today's live-price point separately, so extending
+  // here would forward-fill yesterday's close into today's date key, causing
+  // every label on the chart to appear one day ahead of its actual data.
+  const end = new Date(dates[dates.length - 1] + 'T12:00:00Z');
   let last = null;
 
   for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
@@ -123,32 +124,38 @@ export async function buildTimeSeries(histories) {
  * Call this after refreshPricesOnly() instead of rebuilding the full 2-year series.
  */
 export function patchTodayTimeSeries() {
+  if (!state.fullTimeSeries.length) return;
+
   const todayStr = new Date().toISOString().split('T')[0];
-  if (isWeekend(todayStr) || !state.fullTimeSeries.length) return;
+  const isWeekendToday = isWeekend(todayStr);
 
   const holdings = Object.values(state.holdings);
-  let todayValue = 0;
+  let liveValue = 0;
   holdings.forEach(h => {
     const lp = state.livePrices[h.ticker];
     if (lp) {
-      todayValue += lp * h.totalQty;
+      liveValue += lp * h.totalQty;
     } else {
       const hist = state.histories?.[h.ticker];
       if (hist) {
         const dates = Object.keys(hist).sort();
         const lastClose = hist[dates[dates.length - 1]];
-        if (lastClose) todayValue += lastClose * h.totalQty;
+        if (lastClose) liveValue += lastClose * h.totalQty;
       }
     }
   });
 
-  if (todayValue <= 0) return;
-  const rounded = Math.round(todayValue);
-  const idx = state.fullTimeSeries.findIndex(p => p.date === todayStr);
-  if (idx >= 0) {
-    state.fullTimeSeries[idx].value = rounded;
+  if (liveValue <= 0) return;
+  const rounded = Math.round(liveValue);
+
+  if (!isWeekendToday) {
+    // Weekday: patch or append today's entry
+    const idx = state.fullTimeSeries.findIndex(p => p.date === todayStr);
+    if (idx >= 0) state.fullTimeSeries[idx].value = rounded;
+    else state.fullTimeSeries.push({ date: todayStr, value: rounded });
   } else {
-    state.fullTimeSeries.push({ date: todayStr, value: rounded });
+    // Weekend: update the last entry (most recent Friday) in place
+    state.fullTimeSeries[state.fullTimeSeries.length - 1].value = rounded;
   }
 }
 

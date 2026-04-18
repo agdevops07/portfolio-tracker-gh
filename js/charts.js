@@ -279,6 +279,44 @@ async function renderPortfolioChartWithBenchmark(filter) {
     }, 100);
   }
 
+  // ── Always patch the last weekday point with live prices before rendering ──
+  // Weekday: patch/append today. Weekend: update last Friday in-place.
+  // This keeps the chart's rightmost value in sync with live prices always.
+  if (state.fullTimeSeries?.length) {
+    const holdings = Object.values(state.holdings);
+    let liveValue = 0;
+    let hasAnyPrice = false;
+    holdings.forEach(h => {
+      const lp = state.livePrices?.[h.ticker];
+      if (lp) {
+        liveValue += lp * h.totalQty;
+        hasAnyPrice = true;
+      } else {
+        const hist = state.histories?.[h.ticker];
+        if (hist) {
+          const dates = Object.keys(hist).sort();
+          const lastClose = hist[dates[dates.length - 1]];
+          if (lastClose) liveValue += lastClose * h.totalQty;
+        }
+      }
+    });
+    if (hasAnyPrice && liveValue > 0) {
+      const rounded = Math.round(liveValue);
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayDow = new Date(todayStr + 'T12:00:00Z').getUTCDay();
+      const isWeekendToday = todayDow === 0 || todayDow === 6;
+      if (!isWeekendToday) {
+        // Weekday: patch or append today's entry
+        const idx = state.fullTimeSeries.findIndex(p => p.date === todayStr);
+        if (idx >= 0) state.fullTimeSeries[idx].value = rounded;
+        else state.fullTimeSeries.push({ date: todayStr, value: rounded });
+      } else {
+        // Weekend: update the last entry (most recent Friday) in place
+        state.fullTimeSeries[state.fullTimeSeries.length - 1].value = rounded;
+      }
+    }
+  }
+
   let series;
   if (filter === 'CUSTOM') {
     const from = document.getElementById('port-from')?.value;
@@ -353,12 +391,27 @@ async function renderPortfolioChartWithBenchmark(filter) {
   // Always percentage mode
   const portfolioData = portfolioValues.map(v => ((v - startValue) / startValue) * 100);
 
+  // Calculate if overall period is up or down
+  const periodPerformance = periodChg >= 0;
+  const lineColor = periodPerformance ? '#22c55e' : '#ef4444';
+  const gradientColor = periodPerformance ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
+
+  // Create gradient based on period performance
+  let portfolioGradient;
+  try {
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    portfolioGradient = makeGrad(tempCtx, 400, gradientColor, 'rgba(0,0,0,0)');
+  } catch(e) {
+    portfolioGradient = gradientColor;
+  }
+
   const datasets = [{
     label: 'Portfolio',
     data: portfolioData,
-    borderColor: '#6366f1',
+    borderColor: lineColor,
     borderWidth: 2.5,
-    backgroundColor: 'rgba(99,102,241,0.05)',
+    backgroundColor: portfolioGradient,
     fill: true,
     pointRadius: 0,
     pointHoverRadius: 5,
