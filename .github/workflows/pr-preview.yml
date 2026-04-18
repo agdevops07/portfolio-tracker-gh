@@ -30,12 +30,13 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          OUTPUT=$(netlify deploy \
+          netlify deploy \
             --dir=. \
             --alias=pr-${{ github.event.pull_request.number }} \
             --message="PR #${{ github.event.pull_request.number }} preview" \
-            --json 2>/dev/null)
-          echo "deploy_url=$(echo $OUTPUT | python3 -c \"import sys,json; print(json.load(sys.stdin)['deploy_url'])\")" >> $GITHUB_OUTPUT
+            --json > deploy_output.json 2>/dev/null
+          DEPLOY_URL=$(python3 -c "import json; d=json.load(open('deploy_output.json')); print(d['deploy_url'])")
+          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
       - name: Comment preview URL on PR
         uses: actions/github-script@v7
