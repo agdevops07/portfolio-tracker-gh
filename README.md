@@ -1,6 +1,8 @@
 # 📈 Portfolio Tracker — GitHub Pages Edition
 
-A fully client-side portfolio tracker. No server, no backend. Works from any static host including GitHub Pages.
+A fully client-side portfolio tracker. No server, no backend, no login. Works from any static host including GitHub Pages. Your data never leaves your browser.
+
+---
 
 ## 🚀 Deploy in 3 steps
 
@@ -10,122 +12,220 @@ A fully client-side portfolio tracker. No server, no backend. Works from any sta
 git init
 git add .
 git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/portfolio-tracker.git
+git remote add origin https://github.com/YOUR_USERNAME/portfolio-tracker-gh.git
 git push -u origin main
 ```
 
 ### 2. Enable GitHub Pages
 
-In your repo on GitHub:
+Go to your repo → **Settings → Pages → Source → GitHub Actions** → Save.
 
-- Go to **Settings → Pages**
-- Under **Source**, select **GitHub Actions**
-- Save — that's it. The workflow in `.github/workflows/deploy.yml` handles the rest automatically.
+### 3. Add your API key secret
 
-### 3. Access your tracker
+**Settings → Secrets and variables → Actions → New repository secret**
 
-GitHub will give you a URL like:
+| Secret | Value |
+|---|---|
+| `GROQ_API_KEY` | Your Groq API key (free at [console.groq.com](https://console.groq.com)) — powers AI analysis in the Stock Screener |
+
+Your site will be live at:
 ```
 https://YOUR_USERNAME.github.io/portfolio-tracker-gh/
 ```
 
-Every time you `git push` to `main`, the site redeploys automatically.
+Every `git push` to `main` redeploys automatically.
 
 ---
 
-## 📁 Updating your portfolio
+## 📁 CSV Format
 
-Edit `data/my_portfolio.csv` with your actual holdings:
+Upload a CSV (drag-drop, browse, or paste text). Only 3 columns are required:
 
 ```csv
-ticker,quantity,average_buy_price,buy_date,upstoxTicker
-RELIANCE.NS,10,2400.50,2023-06-01,INE002A01018
-TCS.NS,5,3800.00,2023-04-15,
-AAPL,15,175.00,2023-03-01,
+ticker,quantity,average_buy_price,buy_date,user
+RELIANCE.NS,10,2400.50,2023-06-01,Alice
+TCS.NS,5,3800.00,2023-04-15,Alice
+INFY.NS,20,1500.00,2023-01-10,Bob
+HDFCBANK.NS,8,1650.00,2023-09-20,Bob
+AAPL,15,175.00,2023-03-01,Alice
 ```
 
 | Column | Required | Notes |
 |---|---|---|
-| `ticker` | ✅ | Yahoo Finance ticker (e.g. `RELIANCE.NS`, `TCS.NS`, `AAPL`) |
-| `quantity` | ✅ | Number of shares |
+| `ticker` | ✅ | Yahoo Finance ticker. NSE: `RELIANCE.NS`. BSE: `RELIANCE.BO`. US: `AAPL`, `MSFT` |
+| `quantity` | ✅ | Number of shares held |
 | `average_buy_price` | ✅ | Your average purchase price |
-| `buy_date` | Optional | Format: `YYYY-MM-DD` |
-| `upstoxTicker` | Optional | ISIN for Upstox data (ignored in this version) |
+| `buy_date` | Optional | `YYYY-MM-DD`. Used for CAGR calculation |
+| `user` | Optional | Owner name for multi-user portfolios (e.g. `Alice`, `Bob`). Defaults to `User 1` if omitted |
+| `upstox_ticker` | — | **No longer required.** ISIN is auto-looked up from the built-in stocks database |
 
-After editing the CSV, commit and push — the site updates within a minute.
+### Multiple rows per ticker
 
----
+Multiple rows for the same ticker are automatically aggregated using weighted average price:
 
-## 🔧 How it works
+```csv
+ticker,quantity,average_buy_price,buy_date,user
+TCS.NS,5,3200.00,2022-11-01,Alice
+TCS.NS,3,4100.00,2024-02-15,Alice
+```
 
-This version calls **Yahoo Finance directly from the browser** via a public CORS proxy (`corsproxy.io`). This removes the need for any server or serverless functions.
+### Default portfolio
 
-| Feature | Method |
-|---|---|
-| Live prices | Yahoo Finance v8 API (proxied) |
-| Historical data | Yahoo Finance v8 API (proxied) |
-| Intraday 5-min | Yahoo Finance v8 API (proxied) |
-| Your portfolio CSV | Fetched from `data/my_portfolio.csv` in the repo |
+Edit `data/my_portfolio.csv` in the repo and push — it's what loads when you click **"Try Sample Portfolio"** on the upload screen.
 
 ---
 
 ## 📊 Features
 
-- Live prices & previous close (auto-refresh every 1–10 min)
-- Portfolio value over time chart (1M / 3M / 1Y / ALL)
-- Today's intraday chart (5-min candles)
-- Allocation doughnut chart
-- Overall P&L by stock
-- Today's P&L by stock
-- Per-stock drilldown with price history (default: 31 Mar – today, fully customisable) + intraday
-- Fundamentals from Screener.in: Key Ratios, P&L, Balance Sheet, Cash Flow, Quarterly Results
-- Standalone / Consolidated toggle for all fundamental views
-- Maximize button on all charts (opens a full-screen overlay)
-- Full holdings modal with sortable table
-- Export chart as PNG
-- Load your CSV from the repo or drag-drop any CSV
+### Dashboard
+- **Live prices** — auto-refreshed every 1–10 min (configurable). ~15-min delayed
+- **Stat cards** — Total Invested, Current Value, Overall P&L, Today's P&L, Portfolio vs ATH
+- **Holdings table** — sortable by any column; toggle between table and card view
+- **Allocation doughnut** chart
+- **Portfolio value over time** — 1W / 1M / 3M / 1Y / ALL filters with benchmark comparison (NIFTY 50, SENSEX, Gold, S&P 500)
+- **Intraday chart** — today's 5-min portfolio value
+- **P&L chart** — overall gain/loss per stock
+- **Today's P&L chart** — daily change per stock
+- **Drawdown chart** — max drawdown from ATH over time
 
-### 🔍 Stock Search tab
-- Search any NSE/BSE stock by name or ticker (5,000+ stock database, no portfolio needed)
-- Identical view to the per-stock drilldown — price history, intraday, full fundamentals
-- Clear (✕) button on the search bar for quick reset on mobile
+### Multi-user portfolios
+When your CSV has a `user` column with multiple names:
+- **All Portfolios tab** — side-by-side summary of every user (invested, current value, P&L, day change)
+- **Per-user tabs** — switch to see individual holdings and charts per person
+
+### Per-stock drilldown
+Click any holding to open a detailed view:
+- Price history (default last 12 months, customisable date range)
+- Intraday 5-min chart
+- Your holding context: qty, avg buy, P&L, CAGR
+- Full fundamentals from Screener.in — Key Ratios, P&L, Balance Sheet, Cash Flow, Quarterly Results
+- Standalone / Consolidated toggle
+
+### Stock Screener tab
+- Search any NSE/BSE stock by name or ticker (5,000+ stock database — no portfolio needed)
+- Same drilldown view as holdings
+- AI-powered stock analysis via Groq
+
+---
+
+## 💾 Sessions
+
+The app saves up to **5 portfolio sessions** in `localStorage` — your data survives browser restarts and tab closes without re-uploading.
+
+| Scenario | Behaviour |
+|---|---|
+| Upload or load a portfolio | Automatically saved as a session |
+| Revisit the site | Redirected straight to the dashboard |
+| **Portfolio ▾** button in dashboard | Switch between up to 5 saved sessions |
+| **Start Fresh** on upload page | Shows upload form; saved sessions are preserved |
+| Rename a session | Click ✏️ next to any session card |
+| Delete a session | Click 🗑️ — permanent, cannot be undone |
+
+All session data lives entirely in your browser — nothing is sent to any server.
+
+---
+
+## 📥 Export
+
+From the **Export ▾** button in the dashboard header.
+
+### Export Holdings CSV
+
+Downloads a CSV with full detail. When a multi-user portfolio is loaded, the file contains **one section per user** — a header block with that user's summary totals, followed by their individual holdings rows, making per-person reconciliation easy.
+
+| Column | Description |
+|---|---|
+| User | Owner of this holding |
+| Ticker | Yahoo Finance ticker |
+| Quantity | Total shares held |
+| Avg Buy Price | Weighted average purchase price |
+| Buy Date | Earliest purchase date for this holding |
+| Invested | Total cost (qty × avg buy price) |
+| Live Price | Latest fetched market price |
+| Current Value | Live price × quantity |
+| P&L (₹) | Current value − invested |
+| P&L (%) | Return percentage |
+| Day Change (₹) | Today's absolute change in portfolio value |
+| Day Change (%) | Today's percentage change |
+| Allocation (%) | This holding as % of total portfolio value |
+
+### Download as PDF
+
+Captures all visible charts + the holdings table as a printable PDF. Opens a new tab with the browser print dialog.
 
 ---
 
 ## 🔀 PR Preview Deployments
 
-Every pull request automatically gets a live preview URL so you can test before merging.
+Every pull request automatically gets a live Netlify preview URL so you can test before merging.
 
 ### How it works
 
-1. Open a PR targeting `main` or `master`
-2. The `pr-preview.yml` workflow builds and deploys to the `gh-pages-previews` branch under `pr-{number}/`
-3. A bot comment appears on the PR with the preview URL:
+1. Open a PR targeting `main`
+2. The `pr-preview.yml` workflow deploys the branch to Netlify
+3. A bot comments on the PR:
    ```
-   https://YOUR_USERNAME.github.io/portfolio-tracker/pr-42/
+   🔗 Open Preview → https://pr-38--YOUR-SITE.netlify.app
    ```
-4. When the PR is closed/merged, the preview is automatically removed
+4. When the PR is closed/merged the preview comment is cleaned up
 
 ### One-time setup
 
-Enable the `gh-pages-previews` branch as an **additional** GitHub Pages source isn't needed — the workflow pushes files there automatically. You only need:
+**a)** Create a free site at [netlify.com](https://netlify.com) → **Add new site → Deploy manually** (don't link the repo, just create it)
 
-- `GROQ_API_KEY` set in **Settings → Secrets → Actions**
-- GitHub Pages enabled on the repo (for the main `gh-pages` branch)
-- The repo's **Actions** tab must have write permissions: **Settings → Actions → General → Workflow permissions → Read and write**
+**b)** Add two GitHub Secrets at **Settings → Secrets and variables → Actions**:
+
+| Secret | Where to find it |
+|---|---|
+| `NETLIFY_AUTH_TOKEN` | Netlify → User Settings → Applications → Personal access tokens |
+| `NETLIFY_SITE_ID` | Netlify → Your site → Site configuration → Site ID |
+
+**c)** Enable write permissions: **Settings → Actions → General → Workflow permissions → Read and write**
 
 ---
 
-## 💾 Session Management
+## 🗂️ Project structure
 
-The app now persists up to **5 portfolio sessions** in `localStorage` so your data survives browser restarts.
+```
+portfolio-tracker-gh/
+├── index.html               # Upload / session picker screen
+├── dashboard.html           # Main dashboard
+├── screener.html            # Stock screener
+├── config.js                # Config (GROQ_API_KEY injected at deploy time)
+├── data/
+│   ├── my_portfolio.csv     # Default sample portfolio — edit this
+│   ├── stocks_db.json       # 5,000+ NSE/BSE stocks with ISIN lookup
+│   └── bse_codes.json       # BSE code mapping
+├── js/
+│   ├── session.js           # localStorage session manager (up to 5 sessions)
+│   ├── state.js             # Shared app state
+│   ├── fileHandler.js       # CSV parsing & holding aggregation
+│   ├── dashboard.js         # Dashboard render logic
+│   ├── dashboard-main.js    # Dashboard entry point
+│   ├── index-main.js        # Upload page entry point
+│   ├── charts.js            # Chart.js wrappers & benchmark logic
+│   ├── api.js               # Yahoo Finance + Screener.in fetch helpers
+│   ├── export.js            # CSV + PDF export
+│   ├── drilldown.js         # Per-stock detail view
+│   ├── preview.js           # CSV preview table before loading dashboard
+│   ├── stockPicker.js       # Manual holdings entry modal
+│   ├── stockSearch.js       # Stock search autocomplete
+│   ├── screener-main.js     # Screener page + AI analysis
+│   ├── timeSeries.js        # Portfolio time-series builder
+│   └── utils.js             # Formatting helpers (fmt, pct, colorPnl)
+├── styles/
+│   └── main.css
+└── .github/workflows/
+    ├── deploy.yml           # Deploy main → GitHub Pages
+    └── pr-preview.yml       # Deploy PRs → Netlify preview URL
+```
 
-| Action | Result |
-|---|---|
-| Upload/load a portfolio | Automatically saved as a session |
-| Revisit the site | Redirected straight to dashboard |
-| Click **Portfolio ▾** in dashboard | Switch between saved sessions |
-| Click **Start Fresh** on upload page | Show upload form without losing saved sessions |
-| Delete a session | Permanently removed from localStorage |
+---
 
-Sessions are stored entirely in your browser — no data leaves your device.
+## ⚠️ Known limitations
+
+- Prices are ~15-min delayed via Yahoo Finance's public API — not for real-time trading
+- The CORS proxy (`corsproxy.io`) may occasionally be slow; hit **⟳ Refresh** to retry
+- Fundamentals (Screener.in) are only available for Indian-listed companies
+- US tickers (`AAPL`, `MSFT` etc.) have full price/chart data but no Screener.in fundamentals
+- PDF export captures charts as images — very long holdings tables may be truncated
