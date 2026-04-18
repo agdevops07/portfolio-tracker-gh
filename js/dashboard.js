@@ -213,9 +213,74 @@ function renderAllPortfoliosCards() {
       </div>
     </div>
   `).join('');
-  
-  // Add click handlers
-  document.querySelectorAll('.all-portfolios-card').forEach(card => {
+
+  // ── Append consolidated "All" card when there are multiple users ──────────
+  if (rows.length > 1) {
+    const allPnl       = totalCurrentAll - totalInvestedAll;
+    const allPnlPct    = totalInvestedAll ? (allPnl / totalInvestedAll) * 100 : 0;
+    const allDayChg    = totalPrevCloseAll > 0 ? totalCurrentAll - totalPrevCloseAll : null;
+    const allDayChgPct = totalPrevCloseAll > 0 ? (allDayChg / totalPrevCloseAll) * 100 : null;
+
+    const allCard = document.createElement('div');
+    allCard.className = 'all-portfolios-card holding-card';
+    allCard.dataset.user = '__all__';
+    allCard.style.cssText = 'cursor:pointer;border:1px solid var(--accent)44;background:rgba(99,102,241,0.06);';
+    allCard.innerHTML = `
+      <div class="hc-top">
+        <div>
+          <div class="hc-ticker" style="display:flex; align-items:center; gap:8px;">
+            <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:16px; color:white;">∑</div>
+            <strong style="color:var(--accent);">All</strong>
+          </div>
+          <div class="hc-name" style="color:var(--text3);">Combined · ${rows.length} portfolios</div>
+        </div>
+        <div class="hc-pnl">
+          <div class="hc-pnl-val" style="color:${colorPnl(allPnl)}">
+            ${allPnl >= 0 ? '+' : ''}${fmt(Math.abs(allPnl))}
+          </div>
+          <div class="hc-pnl-pct" style="color:${colorPnl(allPnlPct)}">
+            ${allPnlPct >= 0 ? '+' : ''}${allPnlPct.toFixed(2)}%
+          </div>
+        </div>
+      </div>
+      <div class="hc-bar-bg">
+        <div class="hc-bar" style="width:100%; background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div>
+      </div>
+      <div class="hc-bottom">
+        <div>
+          <div class="hc-meta-label">Invested</div>
+          <div class="hc-meta-val">${fmt(totalInvestedAll)}</div>
+        </div>
+        <div>
+          <div class="hc-meta-label">Current</div>
+          <div class="hc-meta-val">${fmt(totalCurrentAll)}</div>
+        </div>
+        <div>
+          <div class="hc-meta-label">Day Change</div>
+          <div class="hc-meta-val" style="color:${allDayChg != null ? colorPnl(allDayChg) : 'var(--text2)'}">
+            ${allDayChg != null ? (allDayChg >= 0 ? '+' : '') + fmt(Math.abs(allDayChg)) : '—'}
+          </div>
+        </div>
+        <div>
+          <div class="hc-meta-label">Day %</div>
+          <div class="hc-meta-val" style="color:${allDayChgPct != null ? colorPnl(allDayChgPct) : 'var(--text2)'}">
+            ${allDayChgPct != null ? (allDayChgPct >= 0 ? '+' : '') + allDayChgPct.toFixed(2) + '%' : '—'}
+          </div>
+        </div>
+      </div>
+    `;
+    allCard.addEventListener('click', () => {
+      const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
+      if (portfolioTab) window.switchDashTab('portfolio', portfolioTab);
+      setTimeout(() => {
+        if (typeof switchDashUser === 'function') switchDashUser('all');
+      }, 100);
+    });
+    container.appendChild(allCard);
+  }
+
+  // Add click handlers for individual user cards
+  document.querySelectorAll('.all-portfolios-card[data-user]:not([data-user="__all__"])').forEach(card => {
     card.addEventListener('click', () => {
       const user = card.dataset.user;
       const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
@@ -1210,7 +1275,7 @@ export function renderAllPortfoliosTable() {
     `;
   }
   
-  // Render table rows
+  // Render table rows — individual users
   tbody.innerHTML = rows.map(row => `
     <tr class="all-portfolios-row" data-user="${row.user}" style="cursor:pointer; transition:background 0.15s;">
       <td style="padding:12px 20px; border-bottom:1px solid var(--border);">
@@ -1236,6 +1301,53 @@ export function renderAllPortfoliosTable() {
       </td>
     </tr>
   `).join('');
+
+  // ── "All" consolidated row pinned at the bottom ──────────────────────────
+  // Lets the user jump straight to the combined view without leaving this page.
+  if (rows.length > 1) {
+    const allPnl       = totalCurrentAll - totalInvestedAll;
+    const allPnlPct    = totalInvestedAll ? (allPnl / totalInvestedAll) * 100 : 0;
+    const allDayChg    = totalPrevCloseAll > 0 ? totalCurrentAll - totalPrevCloseAll : null;
+    const allDayChgPct = totalPrevCloseAll > 0 ? (allDayChg / totalPrevCloseAll) * 100 : null;
+    const allTr = document.createElement('tr');
+    allTr.className = 'all-portfolios-row all-portfolios-all-row';
+    allTr.dataset.user = '__all__';
+    allTr.style.cssText = 'cursor:pointer;background:rgba(99,102,241,0.06);border-top:2px solid var(--accent);transition:background 0.15s;';
+    allTr.innerHTML = `
+      <td style="padding:12px 20px; border-bottom:1px solid var(--border);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:14px; color:white;">∑</div>
+          <strong style="font-size:14px; color:var(--accent);">All</strong>
+        </div>
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); font-weight:600;">${uniqueTickersAll.size} <span style="color:var(--text3);font-weight:400;font-size:11px;">unique</span></td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border);">${fmt(totalInvestedAll)}</td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); font-weight:600;">${totalCurrentAll ? fmt(totalCurrentAll) : '—'}</td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${colorPnl(allPnl)}; font-weight:600;">
+        ${allPnl >= 0 ? '+' : ''}${fmt(Math.abs(allPnl))}
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${colorPnl(allPnlPct)};">
+        ${allPnlPct >= 0 ? '+' : ''}${allPnlPct.toFixed(2)}%
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${allDayChg != null ? colorPnl(allDayChg) : 'var(--text2)'};">
+        ${allDayChg != null ? (allDayChg >= 0 ? '+' : '') + fmt(Math.abs(allDayChg)) : '—'}
+      </td>
+      <td style="padding:12px 20px; text-align:right; border-bottom:1px solid var(--border); color:${allDayChgPct != null ? colorPnl(allDayChgPct) : 'var(--text2)'};">
+        ${allDayChgPct != null ? (allDayChgPct >= 0 ? '+' : '') + allDayChgPct.toFixed(2) + '%' : '—'}
+      </td>
+    `;
+    allTr.addEventListener('mouseenter', () => { allTr.style.background = 'rgba(99,102,241,0.12)'; });
+    allTr.addEventListener('mouseleave', () => { allTr.style.background = 'rgba(99,102,241,0.06)'; });
+    allTr.addEventListener('click', () => {
+      const portfolioTab = document.querySelector('.dash-tab[data-tab="portfolio"]');
+      if (portfolioTab) window.switchDashTab('portfolio', portfolioTab);
+      setTimeout(() => {
+        // 'all' is the special user value that shows combined holdings
+        if (typeof switchDashUser === 'function') switchDashUser('all');
+      }, 100);
+    });
+    tbody.appendChild(allTr);
+  }
   
   // Add click handlers (same as before)
   document.querySelectorAll('.all-portfolios-row').forEach(row => {
@@ -1514,13 +1626,13 @@ function renderStatCards({ totalInvested, totalCurrent, totalPnl, totalPnlPct,
     ${intradayBest ? `
       <div class="stat-card">
         <div class="stat-label">Best Performer (Intraday)</div>
-        <div class="stat-value" style="color:var(--green);font-size:1.3rem">${intradayBest.ticker}</div>
+        <div class="stat-value" style="color:var(--green);font-size:${intradayBest.ticker.length > 10 ? '0.95rem' : intradayBest.ticker.length > 7 ? '1.1rem' : '1.3rem'};word-break:break-all;line-height:1.2;">${intradayBest.ticker}</div>
         <div class="stat-sub" style="color:var(--green)">+${intradayBest.pct.toFixed(2)}% today</div>
       </div>` : ''}
     ${best ? `
     <div class="stat-card">
       <div class="stat-label">Best Performer (Overall)</div>
-      <div class="stat-value" style="color:var(--green);font-size:1.3rem">${best.ticker}</div>
+      <div class="stat-value" style="color:var(--green);font-size:${best.ticker.length > 10 ? '0.95rem' : best.ticker.length > 7 ? '1.1rem' : '1.3rem'};word-break:break-all;line-height:1.2;">${best.ticker}</div>
       <div class="stat-sub" style="color:var(--green)">${pct(best.pct)}</div>
     </div>` : ''}`;
 }
