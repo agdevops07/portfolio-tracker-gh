@@ -15,7 +15,7 @@ import {
 
 import { setTimeFilter } from './charts.js';
 import { showDashboard } from './utils.js';
-import { exportHoldingsCSV, exportPDF, toggleExportMenu } from './export.js';
+import { exportPreviewHoldings, exportPortfolioCSV, exportPDF, toggleExportMenu } from './export.js';
 import { openDrilldown } from './drilldown.js';
 import { state } from './state.js';
 import { processCSV } from './fileHandler.js';
@@ -54,7 +54,8 @@ window.toggleRefreshPause = toggleRefreshPause;
 window.setRefreshInterval = setRefreshInterval;
 window.showDashboard      = showDashboard;
 window.setTimeFilter      = setTimeFilter;
-window.exportHoldingsCSV  = exportHoldingsCSV;
+window.exportPreviewHoldings = exportPreviewHoldings;
+window.exportPortfolioCSV    = exportPortfolioCSV;
 window.exportPDF          = exportPDF;
 window.toggleExportMenu   = toggleExportMenu;
 window.openDrilldown      = openDrilldown;

@@ -7,7 +7,7 @@ import { initFileHandlers, loadSampleData, loadMyPortfolio, processCSV } from '.
 import { openStockPicker, closeStockPicker } from './stockPicker.js';
 import { sortPreview } from './preview.js';
 import { goBack } from './utils.js';
-import { exportHoldingsCSV } from './export.js';
+import { exportPreviewHoldings } from './export.js';
 import { state } from './state.js';
 import { switchPreviewUser } from './preview.js';
 import {
@@ -24,7 +24,7 @@ window.loadSampleData    = loadSampleData;
 window.loadMyPortfolio   = loadMyPortfolio;
 window.sortPreview       = sortPreview;
 window.goBack            = goBack;
-window.exportHoldingsCSV = exportHoldingsCSV;
+window.exportPreviewHoldings = exportPreviewHoldings;
 window._stopAutoRefresh  = () => {};
 window._destroyAllCharts = () => {};
 window._getHoldings      = () => state.holdings;

@@ -21,21 +21,22 @@
 #         run: |
 #           sed -i "s/YOUR_GROQ_API_KEY_HERE/${{ secrets.GROQ_API_KEY }}/g" js/screener-main.js
 
-#       - name: Install Netlify CLI
-#         run: npm install -g netlify-cli
+#       - name: Install Vercel CLI
+#         run: npm install -g vercel
 
-#       - name: Deploy PR preview to Netlify
-#         id: netlify
+#       - name: Deploy PR preview to Vercel
+#         id: vercel
 #         env:
-#           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-#           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+#           VERCEL_TOKEN:      ${{ secrets.VERCEL_TOKEN }}
+#           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+#           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 #         run: |
-#           netlify deploy \
-#             --dir=. \
-#             --alias=pr-${{ github.event.pull_request.number }} \
-#             --message="PR #${{ github.event.pull_request.number }} preview" \
-#             --json > deploy_output.json 2>/dev/null
-#           DEPLOY_URL=$(python3 -c "import json; d=json.load(open('deploy_output.json')); print(d['deploy_url'])")
+#           DEPLOY_URL=$(vercel deploy \
+#             --token "$VERCEL_TOKEN" \
+#             --yes \
+#             --name "pr-${{ github.event.pull_request.number }}" \
+#             --meta "pr=${{ github.event.pull_request.number }}" \
+#             2>/dev/null | tail -1)
 #           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
 #       - name: Comment preview URL on PR
@@ -47,7 +48,7 @@
 #             const pr       = context.payload.pull_request.number;
 #             const branch   = context.payload.pull_request.head.ref;
 #             const sha      = context.payload.pull_request.head.sha.slice(0, 7);
-#             const url      = '${{ steps.netlify.outputs.deploy_url }}';
+#             const url      = '${{ steps.vercel.outputs.deploy_url }}';
 
 #             const { data: comments } = await github.rest.issues.listComments({
 #               owner, repo: repoName, issue_number: pr,
