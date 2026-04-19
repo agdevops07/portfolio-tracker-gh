@@ -1,97 +1,98 @@
-name: PR Preview
+# name: PR Preview
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
+# on:
+#   pull_request:
+#     types: [opened, synchronize, reopened, closed]
 
-permissions:
-  pull-requests: write
-  contents: read
+# permissions:
+#   pull-requests: write
+#   contents: read
 
-jobs:
-  deploy-preview:
-    if: github.event.action != 'closed'
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy-preview:
+#     if: github.event.action != 'closed'
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout PR branch
+#         uses: actions/checkout@v4
 
-      - name: Inject API Key
-        run: |
-          sed -i "s/YOUR_GROQ_API_KEY_HERE/${{ secrets.GROQ_API_KEY }}/g" js/screener-main.js
+#       - name: Inject API Key
+#         run: |
+#           sed -i "s/YOUR_GROQ_API_KEY_HERE/${{ secrets.GROQ_API_KEY }}/g" js/screener-main.js
 
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli
+#       - name: Install Vercel CLI
+#         run: npm install -g vercel
 
-      - name: Deploy PR preview to Netlify
-        id: netlify
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          netlify deploy \
-            --dir=. \
-            --alias=pr-${{ github.event.pull_request.number }} \
-            --message="PR #${{ github.event.pull_request.number }} preview" \
-            --json > deploy_output.json 2>/dev/null
-          DEPLOY_URL=$(python3 -c "import json; d=json.load(open('deploy_output.json')); print(d['deploy_url'])")
-          echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+#       - name: Deploy PR preview to Vercel
+#         id: vercel
+#         env:
+#           VERCEL_TOKEN:      ${{ secrets.VERCEL_TOKEN }}
+#           VERCEL_ORG_ID:     ${{ secrets.VERCEL_ORG_ID }}
+#           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+#         run: |
+#           DEPLOY_URL=$(vercel deploy \
+#             --token "$VERCEL_TOKEN" \
+#             --yes \
+#             --name "pr-${{ github.event.pull_request.number }}" \
+#             --meta "pr=${{ github.event.pull_request.number }}" \
+#             2>/dev/null | tail -1)
+#           echo "deploy_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
-      - name: Comment preview URL on PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const owner    = context.repo.owner;
-            const repoName = context.repo.repo;
-            const pr       = context.payload.pull_request.number;
-            const branch   = context.payload.pull_request.head.ref;
-            const sha      = context.payload.pull_request.head.sha.slice(0, 7);
-            const url      = '${{ steps.netlify.outputs.deploy_url }}';
+#       - name: Comment preview URL on PR
+#         uses: actions/github-script@v7
+#         with:
+#           script: |
+#             const owner    = context.repo.owner;
+#             const repoName = context.repo.repo;
+#             const pr       = context.payload.pull_request.number;
+#             const branch   = context.payload.pull_request.head.ref;
+#             const sha      = context.payload.pull_request.head.sha.slice(0, 7);
+#             const url      = '${{ steps.vercel.outputs.deploy_url }}';
 
-            const { data: comments } = await github.rest.issues.listComments({
-              owner, repo: repoName, issue_number: pr,
-            });
-            for (const c of comments) {
-              if (c.user.login === 'github-actions[bot]' && c.body.includes('📐 PR Preview')) {
-                await github.rest.issues.deleteComment({ owner, repo: repoName, comment_id: c.id });
-              }
-            }
-            await github.rest.issues.createComment({
-              owner, repo: repoName, issue_number: pr,
-              body: [
-                '## 📐 PR Preview',
-                '',
-                `🔗 **[Open Preview](${url})**`,
-                '',
-                `| | |`,
-                `|---|---|`,
-                `| Branch | \`${branch}\` |`,
-                `| Commit | \`${sha}\` |`,
-                `| Updated | ${new Date().toUTCString()} |`,
-              ].join('\n'),
-            });
+#             const { data: comments } = await github.rest.issues.listComments({
+#               owner, repo: repoName, issue_number: pr,
+#             });
+#             for (const c of comments) {
+#               if (c.user.login === 'github-actions[bot]' && c.body.includes('📐 PR Preview')) {
+#                 await github.rest.issues.deleteComment({ owner, repo: repoName, comment_id: c.id });
+#               }
+#             }
+#             await github.rest.issues.createComment({
+#               owner, repo: repoName, issue_number: pr,
+#               body: [
+#                 '## 📐 PR Preview',
+#                 '',
+#                 `🔗 **[Open Preview](${url})**`,
+#                 '',
+#                 `| | |`,
+#                 `|---|---|`,
+#                 `| Branch | \`${branch}\` |`,
+#                 `| Commit | \`${sha}\` |`,
+#                 `| Updated | ${new Date().toUTCString()} |`,
+#               ].join('\n'),
+#             });
 
-  teardown-preview:
-    if: github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Post teardown comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const owner    = context.repo.owner;
-            const repoName = context.repo.repo;
-            const pr       = context.payload.pull_request.number;
-            const { data: comments } = await github.rest.issues.listComments({
-              owner, repo: repoName, issue_number: pr,
-            });
-            for (const c of comments) {
-              if (c.user.login === 'github-actions[bot]' && c.body.includes('📐 PR Preview')) {
-                await github.rest.issues.deleteComment({ owner, repo: repoName, comment_id: c.id });
-              }
-            }
-            await github.rest.issues.createComment({
-              owner, repo: repoName, issue_number: pr,
-              body: '🧹 PR preview removed (PR closed).',
-            });
+#   teardown-preview:
+#     if: github.event.action == 'closed'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Post teardown comment
+#         uses: actions/github-script@v7
+#         with:
+#           script: |
+#             const owner    = context.repo.owner;
+#             const repoName = context.repo.repo;
+#             const pr       = context.payload.pull_request.number;
+#             const { data: comments } = await github.rest.issues.listComments({
+#               owner, repo: repoName, issue_number: pr,
+#             });
+#             for (const c of comments) {
+#               if (c.user.login === 'github-actions[bot]' && c.body.includes('📐 PR Preview')) {
+#                 await github.rest.issues.deleteComment({ owner, repo: repoName, comment_id: c.id });
+#               }
+#             }
+#             await github.rest.issues.createComment({
+#               owner, repo: repoName, issue_number: pr,
+#               body: '🧹 PR preview removed (PR closed).',
+#             });

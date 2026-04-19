@@ -349,7 +349,7 @@
         </button>
         <div class="export-menu" id="export-menu" style="display:none; position:absolute; top:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:12px; z-index:200; overflow:hidden; max-width:calc(100vw - 8px);">
           <div class="export-menu-item" onclick="exportPDF()" style="cursor:pointer; transition:background 0.15s;">📄 Download as PDF</div>
-          <div class="export-menu-item" onclick="exportHoldingsCSV()" style="cursor:pointer; transition:background 0.15s;">📥 Export Holdings CSV</div>
+          <div class="export-menu-item" onclick="exportPreviewHoldings()" style="cursor:pointer; transition:background 0.15s;">📥 Export Preview Holdings</div>
         </div>
       </div>
 
@@ -405,7 +405,7 @@
         <div id="holdings-subtoggles" style="display:flex; gap:6px; background:var(--bg3); border-radius:40px; padding:4px;">
           <button id="holdings-table-view-btn" class="holdings-view-toggle active" onclick="setHoldingsView('table')" style="background:var(--accent); color:white; border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">📋 Table View</button>
           <button id="holdings-card-view-btn" class="holdings-view-toggle" onclick="setHoldingsView('card')" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer;">🃏 Card View</button>
-          <button class="export-btn" onclick="exportHoldingsCSV()" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">📥 Export CSV</button>
+          <button class="export-btn" onclick="exportPortfolioCSV()" style="background:transparent; color:var(--text2); border:none; padding:6px 18px; border-radius:40px; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">📥 Export Portfolio</button>
         </div>
 
         <div id="charts-subtoggles" style="display:none; gap:6px; background:var(--bg3); border-radius:40px; padding:4px;">
