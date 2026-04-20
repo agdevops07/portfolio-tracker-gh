@@ -27,6 +27,8 @@ import { toggleChartDisplayMode, restoreChartDisplayMode } from './charts.js';
 
 import { restoreBenchmarks } from './charts.js';
 
+import { initDataSourcePanel } from './dataSourcePanel.js';
+
 // Add to window exports
 window.toggleBenchmark = toggleBenchmark;
 window.restoreBenchmarks = restoreBenchmarks;
@@ -352,6 +354,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   await new Promise(r => setTimeout(r, 100));
   await loadDashboard();  // This will use the preset tab
+  initDataSourcePanel();
   
   document.addEventListener('click', e => {
     const card = e.target.closest('.holding-card[data-ticker]');
