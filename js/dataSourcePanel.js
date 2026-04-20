@@ -18,6 +18,8 @@ import {
 import { showToast } from './utils.js';
 
 // ── Inline styles (no external CSS dependency) ───────────────
+// In dataSourcePanel.js, update the PANEL_STYLES constant:
+
 const PANEL_STYLES = `
 #ds-panel-wrap {
   position: relative;
@@ -27,24 +29,29 @@ const PANEL_STYLES = `
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border, #333);
-  background: var(--bg2, #1e1e2e);
-  color: var(--text2, #aaa);
-  font-size: 12px;
+  padding: 6px 14px;  /* Match portfolio button padding */
+  border-radius: 8px;  /* Match portfolio button radius */
+  border: 1px solid var(--border2, rgba(255,255,255,0.10));
+  background: var(--bg4, #1a1a33);  /* Match portfolio button background */
+  color: var(--text2, #7a7a9e);  /* Match portfolio button color */
+  font-size: 12px;  /* Match portfolio button font size */
+  font-weight: 600;  /* Match portfolio button font weight */
+  font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: all 0.2s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
   white-space: nowrap;
 }
 #ds-panel-btn:hover {
-  background: var(--bg3, #2a2a3a);
-  color: var(--text, #fff);
+  background: rgba(91,94,244,0.07);  /* Match portfolio button hover */
+  color: var(--text, #f0f0fa);
+  border-color: var(--accent2, #7c7ff9);
+  transform: translateY(-1px);
 }
 #ds-panel-btn .ds-dot {
-  width: 7px; height: 7px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--accent, #6366f1);
+  background: var(--accent, #5c5ff5);
   flex-shrink: 0;
 }
 #ds-dropdown {
