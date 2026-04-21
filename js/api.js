@@ -102,7 +102,7 @@ export async function fetchNseIndexHistory(indexName) {
 
 // ── Yahoo Finance live price ─────────────────────────────────
 async function _fetchPriceYahoo(ticker) {
-  const bust = Math.floor(Date.now() / 30000);
+  const bust = Math.floor(Date.now() / 10000);
   const mirrors = [
     `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
     `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
@@ -152,10 +152,10 @@ async function _fetchPriceScreener(ticker) {
   const bseCode = await getBSECode(ticker).catch(() => null);
   const sym = bseCode || rawSym;
 
-  // Cache-bust every 30 s (same cadence as Yahoo) so corsproxy.io and the
+  // Cache-bust every 10 s (same cadence as Yahoo) so corsproxy.io and the
   // browser cache never serve stale HTML. Without this the proxy returns the
   // same cached page for the entire session.
-  const bust = Math.floor(Date.now() / 30000);
+  const bust = Math.floor(Date.now() / 10000);
 
   const urls = [
     `https://www.screener.in/company/${sym}/consolidated/?_=${bust}`,
@@ -449,7 +449,7 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
   const key = `intraday_${ticker}`;
   if (state.dayHistoryCache[key]) return state.dayHistoryCache[key];
 
-  const bust = Math.floor(Date.now() / 30000);
+  const bust = Math.floor(Date.now() / 10000);
 
   let effectiveUpstoxTicker = upstoxTicker;
   if (!effectiveUpstoxTicker && window._stocksDb) {
