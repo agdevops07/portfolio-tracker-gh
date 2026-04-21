@@ -10,6 +10,11 @@
 // as smeStock === true) ALWAYS use Upstox for history regardless
 // of user preference.  This override is enforced by fetchHistory()
 // in api.js which calls isNseSme() exported from this module.
+//
+// BSE-only stocks (ticker ends with ".BO", or flagged bseOnly/exchange=BSE
+// in stocksDb) ALWAYS use Screener.in as the sole live-price source.
+// Yahoo Finance is unreliable for BSE-only prices; Upstox is not used
+// for live prices at all.  Enforced in fetchPrice() via isBseOnly().
 // ═══════════════════════════════════════════════════════════════
 
 const STORAGE_KEY = 'dashboard_data_source_prefs';
@@ -107,6 +112,38 @@ export function isNseSme(ticker) {
     );
     if (entry && entry.smeStock === true) return true;
   }
+  return false;
+}
+
+// ── BSE-only detection ───────────────────────────────────────
+/**
+ * Returns true when a ticker is listed ONLY on BSE (not on NSE).
+ * BSE-only stocks use Screener.in as the sole live-price source
+ * because Yahoo Finance returns stale/unreliable prices for them
+ * and Upstox is not used for live prices at all.
+ *
+ * Detection criteria (any one is sufficient):
+ *  1. Yahoo ticker ends with ".BO" AND does NOT end with ".NS"
+ *     (i.e. the holding was given a BSE ticker, not an NSE one)
+ *  2. stocks_db.json entry has bseOnly === true
+ *  3. stocks_db.json entry has exchange === 'BSE' (and no NSE equivalent)
+ */
+export function isBseOnly(ticker) {
+  if (!ticker) return false;
+
+  // Criterion 1: explicit .BO Yahoo suffix
+  if (/\.BO$/i.test(ticker)) return true;
+
+  // Criteria 2 & 3: stocksDb flags
+  if (window._stocksDb) {
+    const entry = window._stocksDb.find(
+      s => s.yahooTicker && s.yahooTicker.toUpperCase() === ticker.toUpperCase()
+    );
+    if (!entry) return false;
+    if (entry.bseOnly === true) return true;
+    if (entry.exchange && entry.exchange.toUpperCase() === 'BSE' && !entry.nseCode) return true;
+  }
+
   return false;
 }
 

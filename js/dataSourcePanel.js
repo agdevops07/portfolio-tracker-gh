@@ -18,8 +18,6 @@ import {
 import { showToast } from './utils.js';
 
 // ── Inline styles (no external CSS dependency) ───────────────
-// In dataSourcePanel.js, update the PANEL_STYLES constant:
-
 const PANEL_STYLES = `
 #ds-panel-wrap {
   position: relative;
@@ -54,6 +52,7 @@ const PANEL_STYLES = `
   background: var(--accent, #5c5ff5);
   flex-shrink: 0;
 }
+  
 #ds-dropdown {
   display: none;
   position: absolute;
@@ -202,10 +201,14 @@ function buildPanelHTML() {
         </select>
       </div>
 
-      <!-- SME note -->
+      <!-- Override notes -->
       <div class="ds-sme-note">
         ⚠️ <strong>NSE SME stocks</strong> always use <strong>Upstox</strong> for historical data
         regardless of the selection above.
+      </div>
+      <div class="ds-sme-note" style="margin-top:6px;border-left-color:var(--accent,#6366f1);">
+        ℹ️ <strong>BSE-only stocks</strong> (.BO tickers) always use <strong>Screener.in</strong>
+        for live prices — Yahoo Finance is unreliable for BSE-only listings.
       </div>
 
       <button class="ds-apply-btn" id="ds-apply-btn">Apply &amp; Refresh</button>

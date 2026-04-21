@@ -5,6 +5,7 @@
 // Source-toggle behaviour is driven by dataSourceConfig.js:
 //   Historical: Upstox ↔ Yahoo Finance (NSE SME always Upstox)
 //   Live price: Yahoo Finance ↔ Screener.in  (Upstox NOT used)
+//   BSE-only stocks: Screener.in always (Yahoo unreliable for BSE)
 // ═══════════════════════════════════════════════
 
 import { state } from './state.js';
@@ -12,6 +13,7 @@ import {
   getHistoricalSources,
   getLiveSources,
   isNseSme,
+  isBseOnly,
 } from './dataSourceConfig.js';
 
 const PROXY = 'https://corsproxy.io/?url=';
@@ -100,7 +102,7 @@ export async function fetchNseIndexHistory(indexName) {
 
 // ── Yahoo Finance live price ─────────────────────────────────
 async function _fetchPriceYahoo(ticker) {
-  const bust = Math.floor(Date.now() / 30000);
+  const bust = Math.floor(Date.now() / 10000);
   const mirrors = [
     `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
     `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?interval=2m&range=1d&_=${bust}`,
@@ -150,14 +152,21 @@ async function _fetchPriceScreener(ticker) {
   const bseCode = await getBSECode(ticker).catch(() => null);
   const sym = bseCode || rawSym;
 
+  // Cache-bust every 10 s (same cadence as Yahoo) so corsproxy.io and the
+  // browser cache never serve stale HTML. Without this the proxy returns the
+  // same cached page for the entire session.
+  const bust = Math.floor(Date.now() / 10000);
+
   const urls = [
-    `https://www.screener.in/company/${sym}/consolidated/`,
-    `https://www.screener.in/company/${sym}/`,
+    `https://www.screener.in/company/${sym}/consolidated/?_=${bust}`,
+    `https://www.screener.in/company/${sym}/?_=${bust}`,
   ];
 
   for (const url of urls) {
     try {
-      const res = await withTimeout(fetch(proxyUrl(url)));
+      // cache: 'no-store' prevents the browser's own HTTP cache from
+      // returning a stale response even when the URL bust param changes.
+      const res = await withTimeout(fetch(proxyUrl(url), { cache: 'no-store' }));
       if (!res.ok) continue;
       const html = await res.text();
       const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -202,18 +211,42 @@ async function _fetchPriceScreener(ticker) {
 
 /**
  * Public fetchPrice — respects live-source toggle.
+ * Special overrides (take priority over user prefs):
+ *   • BSE-only stocks → always Screener.in only (Yahoo is unreliable for BSE)
  * Order: primary → fallback → null.
  * Result is cached in state.priceCache for the session.
  */
 export async function fetchPrice(ticker) {
-  if (state.priceCache[ticker]) return state.priceCache[ticker];
+  // BSE-only tickers must NOT use the cache — fetchDayHistory may have
+  // written a stale Yahoo price into priceCache before this runs.
+  // We always go direct to Screener for BSE-only stocks.
+  const bseOnly = isBseOnly(ticker);
 
-  const { primary, fallback } = getLiveSources();
+  if (!bseOnly && state.priceCache[ticker]) return state.priceCache[ticker];
 
   const fetchers = {
     yahoo:    () => _fetchPriceYahoo(ticker),
     screener: () => _fetchPriceScreener(ticker),
   };
+
+  // ── BSE-only override: Screener is the only viable source ──
+  if (bseOnly) {
+    console.log(`[fetchPrice] BSE-only detected for ${ticker} — using Screener.in exclusively`);
+    try {
+      const price = await fetchers.screener();
+      if (price && price > 0) {
+        state.priceCache[ticker] = price;
+        return price;
+      }
+    } catch (e) {
+      console.warn(`[fetchPrice] Screener failed for BSE-only ${ticker}:`, e.message);
+    }
+    console.error(`[fetchPrice] Screener returned no price for BSE-only ${ticker}`);
+    return null;
+  }
+
+  // ── Normal toggle-driven flow ──────────────────────────────
+  const { primary, fallback } = getLiveSources();
 
   // Try primary
   try {
@@ -416,7 +449,7 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
   const key = `intraday_${ticker}`;
   if (state.dayHistoryCache[key]) return state.dayHistoryCache[key];
 
-  const bust = Math.floor(Date.now() / 30000);
+  const bust = Math.floor(Date.now() / 10000);
 
   let effectiveUpstoxTicker = upstoxTicker;
   if (!effectiveUpstoxTicker && window._stocksDb) {
@@ -458,8 +491,15 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
       series.push({ time: `${hh}:${mm}`, ts: now.getTime(), price: livePrice });
-      state.priceCache[ticker] = livePrice;
-      state.livePrices[ticker] = livePrice;
+      // BSE-only: do NOT write Yahoo price into priceCache/livePrices.
+      // fetchPrice() must run the Screener override on a cold cache.
+      // Writing here would poison the cache and silently bypass Screener.
+      if (!isBseOnly(ticker)) {
+        state.priceCache[ticker] = livePrice;
+        state.livePrices[ticker] = livePrice;
+      } else {
+        console.log(`[DayHistory Yahoo] skipping priceCache for BSE-only ${ticker} — Screener will set live price`);
+      }
     }
 
     if (series.length > 2) {
