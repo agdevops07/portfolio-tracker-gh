@@ -912,31 +912,36 @@ export async function refreshPricesOnly() {
   showToast('Refreshing prices…');
   resetCaches();
 
-  const tickers = Object.keys(state.holdings);
+  // Fetch prices for ALL holdings across every user, not just the active
+  // user's filtered subset. This keeps the All Portfolios view live too.
+  const allHoldings = state.allHoldings || state.holdings;
+  const allTickers  = Object.keys(allHoldings);
 
   await Promise.all(
-    tickers.map(async (ticker) => {
+    allTickers.map(async (ticker) => {
       let price = await fetchPrice(ticker);
       if (!price && state.histories[ticker] && Object.keys(state.histories[ticker]).length > 0) {
         const dates = Object.keys(state.histories[ticker]).sort();
         price = state.histories[ticker][dates[dates.length - 1]];
       }
       if (!price) {
-        price = state.holdings[ticker]?.avgBuy ?? null;
+        price = allHoldings[ticker]?.avgBuy ?? null;
       }
       state.livePrices[ticker] = price;
     })
   );
 
   await Promise.all(
-    tickers.map(async (ticker) => {
-      const h = state.holdings[ticker];
+    allTickers.map(async (ticker) => {
+      const h = allHoldings[ticker];
       state.dayHistories[ticker] = await fetchDayHistory(h.ticker, h.upstoxTicker);
     })
   );
 
   patchTodayTimeSeries();
   renderDashboardInPlace();
+  // Re-render All Portfolios view so it reflects the fresh prices too.
+  if (typeof renderAllPortfolios === 'function') renderAllPortfolios();
   updateRefreshTimestamp();
   showToast('Prices updated ✓');
 }
@@ -1546,6 +1551,11 @@ function renderDashboardInPlace() {
   restoreChartSection();
   restoreMainView();
   restoreBenchmark();
+  // Keep All Portfolios in sync whenever the portfolio view re-renders.
+  const apContent = document.getElementById('dash-tab-all-portfolios');
+  if (apContent && apContent.style.display !== 'none') {
+    if (typeof renderAllPortfolios === 'function') renderAllPortfolios();
+  }
 }
 
 // Restore time filter button state
