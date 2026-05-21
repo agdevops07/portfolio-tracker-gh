@@ -25,9 +25,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inject API Key
-        run: |
-          sed -i "s/YOUR_GROQ_API_KEY_HERE/${{ secrets.GROQ_API_KEY }}/g" js/screener-main.js
+      # ── Inject API Key step REMOVED ──────────────────────────────────────
+      # Key now lives in Cloudflare Worker env — never touches this pipeline.
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

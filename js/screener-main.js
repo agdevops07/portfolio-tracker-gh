@@ -8,6 +8,7 @@ import { fetchPrice, fetchHistory, fetchDayHistory, fetchScreenerFundamentals } 
 import { pct, colorPnl, showToast } from './utils.js';
 
 const PROXY = 'https://corsproxy.io/?url=';
+const GROQ_WORKER_URL = 'https://groq-proxy.ag-portfolio-tracker.workers.dev/groq';
 const proxyUrl = (u) => PROXY + encodeURIComponent(u);
 
 // ── State ─────────────────────────────────────────
@@ -1032,54 +1033,45 @@ async function loadNews(ticker, meta) {
 //   3. Vercel build-time injection — add to vite.config.js:
 //        define: { __GROQ_KEY: JSON.stringify(process.env.VITE_GROQ_API_KEY||'') }
 //      and add VITE_GROQ_API_KEY to Vercel env vars + GitHub Actions secrets.
-function getGroqKey() {
-  const session = sessionStorage.getItem('groq_api_key');
-  if (session) return session;
-  if (window.__GROQ_KEY) return window.__GROQ_KEY;
-  // Safe build-time constant check — only works if bundler injects it
-  try {
-    // eslint-disable-next-line no-undef
-    if (typeof __GROQ_KEY !== 'undefined' && __GROQ_KEY) return __GROQ_KEY;
-  } catch(_) {}
-  return null;
-}
 
+
+// ── REPLACE the Groq section inside callFreeAI with this ─────────────────────
 async function callFreeAI(prompt) {
-  const key = getGroqKey();
 
-  // ── Primary: Groq ────────────────────────────────
-  if (key) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 20000);
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        signal: ctrl.signal,
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          max_tokens: 512,
-          temperature: 0.4,
-          messages: [
-            { role: 'system', content: 'You are a concise Indian stock market analyst. Reply in 4-5 bullet points. No disclaimers, no preamble.' },
-            { role: 'user',   content: prompt.slice(0, 1500) },
-          ],
-        }),
-      });
-      clearTimeout(t);
-      if (res.ok) {
-        const d = await res.json();
-        const txt = d?.choices?.[0]?.message?.content?.trim();
-        if (txt && txt.length > 20) return txt;
-      } else {
-        const err = await res.json().catch(() => ({}));
-        console.warn('Groq API error:', res.status, err?.error?.message);
-        throw new Error('Groq error ' + res.status + ': ' + (err?.error?.message || 'unknown'));
-      }
-    } catch (e) {
-      if (e.message.startsWith('Groq error')) throw e;
-      console.warn('Groq fetch failed:', e.message);
+  // ── Primary: Groq via Cloudflare Worker (key never sent to browser) ────────
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 20000);
+
+    const res = await fetch(GROQ_WORKER_URL, {   // ← worker URL, no Auth header
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        max_tokens: 512,
+        temperature: 0.4,
+        messages: [
+          { role: 'system', content: 'You are a concise Indian stock market analyst. Reply in 4-5 bullet points. No disclaimers, no preamble.' },
+          { role: 'user',   content: prompt.slice(0, 1500) },
+        ],
+      }),
+    });
+
+    clearTimeout(t);
+
+    if (res.ok) {
+      const d = await res.json();
+      const txt = d?.choices?.[0]?.message?.content?.trim();
+      if (txt && txt.length > 20) return txt;
+    } else {
+      const err = await res.json().catch(() => ({}));
+      console.warn('Groq proxy error:', res.status, err?.error?.message);
+      throw new Error('Groq error ' + res.status + ': ' + (err?.error?.message || 'unknown'));
     }
+  } catch (e) {
+    if (e.message.startsWith('Groq error')) throw e;
+    console.warn('Worker fetch failed:', e.message);
   }
 
   // ── Fallback: Ollama local ───────────────────────
