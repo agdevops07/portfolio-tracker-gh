@@ -125,6 +125,12 @@ export async function exportPDF() {
       y = _drawSectionHeader(doc, 'All Portfolios — Combined Holdings', 14);
       _drawHoldingsTable(doc, allHoldings, y);
 
+      // Holder-grouped sections (if holders exist)
+      const holders = state.holders || [];
+      if (holders.length > 0) {
+        _drawHolderSections(doc, holders);
+      }
+
       // Per user
       users.forEach((user) => {
         const userHoldings = Object.values(getFilteredHoldings(state.rawRows, user));
@@ -214,24 +220,32 @@ function _drawSummaryCards(doc, s, startY, compact = false) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(...C.muted);
-    doc.text(card.label.toUpperCase(), x + 3, startY + 5.5);
+    // Move label DOWN - was startY + 5.5, now startY + 7
+    doc.text(card.label.toUpperCase(), x + 3, startY + 7);
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(compact ? 8.5 : 9.5);
     doc.setTextColor(...card.color);
     const displayVal = `${card.prefix || ''}${card.value}`;
-    doc.text(displayVal, x + 3, startY + cardH - 4.5);
 
+    // Show percentage on the same line for Overall P&L
     if (i === 2 && s.totalInvested > 0) {
       const pct = s.totalPnl / s.totalInvested * 100;
-      doc.setFontSize(7);
-      doc.text(` (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)`, x + 3 + doc.getTextWidth(displayVal), startY + cardH - 4.5);
+      const pctStr = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
+      const valueWidth = doc.getTextWidth(displayVal);
+      // Move value DOWN - was startY + cardH - 4.5, now startY + cardH - 3
+      doc.text(displayVal, x + 3, startY + cardH - 3);
+      doc.setFontSize(compact ? 6.5 : 7.5);
+      doc.setTextColor(...card.color);
+      doc.text(pctStr, x + 3 + valueWidth + 2, startY + cardH - 3);
+    } else {
+      // Move value DOWN - was startY + cardH - 4.5, now startY + cardH - 3
+      doc.text(displayVal, x + 3, startY + cardH - 3);
     }
   });
 
   return startY + cardH + 8;
 }
-
 function _drawCharts(doc, chartImgs, startY) {
   let y = startY;
   const wide  = chartImgs.filter((c) => !c.title.includes('P&L') && !c.title.includes('Allocation'));
@@ -299,7 +313,7 @@ function _drawHoldingsTable(doc, holdings, startY) {
     const alloc     = totalCurrent && cv ? (cv / totalCurrent * 100) : null;
     const s = (v, abs) => v != null ? `${v >= 0 ? '+' : ''}${abs ? _fmtIN(Math.abs(v)) : v.toFixed(1) + '%'}` : '—';
     return [
-      h.ticker,
+      h.ticker.replace(/[-.](?:NS|BO|BSE|SM\.NS|SM\.BO)$/i, ''),  // strip exchange suffix for display
       h.totalQty,
       h.avgBuy ? `${h.avgBuy.toFixed(1)}` : '—',
       lp  ? `${lp.toFixed(1)}`  : '—',
@@ -316,22 +330,22 @@ function _drawHoldingsTable(doc, holdings, startY) {
   doc.autoTable({
     head, body, startY,
     margin      : { left: L_MAR, right: R_MAR },
-    styles      : { font: 'helvetica', fontSize: 7.5, cellPadding: { top: 3, bottom: 3, left: 2, right: 2 }, lineColor: C.border, lineWidth: 0.1, overflow: 'ellipsize' },
+    styles      : { font: 'helvetica', fontSize: 7.5, cellPadding: { top: 3, bottom: 3, left: 2, right: 2 }, lineColor: C.border, lineWidth: 0.1, overflow: 'visible' },
     headStyles  : { fillColor: C.navy, textColor: C.white, fontStyle: 'bold', fontSize: 7 },
     alternateRowStyles: { fillColor: [249, 250, 251] },
     columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 22 },
-      1: { halign: 'right', cellWidth: 12 },
-      2: { halign: 'right', cellWidth: 18 },
-      3: { halign: 'right', cellWidth: 18 },
-      4: { halign: 'right', cellWidth: 20 },
-      5: { halign: 'right', cellWidth: 20 },
-      6: { halign: 'right', cellWidth: 20 },
+      0: { fontStyle: 'bold', cellWidth: 32 },  // wider ticker — no more truncation
+      1: { halign: 'right', cellWidth: 10 },
+      2: { halign: 'right', cellWidth: 16 },
+      3: { halign: 'right', cellWidth: 16 },
+      4: { halign: 'right', cellWidth: 18 },
+      5: { halign: 'right', cellWidth: 18 },
+      6: { halign: 'right', cellWidth: 18 },
       7: { halign: 'right', cellWidth: 14 },
-      8: { halign: 'right', cellWidth: 18 },
-      9: { halign: 'right', cellWidth: 13 },
-      10:{ halign: 'right', cellWidth: 13 },
-    },
+      8: { halign: 'right', cellWidth: 16 },
+      9: { halign: 'right', cellWidth: 12 },
+      10:{ halign: 'right', cellWidth: 12 },
+    },   // total: 32+10+16+16+18+18+18+14+16+12+12 = 182 = BODY_W ✓
     didParseCell(data) {
       if (data.section !== 'body') return;
       const raw = String(data.cell.raw);
@@ -347,6 +361,23 @@ function _drawHoldingsTable(doc, holdings, startY) {
   });
 
   return doc.lastAutoTable.finalY + 8;
+}
+
+function _drawHolderSections(doc, holders) {
+  holders.forEach((holder) => {
+    // Filter rawRows belonging to this holder
+    const holderRows = (state.rawRows || []).filter((r) => r.holder === holder);
+    if (!holderRows.length) return;
+
+    const { aggregateHoldings } = _getAggFns();
+    const holderHoldings = Object.values(aggregateHoldings(holderRows));
+    if (!holderHoldings.length) return;
+
+    doc.addPage();
+    let y = _drawSectionHeader(doc, `${holder} — Consolidated Holdings`, 14);
+    y = _drawSummaryCards(doc, _computeSummary(holderHoldings), y, true);
+    _drawHoldingsTable(doc, holderHoldings, y);
+  });
 }
 
 function _addPageNumbers(doc) {
