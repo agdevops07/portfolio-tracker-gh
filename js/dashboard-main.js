@@ -7,7 +7,7 @@ import { getActiveCSV, saveSession, getActiveSessionId } from './session.js';
 
 import { 
   loadDashboard, refreshDashboard, refreshPricesOnly, toggleRefreshPause, 
-  setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, 
+  setRefreshInterval, stopAutoRefresh, renderDashboard, switchDashUser, switchDashHolder,
   sortHoldingsTable, setHoldingsView, toggleChartSection, restoreChartSection,
   toggleMainView , setPortfolioView , renderAllPortfolios, setAllPortfoliosView,
   sortAllPortfoliosTable
@@ -64,6 +64,7 @@ window.openDrilldown      = openDrilldown;
 window._destroyAllCharts  = destroyAllCharts;
 window._stopAutoRefresh   = stopAutoRefresh;
 window.switchDashUser     = switchDashUser;
+window.switchDashHolder   = switchDashHolder;
 
 // Update window.switchDashTab in dashboard-main.js
 window.switchDashTab = function(tab, btn) {
@@ -77,15 +78,20 @@ window.switchDashTab = function(tab, btn) {
   const portfolioContent = document.getElementById('dash-tab-portfolio');
   const allPortfoliosContent = document.getElementById('dash-tab-all-portfolios');
   const userTabs = document.getElementById('dash-user-tabs');
+  const holderTabs = document.getElementById('dash-holder-tabs');
   
   if (tab === 'portfolio') {
     if (portfolioContent) portfolioContent.style.display = 'block';
     if (allPortfoliosContent) allPortfoliosContent.style.display = 'none';
-    // Show user tabs
+    // Show user tabs if multiple users
     if (userTabs) {
-      // Check if there are multiple users before showing
       const users = state.users || [];
       userTabs.style.display = users.length > 1 ? 'flex' : 'none';
+    }
+    // Show holder tabs if multiple holders
+    if (holderTabs) {
+      const holders = state.holders || [];
+      holderTabs.style.display = holders.length > 1 ? 'flex' : 'none';
     }
     
     // Force re-render dashboard with current data
@@ -107,8 +113,9 @@ window.switchDashTab = function(tab, btn) {
   } else {
     if (portfolioContent) portfolioContent.style.display = 'none';
     if (allPortfoliosContent) allPortfoliosContent.style.display = 'block';
-    // Hide user tabs
+    // Hide user and holder tabs
     if (userTabs) userTabs.style.display = 'none';
+    if (holderTabs) holderTabs.style.display = 'none';
     
     // Render all portfolios
     setTimeout(() => {
@@ -350,6 +357,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const userTabs = document.getElementById('dash-user-tabs');
   if (userTabs) {
     userTabs.style.display = savedTab === 'all-portfolios' ? 'none' : 'flex';
+  }
+  const holderTabs = document.getElementById('dash-holder-tabs');
+  if (holderTabs) {
+    holderTabs.style.display = savedTab === 'all-portfolios' ? 'none' : 'flex';
   }
   
   await new Promise(r => setTimeout(r, 100));

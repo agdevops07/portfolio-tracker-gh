@@ -20,13 +20,82 @@ import {
   setTimeFilter,
 } from './charts.js';
 
-import { getFilteredHoldings } from './fileHandler.js';
+import { getFilteredHoldings, getFilteredHoldingsByHolder } from './fileHandler.js';
 
 // Save current user to sessionStorage
 function saveCurrentUser(user) {
   try {
     sessionStorage.setItem('dashboard_active_user', user);
   } catch(e) {}
+}
+
+// Save current holder to sessionStorage
+function saveCurrentHolder(holder) {
+  try {
+    sessionStorage.setItem('dashboard_active_holder', holder);
+  } catch(e) {}
+}
+
+// Restore saved holder from sessionStorage
+function restoreCurrentHolder() {
+  try {
+    const saved = sessionStorage.getItem('dashboard_active_holder');
+    if (saved && (saved === 'all' || (state.holders && state.holders.includes(saved)))) {
+      return saved;
+    }
+  } catch(e) {}
+  return 'all';
+}
+
+// Render holder filter tabs (hidden when ≤1 holder)
+export function renderHolderTabs() {
+  const holders = state.holders || [];
+  const wrap = document.getElementById('dash-holder-tabs');
+  if (!wrap) return;
+
+  // Hide on All-Portfolios tab or if only 1 holder
+  let currentTab = 'portfolio';
+  try {
+    const savedTab = sessionStorage.getItem('dashboard_current_tab');
+    if (savedTab) currentTab = savedTab;
+  } catch(e) {}
+  const apContent = document.getElementById('dash-tab-all-portfolios');
+  if (apContent && apContent.style.display === 'block') currentTab = 'all-portfolios';
+
+  if (!holders || holders.length <= 1 || currentTab === 'all-portfolios') {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'flex';
+
+  const active = state.activeHolder || 'all';
+
+  const tabs = ['all', ...holders];
+  wrap.innerHTML = tabs.map(h => `
+    <button class="dash-holder-tab${h === active ? ' active' : ''}" data-holder="${h}"
+      onclick="switchDashHolder('${h}')">
+      ${h === 'all' ? '🏦 All Holders' : h}
+    </button>`).join('');
+}
+
+export async function switchDashHolder(holder) {
+  state.activeHolder = holder;
+  saveCurrentHolder(holder);
+
+  // Re-filter holdings respecting BOTH active holder and active user
+  state.holdings = getFilteredHoldingsByHolder(state.rawRows, holder, state.activeUser);
+
+  // Update holder tab UI
+  document.querySelectorAll('.dash-holder-tab').forEach(t => {
+    const isActive = t.dataset.holder === holder;
+    t.classList.toggle('active', isActive);
+    t.style.background = isActive ? 'var(--accent)' : 'var(--bg3)';
+    t.style.color = isActive ? '#fff' : 'var(--text2)';
+  });
+
+  // Rebuild time series for filtered holdings
+  await rebuildTimeSeriesForCurrentUser();
+  renderDashboard();
 }
 
 
@@ -867,13 +936,13 @@ export async function loadDashboard() {
     // CRITICAL: Restore saved user and apply filter
     const savedUser = restoreCurrentUser();
     state.activeUser = savedUser;
+
+    // Restore saved holder
+    const savedHolder = restoreCurrentHolder();
+    state.activeHolder = savedHolder;
     
-    // Filter holdings based on saved user
-    if (savedUser && savedUser !== 'all') {
-      state.holdings = getFilteredHoldings(state.rawRows, savedUser);
-    } else {
-      state.holdings = allHoldings;
-    }
+    // Filter holdings based on saved user AND holder
+    state.holdings = getFilteredHoldingsByHolder(state.rawRows, savedHolder, savedUser);
     
     // CRITICAL: Rebuild time series for the FILTERED holdings only
     // Get histories for filtered holdings
@@ -1428,11 +1497,11 @@ export function renderUserTabs() {
   }
   state.activeUser = active;
   
-  // CRITICAL: Apply the user filter to holdings
+  // CRITICAL: Apply the user filter to holdings (respecting active holder)
   if (active !== 'all') {
-    state.holdings = getFilteredHoldings(state.rawRows, active);
+    state.holdings = getFilteredHoldingsByHolder(state.rawRows, state.activeHolder || 'all', active);
   } else {
-    state.holdings = state.allHoldings || getFilteredHoldings(state.rawRows, 'all');
+    state.holdings = getFilteredHoldingsByHolder(state.rawRows, state.activeHolder || 'all', 'all');
   }
   
   const tabs = ['all', ...users];
@@ -1445,8 +1514,9 @@ export function renderUserTabs() {
 
 export async function switchDashUser(user) {
   state.activeUser = user;
-  saveCurrentUser(user);  // This saves to sessionStorage
-  state.holdings = getFilteredHoldings(state.rawRows, user);
+  saveCurrentUser(user);
+  // Respect active holder when filtering
+  state.holdings = getFilteredHoldingsByHolder(state.rawRows, state.activeHolder || 'all', user);
   
   // Update user tab UI
   document.querySelectorAll('.dash-user-tab').forEach(t => {
@@ -1465,6 +1535,7 @@ export async function switchDashUser(user) {
 
 export function renderDashboard() {
   renderUserTabs();
+  renderHolderTabs();
   const holdings = Object.values(state.holdings);
 
   let totalInvested = 0, totalCurrent = 0, totalPrevClose = 0;

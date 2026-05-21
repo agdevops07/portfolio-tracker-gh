@@ -95,6 +95,39 @@
     background: var(--bg4);
   }
   
+  /* Holder tabs — same pill style as user tabs */
+  .dash-holder-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg3);
+    border-radius: 40px;
+    padding: 4px;
+  }
+  
+  .dash-holder-tab {
+    background: transparent;
+    border: none;
+    color: var(--text3);
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  
+  .dash-holder-tab.active {
+    background: var(--accent2, #8b5cf6);
+    color: white;
+  }
+  
+  .dash-holder-tab:hover:not(.active) {
+    color: var(--text2);
+    background: var(--bg4);
+  }
+
   /* User tabs styling (same pill style as main tabs) */
   .dash-user-tabs {
     display: flex;
@@ -140,6 +173,10 @@
     }
     
     .dash-user-tabs {
+      justify-content: center;
+    }
+    
+    .dash-holder-tabs {
       justify-content: center;
     }
   }
@@ -384,6 +421,7 @@
       <a href="screener.html" class="dash-tab" style="text-decoration:none;">🔍 Stock Search</a>
     </div>
     <div id="dash-user-tabs" class="dash-user-tabs"></div>
+    <div id="dash-holder-tabs" class="dash-holder-tabs" style="display:none;"></div>
   </div>
 
   <div id="dash-loading" class="loading" style="display:flex; justify-content:center; align-items:center; padding:3rem;">

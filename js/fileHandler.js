@@ -20,6 +20,8 @@ function clearPortfolioState() {
   state.allHoldings         = {};
   state.users               = [];
   state.activeUser          = 'all';
+  state.holders             = [];
+  state.activeHolder        = 'all';
   state.portfolioTimeSeries = [];
   state.fullTimeSeries      = [];
   state.histories           = {};
@@ -193,6 +195,9 @@ export async function processCSV(rows) {
     const rawUser = (row.user || row.User || row.USER || '').trim();
     const user = rawUser || 'User 1';
 
+    const rawHolder = (row.holder || row.Holder || row.HOLDER || '').trim();
+    const holder = rawHolder || 'Holder A';
+
     if (!ticker) { errors.push(`Row ${i + 1}: missing ticker`); continue; }
     if (!qty || qty <= 0) { errors.push(`Row ${i + 1}: invalid quantity`); continue; }
     
@@ -200,7 +205,8 @@ export async function processCSV(rows) {
       ticker, qty, avg, 
       date: normalizeDate(date.trim()), 
       upstoxTicker: upstoxTicker || null,
-      user 
+      user,
+      holder,
     });
   }
 
@@ -226,12 +232,17 @@ export async function processCSV(rows) {
   state.users = userSet;
   state.activeUser = 'all';
 
+  const holderSet = [];
+  clean.forEach(r => { if (!holderSet.includes(r.holder)) holderSet.push(r.holder); });
+  state.holders = holderSet;
+  state.activeHolder = 'all';
+
   state.allHoldings = aggregateHoldings(clean);
   state.holdings = state.allHoldings;
 
   const reconstructed = [
-    'ticker,quantity,average_buy_price,buy_date,upstox_ticker,user',
-    ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''},${r.user}`)
+    'ticker,quantity,average_buy_price,buy_date,upstox_ticker,user,holder',
+    ...clean.map(r => `${r.ticker},${r.qty},${r.avg},${r.date || ''},${r.upstoxTicker || ''},${r.user},${r.holder}`)
   ].join('\n');
 
   if (!sessionStorage.getItem('portfolio_csv')) {
@@ -283,4 +294,11 @@ export function aggregateHoldings(rows) {
 export function getFilteredHoldings(rawRows, user) {
   if (!user || user === 'all') return aggregateHoldings(rawRows);
   return aggregateHoldings(rawRows.filter(r => r.user === user));
+}
+
+export function getFilteredHoldingsByHolder(rawRows, holder, user) {
+  let rows = rawRows;
+  if (holder && holder !== 'all') rows = rows.filter(r => r.holder === holder);
+  if (user && user !== 'all') rows = rows.filter(r => r.user === user);
+  return aggregateHoldings(rows);
 }

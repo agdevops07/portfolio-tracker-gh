@@ -4,6 +4,8 @@ export const state = {
   allHoldings: {},        // Feature 3: store all holdings before filtering
   users: [],              // Feature 3: list of unique users
   activeUser: 'all',      // Feature 3: currently selected user
+  holders: [],            // list of unique holders
+  activeHolder: 'all',    // currently selected holder
   priceCache: {},
   historyCache: {},
   dayHistoryCache: {},
