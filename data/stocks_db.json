@@ -26284,9 +26284,9 @@
     {
         "symbol": "VIVIANA",
         "company": "Viviana Power Tech Limited",
-        "exchange": "NSE-SME",
+        "exchange": "NSE",
         "isin": "INE0MEG01014",
-        "yahooTicker": "VIVIANA-SM.NS",
+        "yahooTicker": "VIVIANA.NS",
         "screenerSymbol": "VIVIANA",
         "bseCode": null
     },
