@@ -16,7 +16,7 @@ import {
   isBseOnly,
 } from './dataSourceConfig.js';
 
-const PROXY = 'https://corsproxy.org/?';
+const PROXY = 'https://api.allorigins.win/raw?url=';
 function proxyUrl(url) { return PROXY + encodeURIComponent(url); }
 
 // ── Shared timeout wrapper ───────────────────────────────────
