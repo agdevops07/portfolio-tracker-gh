@@ -16,7 +16,7 @@ import {
   isBseOnly,
 } from './dataSourceConfig.js';
 
-const PROXY = 'https://api.allorigins.win/raw?url=';
+const PROXY = 'https://muddy-leaf-2537.ag-portfolio-tracker.workers.dev/raw?url=';
 function proxyUrl(url) { return PROXY + encodeURIComponent(url); }
 
 // ── Shared timeout wrapper ───────────────────────────────────
