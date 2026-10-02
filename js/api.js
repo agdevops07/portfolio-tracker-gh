@@ -17,7 +17,8 @@ import {
 } from './dataSourceConfig.js';
 
 const PROXY = 'https://muddy-leaf-2537.ag-portfolio-tracker.workers.dev/raw?url=';
-function proxyUrl(url) { return PROXY + encodeURIComponent(url); }
+// Exported so charts.js (and others) use the same Cloudflare Worker proxy
+export function proxyUrl(url) { return PROXY + encodeURIComponent(url); }
 
 // ── Shared timeout wrapper ───────────────────────────────────
 function withTimeout(promise, ms = 8000) {
@@ -43,56 +44,59 @@ function getPreviousWeekday(dateStr) {
 }
 
 // ════════════════════════════════════════════════════════════
-// NSE INDEX HISTORY (benchmarks — always Upstox, no toggle)
+// NSE INDEX HISTORY (benchmarks)
+// Upstox (NSE_INDEX|<name>) via the worker proxy first,
+// then Yahoo Finance index symbols as a fallback.
+//
+// The old version scraped nseindia.com through corsproxy.io. That can't
+// work from a browser (User-Agent / Cookie headers are forbidden and
+// set-cookie is unreadable), and corsproxy.io now returns 401.
 // ════════════════════════════════════════════════════════════
+const YAHOO_INDEX_MAP = {
+  'nifty 50':           '^NSEI',
+  'nifty bank':         '^NSEBANK',
+  'nifty midcap 100':   'NIFTY_MIDCAP_100.NS',
+  'nifty smallcap 100': '^CNXSC',
+  'nifty smallcap 250': 'NIFTYSMLCAP250.NS',
+};
+
 export async function fetchNseIndexHistory(indexName) {
-  const baseUrl = 'https://www.nseindia.com';
-  const proxy = 'https://corsproxy.io/?url=';
+  const bare = indexName.replace(/^NSE_INDEX\|/i, '');
+  const key = `NSE_INDEX|${bare}`;
 
+  // 1) Upstox via worker
   try {
-    const homeResponse = await fetch(proxy + encodeURIComponent(baseUrl + '/'), {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Connection': 'keep-alive',
-      },
-    });
-
-    const cookies = homeResponse.headers.get('set-cookie');
-
-    const apiUrl = `${baseUrl}/api/chart-databyindex?index=${encodeURIComponent(indexName)}`;
-    const dataResponse = await fetch(proxy + encodeURIComponent(apiUrl), {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Referer': baseUrl + '/',
-        'Cookie': cookies || '',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    });
-
-    if (dataResponse.ok) {
-      const data = await dataResponse.json();
-      if (data && data.grapthData && data.grapthData.length > 0) {
-        const series = {};
-        for (const point of data.grapthData) {
-          const date = new Date(point[0]).toISOString().split('T')[0];
-          const price = point[1];
-          const day = new Date(date + 'T12:00:00Z').getUTCDay();
-          if (day !== 0 && day !== 6 && price != null) {
-            series[date] = price;
-          }
-        }
-        return series;
-      }
-    }
-    return null;
-  } catch (error) {
-    console.error(`Failed to fetch NSE index history for ${indexName}:`, error);
-    return null;
+    const series = await fetchHistory(key);
+    if (series && Object.keys(series).length > 0) return series;
+  } catch (e) {
+    console.warn(`[fetchNseIndexHistory] Upstox failed for ${bare}:`, e.message);
   }
+
+  // 2) Yahoo Finance fallback via worker
+  const yahooSym = YAHOO_INDEX_MAP[bare.toLowerCase()];
+  if (yahooSym) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSym)}?interval=1d&range=2y`;
+      const res = await withTimeout(fetch(proxyUrl(url)));
+      if (res.ok) {
+        const data = await res.json();
+        const result = data?.chart?.result?.[0];
+        const timestamps = result?.timestamp || [];
+        const closes = result?.indicators?.quote?.[0]?.close || [];
+        const series = {};
+        timestamps.forEach((ts, i) => {
+          // shift to IST so the date matches the NSE trading day
+          const date = new Date((ts + 19800) * 1000).toISOString().split('T')[0];
+          if (!isWeekend(date) && closes[i] != null) series[date] = closes[i];
+        });
+        if (Object.keys(series).length > 0) return series;
+      }
+    } catch (e) {
+      console.warn(`[fetchNseIndexHistory] Yahoo failed for ${bare}:`, e.message);
+    }
+  }
+
+  return null;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -152,9 +156,8 @@ async function _fetchPriceScreener(ticker) {
   const bseCode = await getBSECode(ticker).catch(() => null);
   const sym = bseCode || rawSym;
 
-  // Cache-bust every 10 s (same cadence as Yahoo) so corsproxy.io and the
-  // browser cache never serve stale HTML. Without this the proxy returns the
-  // same cached page for the entire session.
+  // Cache-bust every 10 s (same cadence as Yahoo) so the proxy and the
+  // browser cache never serve stale HTML.
   const bust = Math.floor(Date.now() / 10000);
 
   const urls = [
@@ -164,8 +167,6 @@ async function _fetchPriceScreener(ticker) {
 
   for (const url of urls) {
     try {
-      // cache: 'no-store' prevents the browser's own HTTP cache from
-      // returning a stale response even when the URL bust param changes.
       const res = await withTimeout(fetch(proxyUrl(url), { cache: 'no-store' }));
       if (!res.ok) continue;
       const html = await res.text();
@@ -181,12 +182,10 @@ async function _fetchPriceScreener(ticker) {
         if (!val) return;
 
         if (label.includes('current price')) {
-          // strip commas and currency symbols
           const clean = val.replace(/[^0-9.]/g, '');
           const n = parseFloat(clean);
           if (n > 0) currentPrice = n;
         }
-        // Some pages expose prev close in ratios
         if (label.includes('previous close') || label.includes('prev. close')) {
           const clean = val.replace(/[^0-9.]/g, '');
           const n = parseFloat(clean);
@@ -219,7 +218,6 @@ async function _fetchPriceScreener(ticker) {
 export async function fetchPrice(ticker) {
   // BSE-only tickers must NOT use the cache — fetchDayHistory may have
   // written a stale Yahoo price into priceCache before this runs.
-  // We always go direct to Screener for BSE-only stocks.
   const bseOnly = isBseOnly(ticker);
 
   if (!bseOnly && state.priceCache[ticker]) return state.priceCache[ticker];
@@ -395,7 +393,7 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
     // Override: always Upstox first
     primary  = 'upstox';
     fallback = 'yahoo';
-    if (forcedUpstox && !isNseIndex) {
+    if (!isNseIndex) {
       console.log(`[fetchHistory] NSE SME detected for ${ticker} — forcing Upstox`);
     }
   }
@@ -433,9 +431,9 @@ export async function fetchHistory(ticker, upstoxTicker, range = '2y') {
     }
   }
 
-  // Both failed
+  // Both failed. Don't cache failures for indices so a later retry can succeed.
   console.error(`[fetchHistory] Both sources failed for ${ticker}`);
-  state.historyCache[key] = {};
+  if (!isNseIndex) state.historyCache[key] = {};
   return {};
 }
 
@@ -493,7 +491,6 @@ export async function fetchDayHistory(ticker, upstoxTicker) {
       series.push({ time: `${hh}:${mm}`, ts: now.getTime(), price: livePrice });
       // BSE-only: do NOT write Yahoo price into priceCache/livePrices.
       // fetchPrice() must run the Screener override on a cold cache.
-      // Writing here would poison the cache and silently bypass Screener.
       if (!isBseOnly(ticker)) {
         state.priceCache[ticker] = livePrice;
         state.livePrices[ticker] = livePrice;

@@ -5,6 +5,7 @@
 import { state } from './state.js';
 import { filterTimeSeries } from './timeSeries.js';
 import { pct, colorPnl } from './utils.js';
+import { proxyUrl } from './api.js';
 
 export const COLORS = [
   '#6366f1', '#22c55e', '#f59e0b', '#ef4444',
@@ -40,7 +41,7 @@ let selectedBenchmarks = new Set();
 
 // ── Benchmark configuration — Yahoo Finance only ──────────────────────────────
 // All historical data (including today via meta.regularMarketPrice) comes from
-// Yahoo Finance. No Upstox dependency for benchmarks at all.
+// Yahoo Finance, fetched through the Cloudflare Worker proxy (see api.js).
 const BENCHMARK_CONFIG = {
   nifty50: {
     name: 'Nifty 50',
@@ -74,11 +75,14 @@ const BENCHMARK_CONFIG = {
   },
 };
 
-// Yahoo Finance CORS proxy — same one already used by the rest of the app
-const YF_PROXY = 'https://corsproxy.io/?url=';
+// Small in-memory cache so a render doesn't hit Yahoo twice per benchmark
+// (getBenchmarkPeriodChange + dataset building both need the same data).
+// Cached for 60 s; failed requests are not cached.
+const _benchCache = {};
+const BENCH_TTL_MS = 60 * 1000;
 
 /**
- * Fetch full daily OHLCV history from Yahoo Finance for a benchmark.
+ * Fetch full daily history from Yahoo Finance for a benchmark, via the worker.
  * Returns { 'YYYY-MM-DD': closePrice, ... } plus today's live price injected
  * via meta.regularMarketPrice — so NO separate intraday call is ever needed.
  *
@@ -88,9 +92,13 @@ async function fetchYahooBenchmarkHistory(benchmark, range = '2y') {
   const config = BENCHMARK_CONFIG[benchmark];
   if (!config) return null;
 
+  const cacheKey = `${benchmark}_${range}`;
+  const cached = _benchCache[cacheKey];
+  if (cached && Date.now() - cached.t < BENCH_TTL_MS) return cached.data;
+
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(config.yahooSymbol)}?interval=1d&range=${range}`;
   try {
-    const res = await fetch(YF_PROXY + encodeURIComponent(url));
+    const res = await fetch(proxyUrl(url));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     const result = json?.chart?.result?.[0];
@@ -111,12 +119,15 @@ async function fetchYahooBenchmarkHistory(benchmark, range = '2y') {
     // Inject today's live price from meta so today's point is always current
     const livePrice = result.meta?.regularMarketPrice;
     if (livePrice) {
-      const todayStr = new Date().toISOString().split('T')[0];
+      // Today's date in IST
+      const todayStr = new Date(Date.now() + 19800 * 1000).toISOString().split('T')[0];
       const dow = new Date(todayStr + 'T12:00:00Z').getUTCDay();
       if (dow !== 0 && dow !== 6) hist[todayStr] = livePrice;
     }
 
-    return Object.keys(hist).length > 0 ? hist : null;
+    const out = Object.keys(hist).length > 0 ? hist : null;
+    if (out) _benchCache[cacheKey] = { t: Date.now(), data: out };
+    return out;
   } catch (e) {
     console.warn(`fetchYahooBenchmarkHistory(${benchmark}) failed:`, e);
     return null;
