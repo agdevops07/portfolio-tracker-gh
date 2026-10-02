@@ -56,8 +56,11 @@ const YAHOO_INDEX_MAP = {
   'nifty 50':           '^NSEI',
   'nifty bank':         '^NSEBANK',
   'nifty midcap 100':   'NIFTY_MIDCAP_100.NS',
+  'nifty midcap 150':   'NIFTYMIDCAP150.NS',     // ← ADD
   'nifty smallcap 100': '^CNXSC',
   'nifty smallcap 250': 'NIFTYSMLCAP250.NS',
+
+  
 };
 
 export async function fetchNseIndexHistory(indexName) {

@@ -55,11 +55,11 @@ const BENCHMARK_CONFIG = {
     color: '#06b6d4',
     shortName: 'Nifty Bank',
   },
-  niftyMidcap100: {
-    name: 'Midcap 100',
-    yahooSymbol: 'NIFTY_MIDCAP_100.NS',
+  niftyMidcap150: {
+    name: 'Midcap 150',
+    yahooSymbol: 'NIFTYMIDCAP150.NS',
     color: '#10b981',
-    shortName: 'Nifty Midcap 100',
+    shortName: 'Nifty Midcap 150',
   },
   niftySmlcap100: {
     name: 'Smlcap 100',
