@@ -47,19 +47,19 @@ const BENCHMARK_CONFIG = {
     name: 'Nifty 50',
     yahooSymbol: '^NSEI',
     color: '#f59e0b',
-    shortName: 'Nifty50',
+    shortName: 'N-50',
   },
   niftyBank: {
     name: 'Nifty Bank',
     yahooSymbol: '^NSEBANK',
     color: '#06b6d4',
-    shortName: 'Nifty Bank',
+    shortName: 'N-Bank',
   },
   niftyMidcap150: {
     name: 'Midcap 150',
     yahooSymbol: 'NIFTYMIDCAP150.NS',
     color: '#10b981',
-    shortName: 'Nifty Midcap 150',
+    shortName: 'MCAP-150',
   },
   niftySmlcap100: {
     name: 'Smlcap 100',
@@ -71,7 +71,7 @@ const BENCHMARK_CONFIG = {
     name: 'Smlcap 250',
     yahooSymbol: 'NIFTYSMLCAP250.NS',
     color: '#a78bfa',
-    shortName: 'S250',
+    shortName: 'SMCAP-250',
   },
 };
 
